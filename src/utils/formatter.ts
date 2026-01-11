@@ -1,17 +1,49 @@
-export function formatNumber(num: number): string {
-  if (num >= 1_000_000_000) {
-    return (num / 1_000_000_000).toFixed(1) + 'B';
+const SUFFIXES = [
+  { value: 1e0, suffix: '' },
+  { value: 1e3, suffix: 'K' },      // Thousand
+  { value: 1e6, suffix: 'M' },      // Million
+  { value: 1e9, suffix: 'B' },      // Billion
+  { value: 1e12, suffix: 'T' },     // Trillion
+  { value: 1e15, suffix: 'Qa' },    // Quadrillion
+  { value: 1e18, suffix: 'Qi' },    // Quintillion
+  { value: 1e21, suffix: 'Sx' },    // Sextillion
+  { value: 1e24, suffix: 'Sp' },    // Septillion
+  { value: 1e27, suffix: 'Oc' },    // Octillion
+  { value: 1e30, suffix: 'No' },    // Nonillion
+  { value: 1e33, suffix: 'Dc' },    // Decillion
+  { value: 1e36, suffix: 'Ud' },    // Undecillion
+  { value: 1e39, suffix: 'Dd' },    // Duodecillion
+  { value: 1e42, suffix: 'Td' },    // Tredecillion
+  { value: 1e45, suffix: 'Qad' },   // Quattuordecillion
+  { value: 1e48, suffix: 'Qid' },   // Quindecillion
+  { value: 1e51, suffix: 'Sxd' },   // Sexdecillion
+  { value: 1e54, suffix: 'Spd' },   // Septendecillion
+  { value: 1e57, suffix: 'Ocd' },   // Octodecillion
+  { value: 1e60, suffix: 'Nod' },   // Novemdecillion
+  { value: 1e63, suffix: 'Vg' },    // Vigintillion
+];
+
+export function formatNumber(num: number, decimals: number = 3): string {
+  if (num < 0) {
+    return '-' + formatNumber(-num, decimals);
   }
-  if (num >= 1_000_000) {
-    return (num / 1_000_000).toFixed(1) + 'M';
+
+  if (num < 1000) {
+    return Math.floor(num).toLocaleString();
   }
-  if (num >= 10_000) {
-    return (num / 1_000).toFixed(1) + 'k';
+
+  // Find appropriate suffix
+  for (let i = SUFFIXES.length - 1; i >= 0; i--) {
+    const { value, suffix } = SUFFIXES[i];
+    if (num >= value) {
+      const formatted = (num / value).toFixed(decimals);
+      // Remove trailing zeros and decimal point if not needed
+      const cleaned = formatted.replace(/\.?0+$/, '');
+      return cleaned + suffix;
+    }
   }
-  if (num >= 1_000) {
-    return (num / 1_000).toFixed(2) + 'k';
-  }
-  return Math.floor(num).toString();
+
+  return num.toFixed(0);
 }
 
 export function formatTime(seconds: number): string {

@@ -1,5 +1,5 @@
 interface MainButtonProps {
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
   disabled: boolean;
   distortionLevel: number;
 }

@@ -6,6 +6,7 @@ import { getSubstance, getSubstanceCost } from './game/substances';
 import { getAction } from './game/maintenance';
 import { checkAchievements, getAchievement } from './game/achievements';
 import { calculateExperience, getKnowledgeLevel } from './game/prestige';
+import { formatNumber } from './utils/formatter';
 import { StatPanel } from './components/StatPanel';
 import { MainButton } from './components/MainButton';
 import { SubstanceShop } from './components/SubstanceShop';
@@ -15,6 +16,7 @@ import { LogPanel } from './components/LogPanel';
 import { DisclaimerModal } from './components/DisclaimerModal';
 import { NightEndModal } from './components/NightEndModal';
 import { SettingsModal } from './components/SettingsModal';
+import { FloatingNumber } from './components/FloatingNumber';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -41,6 +43,7 @@ function App() {
 
   const [showNightEnd, setShowNightEnd] = useState(false);
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
+  const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
 
   // Save to localStorage whenever state changes
   useEffect(() => {
@@ -99,12 +102,17 @@ function App() {
     }
   }, [achievementQueue]);
 
-  const handleMainClick = useCallback(() => {
+  const handleFloatingNumberComplete = useCallback((id: string) => {
+    setFloatingNumbers(prev => prev.filter(fn => fn.id !== id));
+  }, []);
+
+  const handleMainClick = useCallback((event: React.MouseEvent) => {
     setState(prevState => {
       if (!prevState.isNightActive || prevState.energy < 5) return prevState;
 
       const newState = { ...prevState };
-      newState.vibes += 10;
+      const vibesGained = 10;
+      newState.vibes += vibesGained;
       newState.energy -= 5;
       newState.chaos += Math.random() * 3;
 
@@ -113,6 +121,14 @@ function App() {
         message: 'Running the night. Vibes +10',
         type: 'info',
       });
+
+      // Create floating number
+      setFloatingNumbers(prev => [...prev, {
+        id: Date.now().toString() + Math.random(),
+        value: vibesGained,
+        x: event.clientX,
+        y: event.clientY,
+      }]);
 
       return newState;
     });
@@ -269,12 +285,12 @@ function App() {
         <div className="left-panel">
           <div className="vibes-display">
             <div className="vibes-label">VIBES</div>
-            <div className="vibes-value">{Math.floor(state.vibes).toLocaleString()}</div>
+            <div className="vibes-value">{formatNumber(state.vibes)}</div>
             <div className="vibes-per-second">
-              per second: {Object.entries(state.substances).reduce((total, [id, count]) => {
+              per second: {formatNumber(Object.entries(state.substances).reduce((total, [id, count]) => {
                 const substance = getSubstance(id);
                 return total + (substance ? substance.baseVibes * count : 0);
-              }, 0).toFixed(1)}
+              }, 0), 1)}
             </div>
           </div>
 
@@ -325,6 +341,18 @@ function App() {
           })}
         </div>
       )}
+
+      {/* Floating numbers on click */}
+      {floatingNumbers.map(fn => (
+        <FloatingNumber
+          key={fn.id}
+          id={fn.id}
+          value={fn.value}
+          x={fn.x}
+          y={fn.y}
+          onComplete={handleFloatingNumberComplete}
+        />
+      ))}
 
       {!state.hasSeenDisclaimer && <DisclaimerModal onAccept={handleDisclaimerAccept} />}
 
