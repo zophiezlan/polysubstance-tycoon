@@ -1,0 +1,41 @@
+.floating-number {
+  position: fixed;
+  pointer-events: none;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--success);
+  text-shadow: 0 0 10px var(--success), 0 0 20px var(--success);
+  font-family: 'Courier New', monospace;
+  animation: float-up 1s ease-out forwards;
+  z-index: 1000;
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.8);
+  }
+}
+
+/* Reduced motion variant */
+.reduced-motion .floating-number {
+  animation: float-up-simple 1s ease-out forwards;
+}
+
+@keyframes float-up-simple {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}

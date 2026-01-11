@@ -17,11 +17,14 @@ export function createInitialState(): GameState {
 
     // Ownership
     substances: {},
+    upgrades: [],
 
     // Meta progression
     experience: 0,
     knowledgeLevel: 0,
     nightsCompleted: 0,
+    daysCompleted: 0,
+    totalVibesEarned: 0,
     achievements: [],
 
     // Runtime flags
@@ -57,11 +60,18 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.experience = persistentState.experience || 0;
   newState.knowledgeLevel = persistentState.knowledgeLevel || 0;
   newState.nightsCompleted = persistentState.nightsCompleted || 0;
+  newState.daysCompleted = persistentState.daysCompleted || 0;
+  newState.totalVibesEarned = persistentState.totalVibesEarned || 0;
   newState.achievements = persistentState.achievements || [];
+  newState.upgrades = persistentState.upgrades || [];
   newState.hasSeenDisclaimer = persistentState.hasSeenDisclaimer || false;
   newState.disableDistortion = persistentState.disableDistortion || false;
   newState.reducedMotion = persistentState.reducedMotion || false;
   newState.fontSize = persistentState.fontSize || 'default';
+
+  // Preserve vibes and substances for endless mode
+  newState.vibes = persistentState.vibes || 0;
+  newState.substances = persistentState.substances || {};
 
   // Apply sleep debt penalty from previous night
   if (persistentState.sleepDebt && persistentState.sleepDebt > 0) {

@@ -15,11 +15,14 @@ export interface GameState {
 
   // Ownership
   substances: Record<string, number>; // substanceId -> count owned
+  upgrades: string[]; // IDs of purchased upgrades
 
   // Meta progression
   experience: number;
   knowledgeLevel: number;
   nightsCompleted: number;
+  daysCompleted: number;
+  totalVibesEarned: number; // Lifetime vibes for achievements
   achievements: string[]; // IDs of unlocked achievements
 
   // Runtime flags
@@ -112,4 +115,27 @@ export interface KnowledgeLevel {
   name: string;
   description: string;
   unlocks: string[];
+}
+
+export interface Upgrade {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  tier: number; // For organizing in UI (1-5)
+  substanceId?: string; // If specific to a substance
+  effects: {
+    clickPower?: number; // Additive bonus to clicks (e.g., 5 = +5 vibes per click)
+    clickMultiplier?: number; // Multiplicative bonus (e.g., 2 = double clicks)
+    productionMultiplier?: number; // Multiplier for specific substance
+    globalProductionMultiplier?: number; // Multiplier for all substances
+    energyCostReduction?: number; // Reduce click energy cost (e.g., 0.5 = half cost)
+    chaosDampening?: number; // Reduce chaos generation (e.g., 0.5 = half chaos)
+  };
+  requirement?: {
+    substanceOwned?: { id: string; count: number };
+    totalVibes?: number;
+    nightsCompleted?: number;
+    upgradeOwned?: string; // Requires another upgrade first
+  };
 }

@@ -6,15 +6,20 @@ import { getSubstance, getSubstanceCost } from './game/substances';
 import { getAction } from './game/maintenance';
 import { checkAchievements, getAchievement } from './game/achievements';
 import { calculateExperience, getKnowledgeLevel } from './game/prestige';
+import { formatNumber } from './utils/formatter';
 import { StatPanel } from './components/StatPanel';
 import { MainButton } from './components/MainButton';
 import { SubstanceShop } from './components/SubstanceShop';
+import { UpgradeShop } from './components/UpgradeShop';
 import { MaintenancePanel } from './components/MaintenancePanel';
 import { HiddenMeters } from './components/HiddenMeters';
 import { LogPanel } from './components/LogPanel';
 import { DisclaimerModal } from './components/DisclaimerModal';
 import { NightEndModal } from './components/NightEndModal';
 import { SettingsModal } from './components/SettingsModal';
+import { FloatingNumber } from './components/FloatingNumber';
+import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
+import { calculateClickPower, calculateEnergyCost, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -41,6 +46,7 @@ function App() {
 
   const [showNightEnd, setShowNightEnd] = useState(false);
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
+  const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
 
   // Save to localStorage whenever state changes
   useEffect(() => {
@@ -99,20 +105,62 @@ function App() {
     }
   }, [achievementQueue]);
 
-  const handleMainClick = useCallback(() => {
+  const handleFloatingNumberComplete = useCallback((id: string) => {
+    setFloatingNumbers(prev => prev.filter(fn => fn.id !== id));
+  }, []);
+
+  const handleMainClick = useCallback((event: React.MouseEvent) => {
     setState(prevState => {
-      if (!prevState.isNightActive || prevState.energy < 5) return prevState;
+      if (!prevState.isNightActive) return prevState;
 
       const newState = { ...prevState };
-      newState.vibes += 10;
-      newState.energy -= 5;
-      newState.chaos += Math.random() * 3;
+      const energyCost = calculateEnergyCost(prevState);
+      const baseClickPower = calculateClickPower(prevState);
+
+      // Low energy reduces efficiency but never blocks clicking
+      let vibesGained = baseClickPower;
+      let energyPenalty = 1;
+
+      if (newState.energy < energyCost) {
+        // Can still click at low energy, but reduced efficiency
+        energyPenalty = Math.max(0.3, newState.energy / energyCost);
+        vibesGained = Math.floor(baseClickPower * energyPenalty);
+      } else {
+        // Normal energy cost
+        newState.energy -= energyCost;
+      }
+
+      // Minimum 1 vibe per click - dopamine must flow
+      vibesGained = Math.max(1, vibesGained);
+
+      newState.vibes += vibesGained;
+      newState.totalVibesEarned += vibesGained;
+
+      const chaosIncrease = Math.random() * 3 * (1 - calculateChaosDampening(prevState));
+      newState.chaos += chaosIncrease;
+
+      // Lore-appropriate messages based on state
+      let message = 'Running the night.';
+      if (energyPenalty < 1) {
+        message = 'Pushing through exhaustion.';
+      }
+      if (newState.chaos > 80) {
+        message = 'Everything is fine.';
+      }
 
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: 'Running the night. Vibes +10',
-        type: 'info',
+        message: `${message} Vibes +${vibesGained}`,
+        type: energyPenalty < 0.5 ? 'warning' : 'info',
       });
+
+      // Create floating number
+      setFloatingNumbers(prev => [...prev, {
+        id: Date.now().toString() + Math.random(),
+        value: vibesGained,
+        x: event.clientX,
+        y: event.clientY,
+      }]);
 
       return newState;
     });
@@ -140,6 +188,27 @@ function App() {
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
         message: `Purchased ${substance.name} (x${owned + 1})`,
+        type: 'info',
+      });
+
+      return newState;
+    });
+  }, []);
+
+  const handlePurchaseUpgrade = useCallback((upgradeId: string) => {
+    setState(prevState => {
+      const upgrade = getUpgrade(upgradeId);
+      if (!upgrade) return prevState;
+
+      if (!canPurchaseUpgrade(upgrade, prevState)) return prevState;
+
+      const newState = { ...prevState };
+      newState.vibes -= upgrade.cost;
+      newState.upgrades.push(upgradeId);
+
+      newState.log.push({
+        timestamp: 3600 - newState.timeRemaining,
+        message: `🔬 Unlocked: ${upgrade.name}`,
         type: 'info',
       });
 
@@ -199,7 +268,12 @@ function App() {
         experience: newTotalXP,
         knowledgeLevel: newLevel,
         nightsCompleted: prevState.nightsCompleted + 1,
+        daysCompleted: prevState.daysCompleted + 1,
+        totalVibesEarned: prevState.totalVibesEarned,
         achievements: prevState.achievements,
+        upgrades: prevState.upgrades,
+        vibes: prevState.vibes,
+        substances: prevState.substances,
         hasSeenDisclaimer: prevState.hasSeenDisclaimer,
         disableDistortion: prevState.disableDistortion,
         reducedMotion: prevState.reducedMotion,
@@ -265,30 +339,57 @@ function App() {
       </header>
 
       <main className="app-main">
-        <section className="stats-section">
-          <StatPanel state={state} />
-          <HiddenMeters state={state} />
-        </section>
+        {/* Left Panel - Big Clicker & Vibes */}
+        <div className="left-panel">
+          <div className="vibes-display">
+            <div className="vibes-label">VIBES</div>
+            <div className="vibes-value">{formatNumber(state.vibes)}</div>
+            <div className="vibes-per-second">
+              per second: {formatNumber(Object.entries(state.substances).reduce((total, [id, count]) => {
+                const substance = getSubstance(id);
+                if (!substance) return total;
+                const multiplier = calculateProductionMultiplier(state, id);
+                return total + (substance.baseVibes * count * multiplier);
+              }, 0), 1)}
+            </div>
+          </div>
 
-        <section className="main-action-section">
-          <MainButton
-            onClick={handleMainClick}
-            disabled={!state.isNightActive || state.energy < 5}
-            distortionLevel={state.distortionLevel}
-          />
-        </section>
+          <div className="main-action-container">
+            <MainButton
+              onClick={handleMainClick}
+              disabled={!state.isNightActive}
+              distortionLevel={state.distortionLevel}
+            />
+          </div>
+        </div>
 
-        <section className="shop-section">
-          <SubstanceShop state={state} onPurchase={handlePurchase} />
-        </section>
+        {/* Right Panel - Stats & Scrollable Content */}
+        <div className="right-panel">
+          {/* Fixed Stats at Top */}
+          <section className="stats-section">
+            <StatPanel state={state} />
+            <HiddenMeters state={state} />
+          </section>
 
-        <section className="maintenance-section">
-          <MaintenancePanel state={state} onAction={handleMaintenance} />
-        </section>
+          {/* Scrollable Content Area */}
+          <div className="scrollable-content">
+            <section className="shop-section">
+              <SubstanceShop state={state} onPurchase={handlePurchase} />
+            </section>
 
-        <section className="log-section">
-          <LogPanel state={state} />
-        </section>
+            <section className="upgrade-section">
+              <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+            </section>
+
+            <section className="maintenance-section">
+              <MaintenancePanel state={state} onAction={handleMaintenance} />
+            </section>
+
+            <section className="log-section">
+              <LogPanel state={state} />
+            </section>
+          </div>
+        </div>
       </main>
 
       {achievementQueue.length > 0 && (
@@ -304,6 +405,18 @@ function App() {
           })}
         </div>
       )}
+
+      {/* Floating numbers on click */}
+      {floatingNumbers.map(fn => (
+        <FloatingNumber
+          key={fn.id}
+          id={fn.id}
+          value={fn.value}
+          x={fn.x}
+          y={fn.y}
+          onComplete={handleFloatingNumberComplete}
+        />
+      ))}
 
       {!state.hasSeenDisclaimer && <DisclaimerModal onAccept={handleDisclaimerAccept} />}
 

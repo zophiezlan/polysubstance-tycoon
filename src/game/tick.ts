@@ -5,6 +5,7 @@ import {
   getAlcoholAmplification,
   getStimulantEnergyMod,
 } from './interactions';
+import { calculateProductionMultiplier } from './upgradeEffects';
 
 export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!state.isNightActive) {
@@ -39,7 +40,10 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     const substance = getSubstance(substanceId);
     if (!substance) return;
 
-    totalVibesPerSec += substance.baseVibes * count;
+    // Apply upgrade multipliers to production
+    const productionMultiplier = calculateProductionMultiplier(newState, substanceId);
+
+    totalVibesPerSec += substance.baseVibes * count * productionMultiplier;
     totalEnergyMod += substance.energyMod * count;
     totalChaosMod += substance.chaosMod * count;
     totalStrainMod += substance.strainMod * count;
@@ -58,7 +62,9 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   // Apply vibe multiplier from interactions
   totalVibesPerSec *= interactions.vibesMultiplier;
 
-  newState.vibes += totalVibesPerSec * dt;
+  const vibesGained = totalVibesPerSec * dt;
+  newState.vibes += vibesGained;
+  newState.totalVibesEarned += vibesGained;
 
   // 2. Apply energy changes
   newState.energy += totalEnergyMod * dt;
