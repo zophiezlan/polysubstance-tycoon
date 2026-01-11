@@ -65,6 +65,8 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   const vibesGained = totalVibesPerSec * dt;
   newState.vibes += vibesGained;
   newState.totalVibesEarned += vibesGained;
+  newState.timePlayed += dt;
+  newState.highestVibesPerSecond = Math.max(newState.highestVibesPerSecond, totalVibesPerSec);
 
   // 2. Apply energy changes
   newState.energy += totalEnergyMod * dt;
