@@ -1,19 +1,20 @@
+/* Root App Container - Full Height */
 .app {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Header */
+/* Header - Fixed at Top */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
+  padding: 0.75rem 1.5rem;
   background: var(--bg-panel);
-  border: 2px solid var(--purple);
-  border-radius: 8px;
+  border-bottom: 2px solid var(--purple);
+  flex-shrink: 0;
 }
 
 .app-header h1 {
@@ -36,17 +37,102 @@
   box-shadow: 0 0 10px var(--purple);
 }
 
-/* Main layout */
+/* Main Layout - Two Panels Side-by-Side */
 .app-main {
-  display: grid;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Left Panel - Big Clicker */
+.left-panel {
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-panel);
+  border: 2px solid var(--purple);
+  border-radius: 8px;
+  padding: 2rem;
+  position: relative;
+}
+
+/* Vibes Display */
+.vibes-display {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.vibes-label {
+  font-size: 1.2rem;
+  color: var(--text-cyan);
+  text-shadow: 0 0 10px var(--text-cyan);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.vibes-value {
+  font-size: 4rem;
+  font-weight: bold;
+  color: var(--success);
+  text-shadow: 0 0 20px var(--success);
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+}
+
+.vibes-per-second {
+  font-size: 1rem;
+  color: var(--text-cyan);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Main Action Container */
+.main-action-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Right Panel - Stats & Scrollable Content */
+.right-panel {
+  flex: 0 0 55%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   gap: 1rem;
 }
 
+/* Stats Section - Fixed at Top of Right Panel */
+.stats-section {
+  background: var(--bg-panel);
+  padding: 1rem;
+  border: 2px solid var(--purple);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* Scrollable Content Area */
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-right: 0.5rem;
+}
+
+/* Section Styling */
 section {
   background: var(--bg-panel);
   padding: 1rem;
   border: 1px solid var(--purple);
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 /* Stat Panel */
@@ -138,34 +224,44 @@ section {
   margin-top: 0.25rem;
 }
 
-/* Main Button */
-.main-action-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 120px;
-}
-
+/* Main Button - Massive Cookie Clicker Style */
 .main-button {
-  font-size: 1.5rem;
+  width: 300px;
+  height: 300px;
+  font-size: 2rem;
   font-weight: bold;
-  padding: 1.5rem 3rem;
   background: linear-gradient(135deg, var(--purple), var(--purple-light));
   color: var(--text-white);
-  border: 2px solid var(--text-cyan);
-  border-radius: 8px;
-  text-shadow: 0 0 5px var(--text-cyan);
-  box-shadow: 0 0 20px var(--purple);
-  transition: all 0.2s;
+  border: 4px solid var(--text-cyan);
+  border-radius: 50%;
+  text-shadow: 0 0 10px var(--text-cyan);
+  box-shadow: 0 0 40px var(--purple), inset 0 0 40px rgba(107, 76, 154, 0.3);
+  transition: all 0.15s;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  line-height: 1.3;
 }
 
 .main-button:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px var(--text-cyan);
+  transform: scale(1.08);
+  box-shadow: 0 0 60px var(--text-cyan), inset 0 0 60px rgba(0, 255, 255, 0.2);
+  border-color: var(--success);
 }
 
 .main-button:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(0.95);
+  box-shadow: 0 0 30px var(--purple), inset 0 0 30px rgba(107, 76, 154, 0.5);
+}
+
+.main-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 
 /* Distortion effects on main button */
@@ -175,7 +271,8 @@ section {
 
 .main-button.distorted-3 {
   animation: intense-wobble 1s infinite;
-  text-shadow: 0 0 10px var(--danger);
+  text-shadow: 0 0 20px var(--danger);
+  border-color: var(--danger);
 }
 
 @keyframes subtle-wobble {
@@ -683,17 +780,33 @@ section {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .app {
+  .app-main {
+    flex-direction: column;
     padding: 0.5rem;
+  }
+
+  .left-panel {
+    flex: 0 0 auto;
+    padding: 1rem;
+  }
+
+  .right-panel {
+    flex: 1;
+  }
+
+  .vibes-value {
+    font-size: 3rem;
+  }
+
+  .main-button {
+    width: 250px;
+    height: 250px;
+    font-size: 1.5rem;
+    padding: 1.5rem;
   }
 
   .app-header h1 {
     font-size: 1.2rem;
-  }
-
-  .main-button {
-    font-size: 1.2rem;
-    padding: 1rem 2rem;
   }
 
   .achievement-toast {
@@ -703,6 +816,10 @@ section {
 
   .modal {
     padding: 1.5rem;
+  }
+
+  .scrollable-content {
+    max-height: 50vh;
   }
 }
 

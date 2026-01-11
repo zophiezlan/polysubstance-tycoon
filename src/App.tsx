@@ -265,30 +265,51 @@ function App() {
       </header>
 
       <main className="app-main">
-        <section className="stats-section">
-          <StatPanel state={state} />
-          <HiddenMeters state={state} />
-        </section>
+        {/* Left Panel - Big Clicker & Vibes */}
+        <div className="left-panel">
+          <div className="vibes-display">
+            <div className="vibes-label">VIBES</div>
+            <div className="vibes-value">{Math.floor(state.vibes).toLocaleString()}</div>
+            <div className="vibes-per-second">
+              per second: {Object.entries(state.substances).reduce((total, [id, count]) => {
+                const substance = getSubstance(id);
+                return total + (substance ? substance.baseVibes * count : 0);
+              }, 0).toFixed(1)}
+            </div>
+          </div>
 
-        <section className="main-action-section">
-          <MainButton
-            onClick={handleMainClick}
-            disabled={!state.isNightActive || state.energy < 5}
-            distortionLevel={state.distortionLevel}
-          />
-        </section>
+          <div className="main-action-container">
+            <MainButton
+              onClick={handleMainClick}
+              disabled={!state.isNightActive || state.energy < 5}
+              distortionLevel={state.distortionLevel}
+            />
+          </div>
+        </div>
 
-        <section className="shop-section">
-          <SubstanceShop state={state} onPurchase={handlePurchase} />
-        </section>
+        {/* Right Panel - Stats & Scrollable Content */}
+        <div className="right-panel">
+          {/* Fixed Stats at Top */}
+          <section className="stats-section">
+            <StatPanel state={state} />
+            <HiddenMeters state={state} />
+          </section>
 
-        <section className="maintenance-section">
-          <MaintenancePanel state={state} onAction={handleMaintenance} />
-        </section>
+          {/* Scrollable Content Area */}
+          <div className="scrollable-content">
+            <section className="shop-section">
+              <SubstanceShop state={state} onPurchase={handlePurchase} />
+            </section>
 
-        <section className="log-section">
-          <LogPanel state={state} />
-        </section>
+            <section className="maintenance-section">
+              <MaintenancePanel state={state} onAction={handleMaintenance} />
+            </section>
+
+            <section className="log-section">
+              <LogPanel state={state} />
+            </section>
+          </div>
+        </div>
       </main>
 
       {achievementQueue.length > 0 && (

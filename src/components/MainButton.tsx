@@ -6,17 +6,17 @@ interface MainButtonProps {
 
 export function MainButton({ onClick, disabled, distortionLevel }: MainButtonProps) {
   const buttonTexts = [
-    'RUN THE NIGHT',
-    'MAXIMIZE VIBES',
-    'OPTIMIZE EXPERIENCE',
-    'GENERATE VALUE',
+    '🌃 RUN THE NIGHT 🌃',
+    '✨ MAXIMIZE VIBES ✨',
+    '🎯 OPTIMIZE EXPERIENCE 🎯',
+    '💎 GENERATE VALUE 💎',
   ];
 
   const distortedTexts = [
-    'EVERYTHING IS FINE',
-    'KEEP GOING',
-    'YOU\'RE DOING GREAT',
-    'NO PROBLEMS HERE',
+    '✅ EVERYTHING IS FINE ✅',
+    '🔥 KEEP GOING 🔥',
+    '⭐ YOU\'RE DOING GREAT ⭐',
+    '👍 NO PROBLEMS HERE 👍',
   ];
 
   const text = distortionLevel >= 2 && Math.random() > 0.7
