@@ -11,14 +11,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   background: var(--bg-panel);
   border-bottom: 2px solid var(--purple);
   flex-shrink: 0;
 }
 
 .app-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: var(--text-cyan);
   text-shadow: 0 0 10px var(--text-cyan);
   font-family: 'Courier New', monospace;
@@ -27,8 +27,9 @@
 .settings-button {
   background: var(--purple);
   color: var(--text-white);
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 4px;
+  font-size: 0.9rem;
   transition: all 0.2s;
 }
 
@@ -42,13 +43,13 @@
   display: flex;
   flex: 1;
   overflow: hidden;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.5rem;
+  padding: 0.5rem;
 }
 
 /* Left Panel - Big Clicker */
 .left-panel {
-  flex: 0 0 45%;
+  flex: 0 0 40%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,26 +57,26 @@
   background: var(--bg-panel);
   border: 2px solid var(--purple);
   border-radius: 8px;
-  padding: 2rem;
+  padding: 1rem;
   position: relative;
 }
 
 /* Vibes Display */
 .vibes-display {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .vibes-label {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--text-cyan);
   text-shadow: 0 0 10px var(--text-cyan);
   font-family: 'Courier New', monospace;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .vibes-value {
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: bold;
   color: var(--success);
   text-shadow: 0 0 20px var(--success);
@@ -84,9 +85,9 @@
 }
 
 .vibes-per-second {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--text-cyan);
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
   font-style: italic;
 }
 
@@ -99,17 +100,17 @@
 
 /* Right Panel - Stats & Scrollable Content */
 .right-panel {
-  flex: 0 0 55%;
+  flex: 0 0 60%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 /* Stats Section - Fixed at Top of Right Panel */
 .stats-section {
   background: var(--bg-panel);
-  padding: 1rem;
+  padding: 0.75rem;
   border: 2px solid var(--purple);
   border-radius: 8px;
   flex-shrink: 0;
@@ -122,14 +123,14 @@
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding-right: 0.5rem;
+  gap: 0.5rem;
+  padding-right: 0.3rem;
 }
 
 /* Section Styling */
 section {
   background: var(--bg-panel);
-  padding: 1rem;
+  padding: 0.75rem;
   border: 1px solid var(--purple);
   border-radius: 8px;
   flex-shrink: 0;
@@ -139,7 +140,7 @@ section {
 .stat-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .stat-row {
@@ -151,18 +152,18 @@ section {
 
 .stat-label {
   color: var(--text-cyan);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .stat-value {
   font-family: 'Courier New', monospace;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 .stat-value.vibes {
   color: var(--success);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .stat-value.time {
@@ -177,13 +178,13 @@ section {
 .stat-bar-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
   color: var(--text-cyan);
 }
 
 .stat-bar {
-  height: 20px;
+  height: 16px;
   background: var(--bg-dark);
   border: 1px solid var(--purple);
   border-radius: 4px;
@@ -226,9 +227,9 @@ section {
 
 /* Main Button - Massive Cookie Clicker Style */
 .main-button {
-  width: 300px;
-  height: 300px;
-  font-size: 2rem;
+  width: 240px;
+  height: 240px;
+  font-size: 1.6rem;
   font-weight: bold;
   background: linear-gradient(135deg, var(--purple), var(--purple-light));
   color: var(--text-white);
@@ -243,7 +244,7 @@ section {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 2rem;
+  padding: 1.5rem;
   line-height: 1.3;
 }
 
@@ -295,18 +296,18 @@ section {
 .hidden-meters h3,
 .log-panel h3 {
   color: var(--text-cyan);
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
 }
 
 .substance-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .substance-item {
-  padding: 0.75rem;
+  padding: 0.6rem;
   background: var(--bg-dark);
   border: 1px solid var(--purple-dark);
   border-radius: 4px;
@@ -316,25 +317,26 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .substance-name {
   color: var(--text-white);
   font-weight: bold;
+  font-size: 0.95rem;
 }
 
 .owned-count {
   color: var(--text-cyan);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .buy-button {
   background: var(--purple);
   color: var(--text-white);
-  padding: 0.4rem 0.8rem;
+  padding: 0.35rem 0.7rem;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all 0.2s;
 }
 
@@ -344,17 +346,17 @@ section {
 }
 
 .substance-tagline {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--warning);
   font-style: italic;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .substance-effects {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.8rem;
+  gap: 0.4rem;
+  font-size: 0.75rem;
 }
 
 .substance-effects span {
@@ -399,11 +401,11 @@ section {
 .upgrade-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .upgrade-item {
-  padding: 0.75rem;
+  padding: 0.6rem;
   background: var(--bg-dark);
   border: 1px solid var(--text-cyan);
   border-radius: 4px;
@@ -413,36 +415,37 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .upgrade-name {
   color: var(--text-white);
   font-weight: bold;
+  font-size: 0.95rem;
 }
 
 .upgrade-tier {
   color: var(--text-cyan);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: normal;
 }
 
 .upgrade-description {
   color: var(--text-white);
   font-style: italic;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
 }
 
 .upgrade-effects {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.8rem;
+  gap: 0.4rem;
+  font-size: 0.75rem;
 }
 
 .upgrade-effects span {
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 3px;
   background: rgba(0, 255, 255, 0.2);
 }
@@ -451,37 +454,40 @@ section {
   color: var(--text-white);
   font-style: italic;
   text-align: center;
-  padding: 1rem;
+  padding: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .more-upgrades {
   color: var(--text-cyan);
   font-style: italic;
   text-align: center;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
+  margin-top: 0.3rem;
+  padding: 0.3rem;
+  font-size: 0.85rem;
 }
 
 /* Maintenance Panel */
 .maintenance-actions {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .maintenance-action {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 
 .maintenance-button {
   background: var(--purple-dark);
   color: var(--text-white);
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 0.8rem;
   border-radius: 4px;
   text-align: left;
   transition: all 0.2s;
   border: 1px solid var(--purple);
+  font-size: 0.9rem;
 }
 
 .maintenance-button:hover:not(:disabled) {
@@ -490,32 +496,32 @@ section {
 }
 
 .action-description {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-cyan);
   font-style: italic;
-  padding-left: 1rem;
+  padding-left: 0.8rem;
 }
 
 /* Hidden Meters */
 .hidden-meters {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 /* Log Panel */
 .log-entries {
-  max-height: 300px;
+  max-height: 250px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .log-entry {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.4rem;
+  gap: 0.4rem;
+  padding: 0.3rem;
   border-left: 2px solid var(--purple);
   background: rgba(107, 76, 154, 0.1);
 }
