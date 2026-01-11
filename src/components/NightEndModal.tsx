@@ -16,6 +16,8 @@ export function NightEndModal({ state, onNewNight }: NightEndModalProps) {
 
   const canRemember = state.memoryIntegrity > 10;
 
+  const nextDay = state.daysCompleted + 1;
+
   return (
     <div className="modal-overlay">
       <div className="modal night-end-modal">
@@ -23,9 +25,24 @@ export function NightEndModal({ state, onNewNight }: NightEndModalProps) {
 
         {canRemember ? (
           <div className="modal-content">
+            <div className="day-transition">
+              <h3>☀️ Day {nextDay} Begins</h3>
+              <p className="day-message">
+                {nextDay === 1 && 'The night is over. The cycle continues.'}
+                {nextDay === 2 && 'Night 2 awaits. You know what you\'re doing now.'}
+                {nextDay === 3 && 'Third night. The vibes are accumulating.'}
+                {nextDay >= 4 && `Night ${nextDay}. How far can you push it?`}
+              </p>
+            </div>
+
             <div className="summary-stat">
-              <span>Final Vibes:</span>
+              <span>Current Vibes:</span>
               <span className="stat-value">{formatNumber(state.vibes)}</span>
+            </div>
+
+            <div className="summary-stat">
+              <span>Lifetime Vibes Earned:</span>
+              <span className="stat-value">{formatNumber(state.totalVibesEarned)}</span>
             </div>
 
             {state.hasCollapsed && (
@@ -61,7 +78,9 @@ export function NightEndModal({ state, onNewNight }: NightEndModalProps) {
 
             <div className="night-stats">
               <div>Nights completed: {state.nightsCompleted + 1}</div>
+              <div>Days completed: {nextDay - 1}</div>
               <div>Achievements unlocked: {state.achievements.length}</div>
+              <div>Upgrades owned: {state.upgrades.length}</div>
             </div>
           </div>
         ) : (

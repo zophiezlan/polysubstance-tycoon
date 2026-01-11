@@ -288,8 +288,9 @@ section {
   75% { transform: rotate(0.5deg) scale(1.01); }
 }
 
-/* Substance Shop */
+/* Substance Shop and Upgrade Shop */
 .substance-shop h3,
+.upgrade-shop h3,
 .maintenance-panel h3,
 .hidden-meters h3,
 .log-panel h3 {
@@ -392,6 +393,73 @@ section {
   border: 1px solid var(--danger);
   border-radius: 3px;
   color: var(--danger);
+}
+
+/* Upgrade Shop */
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.upgrade-item {
+  padding: 0.75rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--text-cyan);
+  border-radius: 4px;
+}
+
+.upgrade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-name {
+  color: var(--text-white);
+  font-weight: bold;
+}
+
+.upgrade-tier {
+  color: var(--text-cyan);
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+.upgrade-description {
+  color: var(--text-white);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.upgrade-effects span {
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  background: rgba(0, 255, 255, 0.2);
+}
+
+.no-upgrades {
+  color: var(--text-white);
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+.more-upgrades {
+  color: var(--text-cyan);
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
 }
 
 /* Maintenance Panel */
@@ -612,6 +680,28 @@ section {
   color: var(--danger);
   text-align: center;
   margin-bottom: 1rem;
+}
+
+.day-transition {
+  background: rgba(0, 255, 255, 0.15);
+  border: 2px solid var(--text-cyan);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.day-transition h3 {
+  color: var(--text-cyan);
+  text-shadow: 0 0 10px var(--text-cyan);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.day-message {
+  color: var(--text-white);
+  font-style: italic;
+  margin-top: 0.5rem;
 }
 
 .level-up-message {

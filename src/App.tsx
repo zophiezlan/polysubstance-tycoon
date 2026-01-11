@@ -10,6 +10,7 @@ import { formatNumber } from './utils/formatter';
 import { StatPanel } from './components/StatPanel';
 import { MainButton } from './components/MainButton';
 import { SubstanceShop } from './components/SubstanceShop';
+import { UpgradeShop } from './components/UpgradeShop';
 import { MaintenancePanel } from './components/MaintenancePanel';
 import { HiddenMeters } from './components/HiddenMeters';
 import { LogPanel } from './components/LogPanel';
@@ -17,6 +18,8 @@ import { DisclaimerModal } from './components/DisclaimerModal';
 import { NightEndModal } from './components/NightEndModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FloatingNumber } from './components/FloatingNumber';
+import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
+import { calculateClickPower, calculateEnergyCost, calculateChaosDampening } from './game/upgradeEffects';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -108,17 +111,21 @@ function App() {
 
   const handleMainClick = useCallback((event: React.MouseEvent) => {
     setState(prevState => {
-      if (!prevState.isNightActive || prevState.energy < 5) return prevState;
+      const energyCost = calculateEnergyCost(prevState);
+      if (!prevState.isNightActive || prevState.energy < energyCost) return prevState;
 
       const newState = { ...prevState };
-      const vibesGained = 10;
+      const vibesGained = Math.floor(calculateClickPower(prevState));
       newState.vibes += vibesGained;
-      newState.energy -= 5;
-      newState.chaos += Math.random() * 3;
+      newState.totalVibesEarned += vibesGained;
+      newState.energy -= energyCost;
+
+      const chaosIncrease = Math.random() * 3 * (1 - calculateChaosDampening(prevState));
+      newState.chaos += chaosIncrease;
 
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: 'Running the night. Vibes +10',
+        message: `Running the night. Vibes +${vibesGained}`,
         type: 'info',
       });
 
@@ -156,6 +163,27 @@ function App() {
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
         message: `Purchased ${substance.name} (x${owned + 1})`,
+        type: 'info',
+      });
+
+      return newState;
+    });
+  }, []);
+
+  const handlePurchaseUpgrade = useCallback((upgradeId: string) => {
+    setState(prevState => {
+      const upgrade = getUpgrade(upgradeId);
+      if (!upgrade) return prevState;
+
+      if (!canPurchaseUpgrade(upgrade, prevState)) return prevState;
+
+      const newState = { ...prevState };
+      newState.vibes -= upgrade.cost;
+      newState.upgrades.push(upgradeId);
+
+      newState.log.push({
+        timestamp: 3600 - newState.timeRemaining,
+        message: `🔬 Unlocked: ${upgrade.name}`,
         type: 'info',
       });
 
@@ -215,7 +243,12 @@ function App() {
         experience: newTotalXP,
         knowledgeLevel: newLevel,
         nightsCompleted: prevState.nightsCompleted + 1,
+        daysCompleted: prevState.daysCompleted + 1,
+        totalVibesEarned: prevState.totalVibesEarned,
         achievements: prevState.achievements,
+        upgrades: prevState.upgrades,
+        vibes: prevState.vibes,
+        substances: prevState.substances,
         hasSeenDisclaimer: prevState.hasSeenDisclaimer,
         disableDistortion: prevState.disableDistortion,
         reducedMotion: prevState.reducedMotion,
@@ -315,6 +348,10 @@ function App() {
           <div className="scrollable-content">
             <section className="shop-section">
               <SubstanceShop state={state} onPurchase={handlePurchase} />
+            </section>
+
+            <section className="upgrade-section">
+              <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
             </section>
 
             <section className="maintenance-section">
