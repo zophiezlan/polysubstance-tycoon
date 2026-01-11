@@ -19,7 +19,7 @@ import { NightEndModal } from './components/NightEndModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FloatingNumber } from './components/FloatingNumber';
 import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
-import { calculateClickPower, calculateEnergyCost, calculateChaosDampening } from './game/upgradeEffects';
+import { calculateClickPower, calculateEnergyCost, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -111,22 +111,47 @@ function App() {
 
   const handleMainClick = useCallback((event: React.MouseEvent) => {
     setState(prevState => {
-      const energyCost = calculateEnergyCost(prevState);
-      if (!prevState.isNightActive || prevState.energy < energyCost) return prevState;
+      if (!prevState.isNightActive) return prevState;
 
       const newState = { ...prevState };
-      const vibesGained = Math.floor(calculateClickPower(prevState));
+      const energyCost = calculateEnergyCost(prevState);
+      const baseClickPower = calculateClickPower(prevState);
+
+      // Low energy reduces efficiency but never blocks clicking
+      let vibesGained = baseClickPower;
+      let energyPenalty = 1;
+
+      if (newState.energy < energyCost) {
+        // Can still click at low energy, but reduced efficiency
+        energyPenalty = Math.max(0.3, newState.energy / energyCost);
+        vibesGained = Math.floor(baseClickPower * energyPenalty);
+      } else {
+        // Normal energy cost
+        newState.energy -= energyCost;
+      }
+
+      // Minimum 1 vibe per click - dopamine must flow
+      vibesGained = Math.max(1, vibesGained);
+
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
-      newState.energy -= energyCost;
 
       const chaosIncrease = Math.random() * 3 * (1 - calculateChaosDampening(prevState));
       newState.chaos += chaosIncrease;
 
+      // Lore-appropriate messages based on state
+      let message = 'Running the night.';
+      if (energyPenalty < 1) {
+        message = 'Pushing through exhaustion.';
+      }
+      if (newState.chaos > 80) {
+        message = 'Everything is fine.';
+      }
+
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: `Running the night. Vibes +${vibesGained}`,
-        type: 'info',
+        message: `${message} Vibes +${vibesGained}`,
+        type: energyPenalty < 0.5 ? 'warning' : 'info',
       });
 
       // Create floating number
@@ -322,7 +347,9 @@ function App() {
             <div className="vibes-per-second">
               per second: {formatNumber(Object.entries(state.substances).reduce((total, [id, count]) => {
                 const substance = getSubstance(id);
-                return total + (substance ? substance.baseVibes * count : 0);
+                if (!substance) return total;
+                const multiplier = calculateProductionMultiplier(state, id);
+                return total + (substance.baseVibes * count * multiplier);
               }, 0), 1)}
             </div>
           </div>
@@ -330,7 +357,7 @@ function App() {
           <div className="main-action-container">
             <MainButton
               onClick={handleMainClick}
-              disabled={!state.isNightActive || state.energy < 5}
+              disabled={!state.isNightActive}
               distortionLevel={state.distortionLevel}
             />
           </div>
