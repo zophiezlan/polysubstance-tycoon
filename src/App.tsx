@@ -36,7 +36,16 @@ function App() {
         if (parsed.isNightActive === false) {
           return startNewNight(parsed);
         }
-        return parsed;
+        const baseState = createInitialState();
+        return {
+          ...baseState,
+          ...parsed,
+          substances: parsed.substances || {},
+          upgrades: parsed.upgrades || [],
+          achievements: parsed.achievements || [],
+          actionCooldowns: parsed.actionCooldowns || {},
+          log: parsed.log || baseState.log,
+        };
       } catch (e) {
         console.error('Failed to parse save:', e);
       }
@@ -135,6 +144,7 @@ function App() {
 
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
+      newState.totalClicks += 1;
 
       const chaosIncrease = Math.random() * 3 * (1 - calculateChaosDampening(prevState));
       newState.chaos += chaosIncrease;

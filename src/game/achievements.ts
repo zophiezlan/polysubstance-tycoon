@@ -20,6 +20,67 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: 'Reach 1000 Vibes',
     checkCondition: (state) => state.vibes >= 1000,
   },
+  // Substance Milestones
+  {
+    id: 'firstNootropic',
+    name: 'First Nootropic',
+    description: 'Silicon Valley Mindset',
+    checkCondition: (state) => (state.substances.nootropic || 0) > 0,
+  },
+  {
+    id: 'deliriantDabbler',
+    name: 'Deliriant Dabbler',
+    description: 'Shadow People Convention',
+    checkCondition: (state) => (state.substances.deliriant || 0) > 0,
+  },
+  {
+    id: 'psychonaut',
+    name: 'Psychonaut',
+    description: 'Ego Death Speedrun',
+    checkCondition: (state) => (state.substances.psychedelic || 0) > 0,
+  },
+  {
+    id: 'syntheticPioneer',
+    name: 'Synthetic Pioneer',
+    description: 'Designer Problems',
+    checkCondition: (state) => (state.substances.synthetic || 0) > 0,
+  },
+  {
+    id: 'researchSubject',
+    name: 'Research Subject',
+    description: 'DIY Pharmacology',
+    checkCondition: (state) => (state.substances.research || 0) > 0,
+  },
+  {
+    id: 'exoticCollector',
+    name: 'Exotic Collector',
+    description: 'Banned in 47 Countries',
+    checkCondition: (state) => (state.substances.exotic || 0) > 0,
+  },
+  {
+    id: 'experimentalSubject',
+    name: 'Experimental Subject',
+    description: 'Human Trial Complete',
+    checkCondition: (state) => (state.substances.experimental || 0) > 0,
+  },
+  {
+    id: 'forbiddenKnowledge',
+    name: 'Forbidden Knowledge',
+    description: 'Geneva Suggestion Violator',
+    checkCondition: (state) => (state.substances.forbidden || 0) > 0,
+  },
+  {
+    id: 'eldritchContact',
+    name: 'Eldritch Contact',
+    description: 'The Vibes Have Eyes',
+    checkCondition: (state) => (state.substances.eldritch || 0) > 0,
+  },
+  {
+    id: 'voidGazer',
+    name: 'Void Gazer',
+    description: 'Neurons On Strike',
+    checkCondition: (state) => (state.substances.void || 0) > 0,
+  },
 
   // Mid Game
   {
@@ -92,6 +153,36 @@ export const ACHIEVEMENTS: Achievement[] = [
     name: 'Knowledge Is A Curse',
     description: 'Unlock all hidden meters',
     checkCondition: (state) => state.knowledgeLevel >= 5,
+  },
+  {
+    id: 'upgradeEnthusiast',
+    name: 'Upgrade Enthusiast',
+    description: 'Own 10 upgrades',
+    checkCondition: (state) => state.upgrades.length >= 10,
+  },
+  {
+    id: 'fullyOptimized',
+    name: 'Fully Optimized',
+    description: 'Own 25 upgrades',
+    checkCondition: (state) => state.upgrades.length >= 25,
+  },
+  {
+    id: 'vibesMillionaire',
+    name: 'Vibes Millionaire',
+    description: 'Earn 1,000,000 total Vibes',
+    checkCondition: (state) => state.totalVibesEarned >= 1_000_000,
+  },
+  {
+    id: 'vibesBillionaire',
+    name: 'Vibes Billionaire',
+    description: 'Earn 1,000,000,000 total Vibes',
+    checkCondition: (state) => state.totalVibesEarned >= 1_000_000_000,
+  },
+  {
+    id: 'vibesTrillionaire',
+    name: 'Vibes Trillionaire',
+    description: 'Earn 1,000,000,000,000 total Vibes',
+    checkCondition: (state) => state.totalVibesEarned >= 1_000_000_000_000,
   },
   {
     id: 'harmReductionTycoon',

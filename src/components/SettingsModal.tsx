@@ -1,4 +1,5 @@
 import { GameState } from '../game/types';
+import { formatNumber, formatTime } from '../utils/formatter';
 
 interface SettingsModalProps {
   state: GameState;
@@ -93,6 +94,16 @@ export function SettingsModal({
             <button className="danger-button" onClick={onReset}>
               Reset All Progress
             </button>
+          </div>
+
+          <div className="settings-section">
+            <h3>Statistics</h3>
+            <p>
+              Total Clicks: {formatNumber(state.totalClicks)}<br />
+              Total Vibes Earned: {formatNumber(state.totalVibesEarned)}<br />
+              Time Played: {formatTime(state.timePlayed)}<br />
+              Highest Vibes/Second: {formatNumber(state.highestVibesPerSecond, 2)}
+            </p>
           </div>
         </div>
 

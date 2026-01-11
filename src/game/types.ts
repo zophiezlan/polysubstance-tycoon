@@ -23,6 +23,9 @@ export interface GameState {
   nightsCompleted: number;
   daysCompleted: number;
   totalVibesEarned: number; // Lifetime vibes for achievements
+  totalClicks: number; // Lifetime clicks
+  timePlayed: number; // Total seconds played
+  highestVibesPerSecond: number; // Peak passive vibes/sec
   achievements: string[]; // IDs of unlocked achievements
 
   // Runtime flags

@@ -25,6 +25,9 @@ export function createInitialState(): GameState {
     nightsCompleted: 0,
     daysCompleted: 0,
     totalVibesEarned: 0,
+    totalClicks: 0,
+    timePlayed: 0,
+    highestVibesPerSecond: 0,
     achievements: [],
 
     // Runtime flags
@@ -62,6 +65,9 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.nightsCompleted = persistentState.nightsCompleted || 0;
   newState.daysCompleted = persistentState.daysCompleted || 0;
   newState.totalVibesEarned = persistentState.totalVibesEarned || 0;
+  newState.totalClicks = persistentState.totalClicks || 0;
+  newState.timePlayed = persistentState.timePlayed || 0;
+  newState.highestVibesPerSecond = persistentState.highestVibesPerSecond || 0;
   newState.achievements = persistentState.achievements || [];
   newState.upgrades = persistentState.upgrades || [];
   newState.hasSeenDisclaimer = persistentState.hasSeenDisclaimer || false;
