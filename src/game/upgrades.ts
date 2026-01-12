@@ -261,6 +261,167 @@ export const UPGRADES: Upgrade[] = [
       substanceOwned: { id: 'experimental', count: 1 },
     },
   },
+  {
+    id: 'peer-reviewed-madness',
+    name: 'Peer-Reviewed Madness',
+    description: 'Your findings are published. No one will replicate them. Experimental Labs +50%.',
+    cost: 5000000,
+    tier: 2,
+    substanceId: 'experimental',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'experimental', count: 5 },
+      upgradeOwned: 'lab-equipment',
+    },
+  },
+
+  // Forbidden Formulae Upgrades
+  {
+    id: 'forbidden-synthesis',
+    name: 'Forbidden Synthesis',
+    description: 'Techniques that should remain forgotten. Forbidden Formulae twice as efficient.',
+    cost: 5000000,
+    tier: 1,
+    substanceId: 'forbidden',
+    effects: {
+      productionMultiplier: 2,
+    },
+    requirement: {
+      substanceOwned: { id: 'forbidden', count: 1 },
+    },
+  },
+  {
+    id: 'occult-chemistry',
+    name: 'Occult Chemistry',
+    description: 'Mixing science with things that predate science. Forbidden Formulae +50%.',
+    cost: 25000000,
+    tier: 2,
+    substanceId: 'forbidden',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'forbidden', count: 5 },
+      upgradeOwned: 'forbidden-synthesis',
+    },
+  },
+
+  // Eldritch Extracts Upgrades
+  {
+    id: 'dimensional-distillation',
+    name: 'Dimensional Distillation',
+    description: 'Refining substances from beyond. Eldritch Extracts twice as efficient.',
+    cost: 50000000,
+    tier: 1,
+    substanceId: 'eldritch',
+    effects: {
+      productionMultiplier: 2,
+    },
+    requirement: {
+      substanceOwned: { id: 'eldritch', count: 1 },
+    },
+  },
+  {
+    id: 'cosmic-concentration',
+    name: 'Cosmic Concentration',
+    description: 'The vibes are listening. Eldritch Extracts +50%.',
+    cost: 250000000,
+    tier: 2,
+    substanceId: 'eldritch',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'eldritch', count: 5 },
+      upgradeOwned: 'dimensional-distillation',
+    },
+  },
+
+  // Void Pharmaceuticals Upgrades
+  {
+    id: 'void-optimization',
+    name: 'Void Optimization',
+    description: 'Optimizing nothingness. A paradox that works. Void Pharmaceuticals twice as efficient.',
+    cost: 500000000,
+    tier: 1,
+    substanceId: 'void',
+    effects: {
+      productionMultiplier: 2,
+    },
+    requirement: {
+      substanceOwned: { id: 'void', count: 1 },
+    },
+  },
+  {
+    id: 'embrace-the-void',
+    name: 'Embrace the Void',
+    description: 'Resistance is futile. Void Pharmaceuticals +50%.',
+    cost: 2500000000,
+    tier: 2,
+    substanceId: 'void',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'void', count: 5 },
+      upgradeOwned: 'void-optimization',
+    },
+  },
+
+  // ===== PROGRESSION GATES - Required to unlock substance tiers =====
+  {
+    id: 'tier-2-license',
+    name: 'Advanced Procurement License',
+    description: 'Unlocks access to high-tier substances (Research Chemicals onwards). Required to purchase exotic and beyond.',
+    cost: 25000,
+    tier: 3,
+    effects: {},
+    requirement: {
+      totalVibes: 100000,
+      substanceOwned: { id: 'research', count: 1 },
+    },
+  },
+  {
+    id: 'tier-3-connections',
+    name: 'Underground Network Access',
+    description: 'Connects you to the darkest markets. Required to purchase experimental and beyond.',
+    cost: 500000,
+    tier: 4,
+    effects: {},
+    requirement: {
+      totalVibes: 2000000,
+      upgradeOwned: 'tier-2-license',
+      substanceOwned: { id: 'exotic', count: 5 },
+    },
+  },
+  {
+    id: 'tier-4-clearance',
+    name: 'Forbidden Knowledge',
+    description: 'You know too much. Required to purchase forbidden and beyond.',
+    cost: 5000000,
+    tier: 5,
+    effects: {},
+    requirement: {
+      totalVibes: 20000000,
+      upgradeOwned: 'tier-3-connections',
+      substanceOwned: { id: 'experimental', count: 5 },
+    },
+  },
+  {
+    id: 'tier-5-transcendence',
+    name: 'Reality Breach Protocol',
+    description: 'You\'ve pierced the veil. Required to purchase eldritch and void substances.',
+    cost: 50000000,
+    tier: 5,
+    effects: {},
+    requirement: {
+      totalVibes: 200000000,
+      upgradeOwned: 'tier-4-clearance',
+      substanceOwned: { id: 'forbidden', count: 3 },
+    },
+  },
 
   // Late Game Global Upgrades
   {

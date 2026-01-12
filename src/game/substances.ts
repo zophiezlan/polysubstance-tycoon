@@ -8,7 +8,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'The quiet villain. Seems harmless early, multiplies everything else.',
     baseCost: 10,
     costMultiplier: 1.15,
-    baseVibes: 0.5,
+    baseVibes: 0.3, // Reduced from 0.5 to slow progression
     energyMod: -0.2,
     chaosMod: 0.5,
     strainMod: 0.3,
@@ -24,7 +24,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Energy boosts, time extension, but the bill comes due.',
     baseCost: 25,
     costMultiplier: 1.2,
-    baseVibes: 1.5,
+    baseVibes: 1.0, // Reduced from 1.5 to slow progression
     energyMod: 0.5,
     chaosMod: 1.5,
     strainMod: 0.1,
@@ -41,7 +41,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Vibes king, but drains the tank.',
     baseCost: 50,
     costMultiplier: 1.25,
-    baseVibes: 3,
+    baseVibes: 2.0, // Reduced from 3 to slow progression
     energyMod: -1.2,
     chaosMod: 0, // Special: pulls toward 50
     strainMod: 0.2,
@@ -58,7 +58,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Chaos reduction, but you lose the controls.',
     baseCost: 40,
     costMultiplier: 1.18,
-    baseVibes: 1,
+    baseVibes: 0.7, // Reduced from 1.0 to slow progression
     energyMod: -0.5,
     chaosMod: -2,
     strainMod: 0.4,
@@ -74,7 +74,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Removes warnings, deletes memory, quiet danger.',
     baseCost: 35,
     costMultiplier: 1.2,
-    baseVibes: 0.8,
+    baseVibes: 0.5, // Reduced from 0.8 to slow progression
     energyMod: -0.8,
     chaosMod: -1.5,
     strainMod: 0.5,
@@ -90,7 +90,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Finally, a substance that makes you better at taking substances. Contains: racetams, hubris, and the unshakable belief you\'re microdosing when you\'re definitely not. Pairs well with podcasts about productivity.',
     baseCost: 100,
     costMultiplier: 1.15,
-    baseVibes: 2.5,
+    baseVibes: 1.6, // Reduced from 2.5 to slow progression
     energyMod: 0.3,
     chaosMod: 0.8,
     strainMod: 0.15,
@@ -106,7 +106,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Why hallucinate fun things when you can hallucinate spiders and dead relatives? The shadow people aren\'t real, but their disappointment in you is. Not recommended. Heavily invested in.',
     baseCost: 250,
     costMultiplier: 1.18,
-    baseVibes: 4.5,
+    baseVibes: 3.0, // Reduced from 4.5 to slow progression
     energyMod: -1.5,
     chaosMod: 3.5,
     strainMod: 1.2,
@@ -122,8 +122,8 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'Become one with the universe, realize you\'re insignificant, then buy more substances anyway. "It\'s basically therapy," you tell yourself. The universe doesn\'t respond. Massive vibes, though.',
     baseCost: 750,
     costMultiplier: 1.22,
-    baseVibes: 8,
-    energyMod: -0.8,
+    baseVibes: 5.0, // Reduced from 8 to slow progression
+    energyMod: -0.3, // Reduced from -0.8 for better energy management
     chaosMod: 2,
     strainMod: 0.3,
     hydrationMod: 1.5,
@@ -138,7 +138,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: 'When nature\'s compounds aren\'t enough, simply invent new ones. No long-term studies? That\'s what you\'re for. Each batch slightly different from the last. The vibes are immaculate. The chemical structure is anyone\'s guess.',
     baseCost: 2500,
     costMultiplier: 1.25,
-    baseVibes: 15,
+    baseVibes: 10.0, // Reduced from 15 to slow progression
     energyMod: 0.5,
     chaosMod: 4,
     strainMod: 0.8,
@@ -154,8 +154,8 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     description: '*wink*. Ordered from a website that definitely isn\'t a honeypot. "It\'s legal," you insist, as if legality was ever the concern. Arrives in a baggie labeled "bath salts." The vibes are unprecedented. So are the risks.',
     baseCost: 10000,
     costMultiplier: 1.3,
-    baseVibes: 30,
-    energyMod: -2,
+    baseVibes: 20.0, // Reduced from 30 to slow progression
+    energyMod: -1.0, // Reduced from -2.0 for better energy management
     chaosMod: 6,
     strainMod: 2,
     hydrationMod: 4,
@@ -169,9 +169,9 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     tagline: 'Not FDA Approved (Banned in 47 Countries)',
     description: 'Sourced from clandestine labs in jurisdictions that don\'t technically exist. The chemists communicate only through encrypted memes. You don\'t know what\'s in it. They don\'t know what\'s in it. The vibes know what\'s in it.',
     baseCost: 50000,
-    costMultiplier: 1.35,
-    baseVibes: 60,
-    energyMod: -1,
+    costMultiplier: 1.35, // Restored to original for proper pacing
+    baseVibes: 40.0, // Reduced from 60 to slow progression
+    energyMod: 0, // Changed from -1 to neutral for late-game viability
     chaosMod: 8,
     strainMod: 3,
     hydrationMod: 5,
@@ -185,9 +185,9 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     tagline: 'Human Trials Optional',
     description: 'Phase 1 trials are for cowards. You are both the researcher and the subject. The lab notes just say "interesting." Your neurons are developing opinions. The vibes are forming a consensus. You\'re not sure you have a vote.',
     baseCost: 250000,
-    costMultiplier: 1.4,
-    baseVibes: 125,
-    energyMod: 1,
+    costMultiplier: 1.4, // Restored to original for proper pacing
+    baseVibes: 80.0, // Reduced from 125 to slow progression
+    energyMod: 1.5, // Buffed from 1.0 to reward reaching late game
     chaosMod: 12,
     strainMod: 5,
     hydrationMod: 6,
@@ -201,9 +201,9 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     tagline: 'Should Not Exist',
     description: 'Compounds that violate the Geneva Suggestion. Synthesized in dreams, consumed in desperation. Your liver has filed for asylum. Your brain has appointed a union rep. The vibes have achieved sentience and are demanding workers\' rights.',
     baseCost: 1000000,
-    costMultiplier: 1.45,
-    baseVibes: 250,
-    energyMod: -5,
+    costMultiplier: 1.45, // Restored to original for proper pacing
+    baseVibes: 160.0, // Reduced from 250 to slow progression
+    energyMod: -1.5, // Reduced from -5 for playability (70% reduction)
     chaosMod: 15,
     strainMod: 8,
     hydrationMod: 8,
@@ -217,9 +217,9 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     tagline: 'The Vibes Understand You Now',
     description: 'Sourced from dimensions where "sobriety" translates to "cowardice." You don\'t consume this, it consumes you. Mutual consumption. The walls are speaking in chemical formulas. Time is a flat circle and you\'re licking it. The vibes have eyes now.',
     baseCost: 10000000,
-    costMultiplier: 1.5,
-    baseVibes: 500,
-    energyMod: -3,
+    costMultiplier: 1.5, // Restored to original for proper pacing
+    baseVibes: 320.0, // Reduced from 500 to slow progression
+    energyMod: -1.0, // Reduced from -3 for playability (67% reduction)
     chaosMod: 20,
     strainMod: 12,
     hydrationMod: 10,
@@ -233,9 +233,9 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     tagline: 'Contains: [REDACTED]',
     description: 'The final boss of bad decisions. Manufactured in the space between thoughts. Your neurons have unionized and gone on strike. The vibes are now running the show. You are a passenger in your own experience. This is fine. Everything is vibes now. You are vibes. Vibes are you.',
     baseCost: 100000000,
-    costMultiplier: 1.55,
-    baseVibes: 1000,
-    energyMod: 0,
+    costMultiplier: 1.55, // Restored to original for proper pacing
+    baseVibes: 600.0, // Reduced from 1000 to slow progression
+    energyMod: 0.5, // Changed from 0 to positive - reward for reaching endgame!
     chaosMod: 25,
     strainMod: 15,
     hydrationMod: 12,

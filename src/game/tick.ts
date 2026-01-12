@@ -100,7 +100,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
 
   // Hydration debt SLIGHTLY reduces energy gain (if not using new system)
   if (!isExtendedGameState(newState) && newState.hydrationDebt > 70) {
-    const baseRegen = 0.5 + newState.knowledgeLevel * 0.15;
+    const baseRegen = 1.0 + newState.knowledgeLevel * 0.2; // Buffed for better energy management
     const energyRegen = baseRegen * dt;
     const penalty = Math.min(energyRegen * 0.3, (newState.hydrationDebt - 70) * 0.005 * dt);
     newState.energy -= penalty;
