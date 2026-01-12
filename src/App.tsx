@@ -1,7 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameState } from './game/types';
 import { createInitialState, startNewNight } from './game/state';
 import { gameTick } from './game/tick';
+import {
+  validateSaveData,
+  migrateSaveData,
+  sanitizeGameState,
+  createSaveData,
+} from './utils/saveValidation';
 import { getSubstance, getSubstanceCost } from './game/substances';
 import { getAction } from './game/maintenance';
 import { checkAchievements, getAchievement } from './game/achievements';
@@ -36,29 +42,38 @@ const TICK_INTERVAL = 1000; // 1 second
 
 function App() {
   const [state, setState] = useState<GameState>(() => {
-    // Try to load from localStorage
+    // Try to load from localStorage with validation and migration
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // If there's a saved active night, create new night with persistent data
-        if (parsed.isNightActive === false) {
-          return startNewNight(parsed);
+
+        // Validate and migrate save data
+        if (validateSaveData(parsed)) {
+          const migratedState = migrateSaveData(parsed);
+          const sanitizedState = sanitizeGameState(migratedState);
+
+          // If there's a saved active night, create new night with persistent data
+          if (sanitizedState.isNightActive === false) {
+            return startNewNight(sanitizedState);
+          }
+
+          // Reset runtime timestamps
+          sanitizedState.lastTickTime = Date.now();
+          sanitizedState.nightStartTime = Date.now();
+
+          console.log('Successfully loaded save data');
+          return sanitizedState;
+        } else {
+          console.warn('Save data validation failed, attempting migration');
+          // Try to migrate legacy format
+          const migratedState = migrateSaveData(parsed);
+          const sanitizedState = sanitizeGameState(migratedState);
+          return sanitizedState;
         }
-        const baseState = createInitialState();
-        return {
-          ...baseState,
-          ...parsed,
-          substances: parsed.substances || {},
-          upgrades: parsed.upgrades || [],
-          achievements: parsed.achievements || [],
-          actionCooldowns: parsed.actionCooldowns || {},
-          log: parsed.log || baseState.log,
-          lastTickTime: Date.now(),
-          nightStartTime: Date.now(),
-        };
       } catch (e) {
         console.error('Failed to parse save:', e);
+        console.log('Starting fresh game');
       }
     }
     return createInitialState();
@@ -68,9 +83,40 @@ function App() {
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
   const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]);
 
-  // Save to localStorage whenever state changes
+  // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const timeoutId = setTimeout(() => {
+      try {
+        // Create versioned save data
+        const saveData = createSaveData(state);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+      } catch (error) {
+        console.error('Failed to save to localStorage:', error);
+        // If quota exceeded, try to save critical data only
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          try {
+            const criticalState = {
+              version: 1,
+              timestamp: Date.now(),
+              state: {
+                vibes: state.vibes,
+                experience: state.experience,
+                knowledgeLevel: state.knowledgeLevel,
+                substances: state.substances,
+                upgrades: state.upgrades,
+                achievements: state.achievements,
+              },
+            };
+            localStorage.setItem(STORAGE_KEY + '_backup', JSON.stringify(criticalState));
+            console.warn('Saved backup due to quota exceeded');
+          } catch (backupError) {
+            console.error('Failed to save backup:', backupError);
+          }
+        }
+      }
+    }, 1000); // Debounce: save 1 second after last state change
+
+    return () => clearTimeout(timeoutId);
   }, [state]);
 
   // Game loop
@@ -424,6 +470,16 @@ function App() {
     setMilestoneQueue([]);
   }, []);
 
+  // Memoize vibes per second calculation for performance
+  const vibesPerSecond = useMemo(() => {
+    return Object.entries(state.substances).reduce((total: number, [id, count]: [string, number]) => {
+      const substance = getSubstance(id);
+      if (!substance) return total;
+      const multiplier = calculateProductionMultiplier(state, id);
+      return total + (substance.baseVibes * count * multiplier);
+    }, 0);
+  }, [state.substances, state.upgrades, state.insightPoints]);
+
   return (
     <div className={`app font-${state.fontSize} ${state.reducedMotion ? 'reduced-motion' : ''} distortion-${state.distortionLevel}`}>
       <header className="app-header">
@@ -440,12 +496,7 @@ function App() {
             <div className="vibes-label">VIBES</div>
             <div className="vibes-value">{formatNumber(state.vibes)}</div>
             <div className="vibes-per-second">
-              per second: {formatNumber(Object.entries(state.substances).reduce((total, [id, count]) => {
-                const substance = getSubstance(id);
-                if (!substance) return total;
-                const multiplier = calculateProductionMultiplier(state, id);
-                return total + (substance.baseVibes * count * multiplier);
-              }, 0), 1)}
+              per second: {formatNumber(vibesPerSecond, 1)}
             </div>
           </div>
 

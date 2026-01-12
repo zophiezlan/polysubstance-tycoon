@@ -29,7 +29,9 @@ import {
   getAutoClickerSpeedMultiplier,
   getChaosActionCooldownMultiplier,
 } from './permanentUnlocks';
-import { calculateClickPower } from './upgradeEffects';
+import { calculateClickPower, calculateProductionMultiplier } from './upgradeEffects';
+import { getSubstance } from './substances';
+import { calculateInteractionMultipliers } from './interactions';
 
 // ============================================================================
 // AUTO-CLICKER IMPLEMENTATION
@@ -341,13 +343,33 @@ export function processProgressionSystems(state: GameState, deltaTime: number): 
 // ============================================================================
 
 function calculateVibesPerSecondQuick(state: GameState): number {
-  // Quick estimation without full calculation
-  // This should be replaced with proper calculation from upgradeEffects.ts
-  let total = 0;
-  for (const [_, count] of Object.entries(state.substances)) {
-    total += count * 1; // Assume average of 1 vibe/sec per substance
+  // Accurate calculation for offline progress
+  // Uses actual substance data and all multipliers for precise calculations
+  let totalVibesPerSec = 0;
+
+  // Calculate base production from all substances
+  for (const [substanceId, count] of Object.entries(state.substances)) {
+    if (count === 0) continue;
+
+    const substance = getSubstance(substanceId);
+    if (!substance) continue;
+
+    // Apply per-substance multipliers (upgrades + prestige)
+    const productionMultiplier = calculateProductionMultiplier(state, substanceId);
+    totalVibesPerSec += substance.baseVibes * count * productionMultiplier;
   }
-  return total;
+
+  // Apply interaction multipliers
+  const interactions = calculateInteractionMultipliers(state.substances);
+  totalVibesPerSec *= interactions.vibesMultiplier;
+
+  // Apply progression system multipliers if extended state
+  if (isExtendedGameState(state)) {
+    const progressionMultiplier = getTotalProductionMultiplier(state as ExtendedGameState);
+    totalVibesPerSec *= progressionMultiplier;
+  }
+
+  return totalVibesPerSec;
 }
 
 // ============================================================================
