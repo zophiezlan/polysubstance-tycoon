@@ -1,0 +1,168 @@
+.action-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.action-panel {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-title {
+  margin: 0 0 12px 0;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #4af;
+}
+
+.chaos-actions-panel .panel-title {
+  color: #f4f;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.action-button {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.15), rgba(100, 150, 255, 0.1));
+  border: 2px solid rgba(100, 200, 255, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  min-height: 100px;
+}
+
+.action-button:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.25), rgba(100, 150, 255, 0.2));
+  border-color: rgba(100, 200, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 200, 255, 0.3);
+}
+
+.action-button:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+.action-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(50, 50, 50, 0.3);
+  border-color: rgba(100, 100, 100, 0.3);
+}
+
+/* Chaos Actions Styling */
+.chaos-action {
+  background: linear-gradient(135deg, rgba(255, 100, 255, 0.15), rgba(200, 100, 255, 0.1));
+  border-color: rgba(255, 100, 255, 0.3);
+}
+
+.chaos-action:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(255, 100, 255, 0.25), rgba(200, 100, 255, 0.2));
+  border-color: rgba(255, 100, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(255, 100, 255, 0.3);
+}
+
+.button-content {
+  position: relative;
+  z-index: 1;
+}
+
+.button-name {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.button-description {
+  font-size: 0.8em;
+  color: #aaa;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.cost-info {
+  font-size: 0.85em;
+  color: #f4f;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.cost-info.cant-afford {
+  color: #f44;
+}
+
+.cooldown-info {
+  position: relative;
+  margin-top: 8px;
+}
+
+.cooldown-text {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #f80;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.cooldown-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #f80, #f40);
+  border-radius: 2px;
+  transition: width 0.5s linear;
+  box-shadow: 0 0 8px rgba(255, 136, 0, 0.5);
+}
+
+/* Glow effect for available actions */
+.action-button:not(.disabled)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shine 3s infinite;
+  z-index: 0;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 200%;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-button {
+    min-height: 80px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .action-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

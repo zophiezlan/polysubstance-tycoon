@@ -10,6 +10,12 @@ import { calculateProductionMultiplier } from './upgradeEffects';
 import { tickCombo } from './combos';
 import { checkGroupChatTriggers } from './groupChat';
 import { checkOrganComplaints } from './organCommentary';
+import {
+  processProgressionSystems,
+  getTotalProductionMultiplier,
+  checkOfflineProgress,
+} from './progressionIntegration';
+import { isExtendedGameState } from './progressionTypes';
 
 export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!state.isNightActive) {
@@ -18,6 +24,15 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
 
   const newState = { ...state };
   const dt = deltaTime / 1000; // Convert to seconds
+
+  // Check for offline progress on first tick back
+  if (isExtendedGameState(newState)) {
+    checkOfflineProgress(newState);
+  }
+
+  // Process all new progression systems (auto-clicker, energy modes, chaos strategies, milestones)
+  const stateAfterProgression = processProgressionSystems(newState, deltaTime);
+  Object.assign(newState, stateAfterProgression);
 
   // Calculate interaction effects
   const interactions = calculateInteractionMultipliers(newState.substances);
@@ -66,6 +81,12 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   // Apply vibe multiplier from interactions
   totalVibesPerSec *= interactions.vibesMultiplier;
 
+  // Apply new progression system multipliers (energy modes, chaos thresholds, permanent unlocks, milestones)
+  if (isExtendedGameState(newState)) {
+    const progressionMultiplier = getTotalProductionMultiplier(newState);
+    totalVibesPerSec *= progressionMultiplier;
+  }
+
   const vibesGained = totalVibesPerSec * dt;
   newState.vibes += vibesGained;
   newState.totalVibesEarned += vibesGained;
@@ -73,22 +94,14 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.highestVibesPerSecond = Math.max(newState.highestVibesPerSecond, totalVibesPerSec);
 
   // 2. Apply energy changes - ENERGY IS ALWAYS POSITIVE!
+  // NOTE: Energy regeneration is now handled by progressionIntegration.ts
+  // This section only applies substance modifiers
   newState.energy += totalEnergyMod * dt;
 
-  // COOKIE CLICKER MODE: Generous energy sustainability
-  // Energy always slowly regenerates - you can't get stuck at 0
-  const baseRegen = 0.5; // Increased - always recovering
-  const progressionBonus = Math.min(1.5, newState.knowledgeLevel * 0.15); // Better scaling
-  const energyRegen = (baseRegen + progressionBonus) * dt;
-
-  // Apply regen when below max
-  if (newState.energy < 100) {
-    newState.energy += energyRegen;
-  }
-
-  // Hydration debt SLIGHTLY reduces energy gain, but never below baseline regen
-  // This keeps the mechanic relevant without being punishing
-  if (newState.hydrationDebt > 70) {
+  // Hydration debt SLIGHTLY reduces energy gain (if not using new system)
+  if (!isExtendedGameState(newState) && newState.hydrationDebt > 70) {
+    const baseRegen = 0.5 + newState.knowledgeLevel * 0.15;
+    const energyRegen = baseRegen * dt;
     const penalty = Math.min(energyRegen * 0.3, (newState.hydrationDebt - 70) * 0.005 * dt);
     newState.energy -= penalty;
   }
@@ -97,13 +110,16 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.energy = Math.max(0, Math.min(100, newState.energy));
 
   // 3. Apply chaos changes - EASY MODE
+  // NOTE: Chaos decay and strategy effects are now handled by progressionIntegration.ts
+  // This section only applies substance modifiers and special interactions
   newState.chaos += totalChaosMod * dt;
 
-  // COOKIE CLICKER MODE: Chaos naturally decays slowly (always recoverable)
-  // This prevents chaos from becoming permanently high
-  const chaosDecay = 0.3 * dt; // Slow but steady decay
-  if (newState.chaos > 30) {
-    newState.chaos -= chaosDecay;
+  // Legacy chaos decay (only if not using new system)
+  if (!isExtendedGameState(newState)) {
+    const chaosDecay = 0.3 * dt;
+    if (newState.chaos > 30) {
+      newState.chaos -= chaosDecay;
+    }
   }
 
   // Empathogen special: pulls chaos toward 50 (more strongly now)

@@ -1,0 +1,135 @@
+.progression-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.status-section {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-label {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.status-value {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #4af;
+}
+
+.status-description {
+  font-size: 0.8em;
+  opacity: 0.6;
+  line-height: 1.3;
+}
+
+.status-effects {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.effect-item {
+  font-size: 0.85em;
+  padding: 2px 6px;
+  background: rgba(0, 255, 100, 0.2);
+  border-radius: 4px;
+  color: #0f8;
+}
+
+/* Energy Mode specific */
+.energy-mode .status-value {
+  color: #ff4;
+}
+
+/* Chaos Threshold specific */
+.chaos-threshold .status-value {
+  color: #f4f;
+}
+
+.chaos-threshold.volatile .status-value {
+  color: #f84;
+  animation: pulse 1s infinite;
+}
+
+.chaos-threshold.transcendent .status-value {
+  color: #f44;
+  animation: pulse 0.5s infinite;
+  font-weight: bolder;
+}
+
+/* Active Bonuses */
+.active-bonuses {
+  flex: 1 1 100%;
+  background: rgba(100, 200, 255, 0.1);
+}
+
+.bonus-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 0.9em;
+}
+
+.bonus-name {
+  font-weight: bold;
+  color: #4cf;
+}
+
+.bonus-effect {
+  color: #0f8;
+  font-size: 0.85em;
+}
+
+.bonus-timer {
+  margin-left: auto;
+  color: #f80;
+  font-weight: bold;
+}
+
+/* Next Milestone */
+.next-milestone {
+  flex: 1 1 100%;
+}
+
+.milestone-progress {
+  font-size: 0.95em;
+  color: #fc4;
+  font-weight: bold;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .progression-status {
+    flex-direction: column;
+  }
+
+  .status-section {
+    min-width: 100%;
+  }
+}
