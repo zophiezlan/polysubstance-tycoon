@@ -212,7 +212,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.nightStartTime = Date.now();
 
     newState.log.push({
-      timestamp: 3600,
+      timestamp: 0,
       message: `⏳ A new day begins. +${xpGained} XP earned.`,
       type: 'info',
     });
