@@ -123,7 +123,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 750,
     costMultiplier: 1.22,
     baseVibes: 5.0, // Reduced from 8 to slow progression
-    energyMod: -0.8,
+    energyMod: -0.3, // Reduced from -0.8 for better energy management
     chaosMod: 2,
     strainMod: 0.3,
     hydrationMod: 1.5,
@@ -155,7 +155,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 10000,
     costMultiplier: 1.3,
     baseVibes: 20.0, // Reduced from 30 to slow progression
-    energyMod: -2,
+    energyMod: -1.0, // Reduced from -2.0 for better energy management
     chaosMod: 6,
     strainMod: 2,
     hydrationMod: 4,
@@ -171,7 +171,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 50000,
     costMultiplier: 1.35, // Restored to original for proper pacing
     baseVibes: 40.0, // Reduced from 60 to slow progression
-    energyMod: -1,
+    energyMod: 0, // Changed from -1 to neutral for late-game viability
     chaosMod: 8,
     strainMod: 3,
     hydrationMod: 5,
@@ -187,7 +187,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 250000,
     costMultiplier: 1.4, // Restored to original for proper pacing
     baseVibes: 80.0, // Reduced from 125 to slow progression
-    energyMod: 1,
+    energyMod: 1.5, // Buffed from 1.0 to reward reaching late game
     chaosMod: 12,
     strainMod: 5,
     hydrationMod: 6,
@@ -203,7 +203,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 1000000,
     costMultiplier: 1.45, // Restored to original for proper pacing
     baseVibes: 160.0, // Reduced from 250 to slow progression
-    energyMod: -5,
+    energyMod: -1.5, // Reduced from -5 for playability (70% reduction)
     chaosMod: 15,
     strainMod: 8,
     hydrationMod: 8,
@@ -219,7 +219,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 10000000,
     costMultiplier: 1.5, // Restored to original for proper pacing
     baseVibes: 320.0, // Reduced from 500 to slow progression
-    energyMod: -3,
+    energyMod: -1.0, // Reduced from -3 for playability (67% reduction)
     chaosMod: 20,
     strainMod: 12,
     hydrationMod: 10,
@@ -235,7 +235,7 @@ export const SUBSTANCES: SubstanceDefinition[] = [
     baseCost: 100000000,
     costMultiplier: 1.55, // Restored to original for proper pacing
     baseVibes: 600.0, // Reduced from 1000 to slow progression
-    energyMod: 0,
+    energyMod: 0.5, // Changed from 0 to positive - reward for reaching endgame!
     chaosMod: 25,
     strainMod: 15,
     hydrationMod: 12,

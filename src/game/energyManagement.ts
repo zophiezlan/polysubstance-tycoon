@@ -256,8 +256,8 @@ export function switchEnergyMode(state: ExtendedGameState, modeId: string): bool
 export function calculateEnergyRegen(state: ExtendedGameState): number {
   const mode = getActiveEnergyMode(state);
 
-  // Base regen (from tick.ts: 0.5 base + 0.15 per knowledge level)
-  let baseRegen = 0.5 + state.knowledgeLevel * 0.15;
+  // Base regen - buffed for better late-game energy management
+  let baseRegen = 1.0 + state.knowledgeLevel * 0.2; // Was 0.5 + 0.15*level
 
   // Apply mode multiplier
   baseRegen *= mode.effects.energyRegenMultiplier;
