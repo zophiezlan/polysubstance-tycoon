@@ -440,7 +440,25 @@ export function awardMilestone(state: ExtendedGameState, milestone: Milestone): 
 }
 
 export function processMilestones(state: ExtendedGameState): void {
-  const completed = checkMilestones(state);
+  const repeatableMilestones = ALL_MILESTONES.filter((milestone) => milestone.repeatable);
+
+  for (const milestone of repeatableMilestones) {
+    let safetyCounter = 0;
+    while (milestone.checkCondition(state)) {
+      awardMilestone(state, milestone);
+      safetyCounter += 1;
+      if (safetyCounter > 1000) {
+        break;
+      }
+    }
+  }
+
+  const completed = ALL_MILESTONES.filter((milestone) => {
+    if (milestone.repeatable) return false;
+    if (state.completedMilestones.includes(milestone.id)) return false;
+    if (milestone.hidden && !state.completedMilestones.includes(milestone.id)) return false;
+    return milestone.checkCondition(state);
+  });
 
   for (const milestone of completed) {
     awardMilestone(state, milestone);
