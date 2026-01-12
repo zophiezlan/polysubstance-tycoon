@@ -175,8 +175,8 @@ export const COLLECTION_MILESTONES: Milestone[] = [
       const uniqueSubstances = Object.keys(state.substances).filter(
         (id) => state.substances[id] > 0
       ).length;
-      // Assume 10 total substances (this should be imported from substances.ts)
-      return uniqueSubstances >= 10;
+      // Game has 15 total substances (alcohol through void)
+      return uniqueSubstances >= 15;
     },
     reward: {
       permanentProductionBonus: 10,
@@ -190,7 +190,8 @@ export const COLLECTION_MILESTONES: Milestone[] = [
     category: 'collection',
     checkCondition: (state) => {
       const substances = Object.values(state.substances);
-      if (substances.length < 10) return false;
+      // Must have all 15 substances with at least 10 each
+      if (substances.length < 15) return false;
       return substances.every((count) => count >= 10);
     },
     reward: {
@@ -220,7 +221,8 @@ export const COLLECTION_MILESTONES: Milestone[] = [
     category: 'collection',
     checkCondition: (state) => {
       const substances = Object.values(state.substances);
-      if (substances.length < 10) return false;
+      // Must have all 15 substances with at least 100 each
+      if (substances.length < 15) return false;
       return substances.every((count) => count >= 100);
     },
     reward: {

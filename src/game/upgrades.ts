@@ -261,6 +261,114 @@ export const UPGRADES: Upgrade[] = [
       substanceOwned: { id: 'experimental', count: 1 },
     },
   },
+  {
+    id: 'peer-reviewed-madness',
+    name: 'Peer-Reviewed Madness',
+    description: 'Your findings are published. No one will replicate them. Experimental Labs +50%.',
+    cost: 5000000,
+    tier: 2,
+    substanceId: 'experimental',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'experimental', count: 5 },
+      upgradeOwned: 'lab-equipment',
+    },
+  },
+
+  // Forbidden Formulae Upgrades
+  {
+    id: 'forbidden-synthesis',
+    name: 'Forbidden Synthesis',
+    description: 'Techniques that should remain forgotten. Forbidden Formulae twice as efficient.',
+    cost: 5000000,
+    tier: 1,
+    substanceId: 'forbidden',
+    effects: {
+      productionMultiplier: 2,
+    },
+    requirement: {
+      substanceOwned: { id: 'forbidden', count: 1 },
+    },
+  },
+  {
+    id: 'occult-chemistry',
+    name: 'Occult Chemistry',
+    description: 'Mixing science with things that predate science. Forbidden Formulae +50%.',
+    cost: 25000000,
+    tier: 2,
+    substanceId: 'forbidden',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'forbidden', count: 5 },
+      upgradeOwned: 'forbidden-synthesis',
+    },
+  },
+
+  // Eldritch Extracts Upgrades
+  {
+    id: 'dimensional-distillation',
+    name: 'Dimensional Distillation',
+    description: 'Refining substances from beyond. Eldritch Extracts twice as efficient.',
+    cost: 50000000,
+    tier: 1,
+    substanceId: 'eldritch',
+    effects: {
+      productionMultiplier: 2,
+    },
+    requirement: {
+      substanceOwned: { id: 'eldritch', count: 1 },
+    },
+  },
+  {
+    id: 'cosmic-concentration',
+    name: 'Cosmic Concentration',
+    description: 'The vibes are listening. Eldritch Extracts +50%.',
+    cost: 250000000,
+    tier: 2,
+    substanceId: 'eldritch',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'eldritch', count: 5 },
+      upgradeOwned: 'dimensional-distillation',
+    },
+  },
+
+  // Void Pharmaceuticals Upgrades
+  {
+    id: 'void-optimization',
+    name: 'Void Optimization',
+    description: 'Optimizing nothingness. A paradox that works. Void Pharmaceuticals twice as efficient.',
+    cost: 500000000,
+    tier: 1,
+    substanceId: 'void',
+    effects: {
+      productionMultiplier: 2,
+    },
+    requirement: {
+      substanceOwned: { id: 'void', count: 1 },
+    },
+  },
+  {
+    id: 'embrace-the-void',
+    name: 'Embrace the Void',
+    description: 'Resistance is futile. Void Pharmaceuticals +50%.',
+    cost: 2500000000,
+    tier: 2,
+    substanceId: 'void',
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'void', count: 5 },
+      upgradeOwned: 'void-optimization',
+    },
+  },
 
   // Late Game Global Upgrades
   {
