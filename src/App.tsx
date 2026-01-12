@@ -92,7 +92,7 @@ function App() {
         }
 
         if (!newState.isNightActive) {
-          const rolledState = startNextNight(newState);
+          const rolledState = startNewNight(newState);
           rolledState.lastTickTime = now;
           return rolledState;
         }
