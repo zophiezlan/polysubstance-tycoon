@@ -318,6 +318,158 @@ export const UPGRADES: Upgrade[] = [
       upgradeOwned: 'transhumanism',
     },
   },
+
+  // ===== TIER 6: COOKIE CLICKER ENDLESS SCALING =====
+
+  {
+    id: 'hyper-efficiency',
+    name: 'Hyper-Efficiency Protocols',
+    description: 'You\'ve optimized the optimization. Click power x3.',
+    cost: 5000000000,
+    tier: 6,
+    effects: {
+      clickMultiplier: 3,
+    },
+    requirement: {
+      totalVibes: 2000000000,
+      totalClicks: 10000,
+    },
+  },
+  {
+    id: 'quantum-vibes',
+    name: 'Quantum Vibe Superposition',
+    description: 'Vibes exist in all states simultaneously. All production x2.5.',
+    cost: 25000000000,
+    tier: 6,
+    effects: {
+      globalProductionMultiplier: 2.5,
+    },
+    requirement: {
+      totalVibes: 10000000000,
+      upgradeOwned: 'post-human',
+    },
+  },
+  {
+    id: 'memetic-hazard',
+    name: 'Weaponized Memetics',
+    description: 'Your vibes spread like a virus. All production x2.',
+    cost: 100000000000,
+    tier: 6,
+    effects: {
+      globalProductionMultiplier: 2,
+    },
+    requirement: {
+      totalVibes: 50000000000,
+      upgradeOwned: 'quantum-vibes',
+    },
+  },
+
+  // ===== TIER 7: ABSURD SCALING =====
+
+  {
+    id: 'reality-editing',
+    name: 'Reality Editing Privileges',
+    description: 'You\'re not playing the game. You ARE the game. Production x5.',
+    cost: 1000000000000,
+    tier: 7,
+    effects: {
+      globalProductionMultiplier: 5,
+    },
+    requirement: {
+      totalVibes: 500000000000,
+      upgradeOwned: 'memetic-hazard',
+    },
+  },
+  {
+    id: 'singularity-core',
+    name: 'Singularity Core',
+    description: 'The vibes have achieved consciousness. Click power x10.',
+    cost: 10000000000000,
+    tier: 7,
+    effects: {
+      clickMultiplier: 10,
+    },
+    requirement: {
+      totalVibes: 5000000000000,
+      totalClicks: 100000,
+    },
+  },
+  {
+    id: 'hyperdimensional',
+    name: 'Hyperdimensional Operations',
+    description: 'Operating across infinite timelines. Production x10.',
+    cost: 100000000000000,
+    tier: 7,
+    effects: {
+      globalProductionMultiplier: 10,
+    },
+    requirement: {
+      totalVibes: 50000000000000,
+      upgradeOwned: 'reality-editing',
+    },
+  },
+
+  // ===== TIER 8: TRANSCENDENT SCALING =====
+
+  {
+    id: 'vibe-deity',
+    name: 'Ascension to Vibe Deity',
+    description: 'You are now worshipped. All production x25.',
+    cost: 1000000000000000,
+    tier: 8,
+    effects: {
+      globalProductionMultiplier: 25,
+    },
+    requirement: {
+      totalVibes: 500000000000000,
+      upgradeOwned: 'hyperdimensional',
+    },
+  },
+  {
+    id: 'omnipotent-clicker',
+    name: 'Omnipotent Click',
+    description: 'Each click echoes through all of reality. Click power x100.',
+    cost: 10000000000000000,
+    tier: 8,
+    effects: {
+      clickMultiplier: 100,
+    },
+    requirement: {
+      totalVibes: 5000000000000000,
+      totalClicks: 1000000,
+    },
+  },
+  {
+    id: 'heat-death',
+    name: 'Survive Heat Death',
+    description: 'The universe ends. The vibes continue. Production x100.',
+    cost: 100000000000000000,
+    tier: 8,
+    effects: {
+      globalProductionMultiplier: 100,
+    },
+    requirement: {
+      totalVibes: 50000000000000000,
+      upgradeOwned: 'vibe-deity',
+    },
+  },
+
+  // ===== TIER 9: THE FINAL FRONTIER =====
+
+  {
+    id: 'infinite-vibes',
+    name: '∞ VIBES',
+    description: 'You have achieved vibe infinity. Nothing can stop you now. Production x1000.',
+    cost: 1000000000000000000,
+    tier: 9,
+    effects: {
+      globalProductionMultiplier: 1000,
+    },
+    requirement: {
+      totalVibes: 500000000000000000,
+      upgradeOwned: 'heat-death',
+    },
+  },
 ];
 
 export function getUpgrade(id: string): Upgrade | undefined {

@@ -119,21 +119,22 @@ function App() {
       const energyCost = calculateEnergyCost(prevState);
       const baseClickPower = calculateClickPower(prevState);
 
-      // Low energy reduces efficiency but never blocks clicking
+      // COOKIE CLICKER MODE: Always clickable at full power
+      // Energy provides a bonus multiplier instead of blocking
       let vibesGained = baseClickPower;
-      let energyPenalty = 1;
+      let energyBonus = 1;
+      let hasEnergy = false;
 
-      if (newState.energy < energyCost) {
-        // Can still click at low energy, but reduced efficiency
-        energyPenalty = Math.max(0.3, newState.energy / energyCost);
-        vibesGained = Math.floor(baseClickPower * energyPenalty);
-      } else {
-        // Normal energy cost
+      if (newState.energy >= energyCost) {
+        // Full energy: get bonus multiplier
+        energyBonus = 1.5;
+        hasEnergy = true;
         newState.energy -= energyCost;
       }
+      // No energy penalty - always get base power minimum
 
-      // Minimum 1 vibe per click - dopamine must flow
-      vibesGained = Math.max(1, vibesGained);
+      vibesGained = Math.floor(baseClickPower * energyBonus);
+      vibesGained = Math.max(1, vibesGained); // Minimum 1 vibe per click
 
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
@@ -144,8 +145,8 @@ function App() {
 
       // Lore-appropriate messages based on state
       let message = 'Running the night.';
-      if (energyPenalty < 1) {
-        message = 'Pushing through exhaustion.';
+      if (!hasEnergy) {
+        message = 'Pure vibes, no fuel needed.';
       }
       if (newState.chaos > 80) {
         message = 'Everything is fine.';
@@ -153,8 +154,8 @@ function App() {
 
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: `${message} Vibes +${vibesGained}`,
-        type: energyPenalty < 0.5 ? 'warning' : 'info',
+        message: `${message} Vibes +${vibesGained}${hasEnergy ? ' (⚡ energized!)' : ''}`,
+        type: 'info',
       });
 
       // Create floating number
@@ -249,6 +250,10 @@ function App() {
       }
       if (action.effects.timeBonus) {
         newState.timeRemaining += action.effects.timeBonus;
+      }
+      // COOKIE CLICKER MODE: Sleep debt recovery
+      if (action.effects.sleepDebtReduction) {
+        newState.sleepDebt = Math.max(0, newState.sleepDebt - action.effects.sleepDebtReduction);
       }
 
       newState.log.push({
