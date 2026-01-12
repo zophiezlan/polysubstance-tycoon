@@ -116,47 +116,45 @@ function App() {
     const { clientX, clientY } = event;
     setState(prevState => {
       const newState = { ...prevState };
-      const energyCost = calculateEnergyCost(prevState);
       const baseClickPower = calculateClickPower(prevState);
 
-      // COOKIE CLICKER MODE: Always clickable at full power
-      // Energy provides a bonus multiplier instead of blocking
-      let vibesGained = baseClickPower;
-      let energyBonus = 1;
-      let hasEnergy = false;
+      // COOKIE CLICKER MODE: Clicks NEVER cost energy!
+      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-2.0x)
+      // This makes energy a pure positive mechanic
+      const energyBonus = 1 + (newState.energy / 100); // 0 energy = 1x, 100 energy = 2x
 
-      if (newState.energy >= energyCost) {
-        // Full energy: get bonus multiplier
-        energyBonus = 1.5;
-        hasEnergy = true;
-        newState.energy -= energyCost;
-      }
-      // No energy penalty - always get base power minimum
-
-      vibesGained = Math.floor(baseClickPower * energyBonus);
+      let vibesGained = Math.floor(baseClickPower * energyBonus);
       vibesGained = Math.max(1, vibesGained); // Minimum 1 vibe per click
 
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
       newState.totalClicks += 1;
 
-      const chaosIncrease = Math.random() * 3 * (1 - calculateChaosDampening(prevState));
-      newState.chaos += chaosIncrease;
+      // Minimal chaos increase - make it VERY easy to manage
+      const chaosIncrease = Math.random() * 1.5 * (1 - calculateChaosDampening(prevState));
+      newState.chaos = Math.min(100, newState.chaos + chaosIncrease);
 
       // Lore-appropriate messages based on state
       let message = 'Running the night.';
-      if (!hasEnergy) {
-        message = 'Pure vibes, no fuel needed.';
+      const energyLevel = newState.energy;
+      if (energyLevel > 80) {
+        message = 'Vibing hard.';
+      } else if (energyLevel < 30) {
+        message = 'Coasting on fumes.';
       }
       if (newState.chaos > 80) {
         message = 'Everything is fine.';
       }
 
-      newState.log.push({
-        timestamp: 3600 - newState.timeRemaining,
-        message: `${message} Vibes +${vibesGained}${hasEnergy ? ' (⚡ energized!)' : ''}`,
-        type: 'info',
-      });
+      // Only log occasionally to reduce spam
+      if (Math.random() < 0.15) {
+        const bonusText = energyLevel > 50 ? ` (⚡${(energyBonus * 100).toFixed(0)}%)` : '';
+        newState.log.push({
+          timestamp: 3600 - newState.timeRemaining,
+          message: `${message} Vibes +${vibesGained}${bonusText}`,
+          type: 'info',
+        });
+      }
 
       // Create floating number
       setFloatingNumbers(prev => [...prev, {
