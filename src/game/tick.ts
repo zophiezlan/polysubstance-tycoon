@@ -1,6 +1,5 @@
 import { GameState } from './types';
 import { getSubstance } from './substances';
-import { createInitialState } from './state';
 import { calculateExperience, getKnowledgeLevel } from './prestige';
 import {
   calculateInteractionMultipliers,
@@ -73,14 +72,21 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   // 2. Apply energy changes
   newState.energy += totalEnergyMod * dt;
 
-  // Base energy regen when low (unless hydration debt is high)
-  if (newState.energy < 50 && newState.hydrationDebt < 50) {
-    newState.energy += 0.1 * dt;
+  // COOKIE CLICKER MODE: Improved energy sustainability
+  // Base passive energy regen (always active, scales with progression)
+  const baseRegen = 0.3; // Increased from 0.1
+  const progressionBonus = Math.min(1.0, newState.knowledgeLevel * 0.1); // +0.1 per knowledge level
+  const energyRegen = (baseRegen + progressionBonus) * dt;
+
+  // Apply regen when below max (not just when low)
+  if (newState.energy < 100) {
+    newState.energy += energyRegen;
   }
 
-  // Hydration debt kills energy regen
-  if (newState.hydrationDebt > 80) {
-    newState.energy -= 0.5 * dt;
+  // Hydration debt reduces but doesn't eliminate regen
+  if (newState.hydrationDebt > 50) {
+    const penalty = Math.min(energyRegen, (newState.hydrationDebt - 50) * 0.01 * dt);
+    newState.energy -= penalty;
   }
 
   newState.energy = Math.max(0, Math.min(100, newState.energy));
@@ -124,13 +130,20 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   }
 
   newState.sleepDebt += totalSleepDebtMod * dt;
-  newState.sleepDebt = Math.max(0, newState.sleepDebt);
 
   // Exponential sleep debt after 10 stimulants
   const stimulantCount = newState.substances.stimulant || 0;
   if (stimulantCount >= 10) {
     newState.sleepDebt += Math.pow(stimulantCount - 9, 1.5) * 0.1 * dt;
   }
+
+  // COOKIE CLICKER MODE: Passive sleep debt recovery (very slow but allows endless play)
+  // Only recovers when not actively using stimulants heavily
+  if (stimulantCount < 5) {
+    newState.sleepDebt = Math.max(0, newState.sleepDebt - 0.05 * dt);
+  }
+
+  newState.sleepDebt = Math.max(0, newState.sleepDebt);
 
   // 5. Calculate strain with interactions
   let strainAccumulation = totalStrainMod * dt;
@@ -187,7 +200,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   // 8. Calculate distortion level
   newState.distortionLevel = calculateDistortionLevel(newState);
 
-  // 9. Tick down time
+  // 9. Tick down time - but it loops endlessly now (Cookie Clicker style)
   newState.timeRemaining -= dt;
 
   // 10. Tick down cooldowns
@@ -195,41 +208,37 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.actionCooldowns[actionId] = Math.max(0, newState.actionCooldowns[actionId] - dt);
   });
 
-  // 11. Check collapse condition
+  // 11. Check collapse condition - but don't end the game, just apply debuffs
   if (checkCollapse(newState)) {
     handleCollapse(newState);
   }
 
-  // 12. Check time ended
+  // 12. ENDLESS MODE: Time loops, days increment, but NO STATE RESET
+  // This is Cookie Clicker style - time is just a counter, not a game-ender
   if (newState.timeRemaining <= 0) {
     const xpGained = calculateExperience(newState, newState.hasCollapsed);
-    const baseState = createInitialState();
     const overtime = Math.abs(newState.timeRemaining);
-    const carryover = Math.min(overtime, 3599);
 
+    // Add XP and increment day counter
     newState.experience += xpGained;
     newState.knowledgeLevel = getKnowledgeLevel(newState.experience);
     newState.nightsCompleted += 1;
     newState.daysCompleted += 1;
-    newState.timeRemaining = 3600 - carryover;
-    newState.nightStartTime = Date.now();
-    newState.actionCooldowns = {};
-    newState.strain = baseState.strain;
-    newState.hydrationDebt = baseState.hydrationDebt;
-    newState.memoryIntegrity = baseState.memoryIntegrity;
-    newState.chaos = baseState.chaos;
-    newState.confidence = baseState.confidence;
-    newState.hasCollapsed = false;
-    newState.distortionLevel = baseState.distortionLevel;
-    newState.energy = baseState.energy;
 
-    if (newState.sleepDebt > 0) {
-      newState.energy = Math.max(20, 100 - newState.sleepDebt * 0.5);
-    }
+    // Reset time to start a new "day" cycle
+    newState.timeRemaining = 3600 - Math.min(overtime, 3599);
+    newState.nightStartTime = Date.now();
+
+    // Clear collapse flag for new day (but keep all stats/debuffs)
+    newState.hasCollapsed = false;
+
+    // COOKIE CLICKER MODE: DO NOT RESET ANYTHING ELSE
+    // Keep: vibes, substances, energy, strain, chaos, memory, hydration, sleep debt
+    // This allows endless accumulation and strategic management
 
     newState.log.push({
       timestamp: 0,
-      message: `⏳ A new day begins. +${xpGained} XP earned.`,
+      message: `🌅 Day ${newState.daysCompleted} dawns. +${xpGained} XP. Everything continues...`,
       type: 'info',
     });
   }
@@ -280,15 +289,23 @@ export function checkCollapse(state: GameState): boolean {
 }
 
 export function handleCollapse(state: GameState): GameState {
+  // COOKIE CLICKER MODE: Collapse is a setback, not a game-over
+  // Apply harsh debuffs but allow recovery and continuation
+
+  // Prevent spam-triggering: only trigger if not collapsed recently
+  if (state.hasCollapsed) {
+    return state; // Already collapsed, wait for recovery
+  }
+
   state.hasCollapsed = true;
 
   // Add log entry (unless memory is completely gone)
   if (state.memoryIntegrity > 5) {
     const messages = [
-      'SYSTEM ALERT: Collapse threshold exceeded.',
-      'Everything was going so well...',
-      'The Night has ended you.',
-      '[CRITICAL ERROR] Cannot continue.',
+      '⚠️ COLLAPSE EVENT: Heavy penalties applied.',
+      'You pushed too hard. Everything slows down...',
+      'The Night fights back. Systems degrading...',
+      '[WARNING] Operating at reduced capacity.',
     ];
     const message = messages[Math.floor(Math.random() * messages.length)];
 
@@ -300,14 +317,34 @@ export function handleCollapse(state: GameState): GameState {
   } else {
     state.log.push({
       timestamp: 3600 - state.timeRemaining,
-      message: '[DATA CORRUPTED]',
+      message: '[DATA CORRUPTED] - SYSTEM INSTABILITY',
       type: 'danger',
       corrupted: true,
     });
   }
 
-  state.strain = 0;
-  state.energy = Math.max(0, state.energy - 20);
+  // HARSH PENALTIES (but recoverable):
+
+  // 1. Reset strain to 50 (not 0) - you're hurt but functional
+  state.strain = 50;
+
+  // 2. Heavy energy drain
+  state.energy = Math.max(0, state.energy - 40);
+
+  // 3. Memory damage
+  state.memoryIntegrity = Math.max(0, state.memoryIntegrity - 30);
+
+  // 4. Chaos spike
+  state.chaos = Math.min(100, state.chaos + 25);
+
+  // 5. Hydration crisis
+  state.hydrationDebt = Math.min(100, state.hydrationDebt + 20);
+
+  // 6. Sleep debt penalty (for future cycles)
+  state.sleepDebt = Math.min(200, state.sleepDebt + 15);
+
+  // NOTE: Production continues but at reduced efficiency due to debuffs
+  // hasCollapsed flag clears on day rollover, allowing endless play
 
   return state;
 }

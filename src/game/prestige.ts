@@ -94,3 +94,128 @@ export function hasUnlock(knowledgeLevel: number, unlockId: string): boolean {
   }
   return false;
 }
+
+// ============================================================================
+// PRESTIGE SYSTEM - Cookie Clicker style reset-for-multipliers
+// ============================================================================
+
+/**
+ * Calculate how many Insight Points you'd earn from prestiging
+ * Formula: sqrt(totalVibesEarned / 1000000)
+ * This creates exponential growth: need more vibes for each point, but points give big bonuses
+ */
+export function calculateInsightPoints(totalVibesEarned: number): number {
+  return Math.floor(Math.sqrt(totalVibesEarned / 1000000));
+}
+
+/**
+ * Calculate global production multiplier from Insight Points
+ * Each point gives +1% to ALL production (clicks + passive)
+ * Formula: 1 + (points * 0.01)
+ */
+export function calculateInsightMultiplier(insightPoints: number): number {
+  return 1 + (insightPoints * 0.01);
+}
+
+/**
+ * Perform prestige reset
+ * Keeps: Insight Points (prestige currency), total stats for next prestige calculation
+ * Resets: Current vibes, substances, day counter, all meters, upgrades (optional)
+ */
+export function performPrestige(state: GameState): GameState {
+  const newInsightPoints = calculateInsightPoints(state.totalVibesEarned);
+
+  // Prevent prestiging if you wouldn't gain any points
+  if (newInsightPoints <= state.insightPoints) {
+    return state; // No prestige happened
+  }
+
+  const pointsGained = newInsightPoints - state.insightPoints;
+
+  // Create fresh state but preserve prestige-related stats
+  return {
+    ...state,
+    // PRESTIGE CURRENCY - Keeps accumulating
+    insightPoints: newInsightPoints,
+
+    // STATS FOR NEXT PRESTIGE - Keep for calculation
+    totalVibesEarned: state.totalVibesEarned,
+    totalClicks: state.totalClicks,
+
+    // RESET CURRENT RUN
+    vibes: 0,
+    substances: {},
+    energy: 100,
+    strain: 0,
+    hydrationDebt: 0,
+    sleepDebt: 0,
+    chaos: 50,
+    memoryIntegrity: 100,
+    confidence: 0,
+    timeRemaining: 3600,
+    daysCompleted: 0,
+    nightsCompleted: 0,
+    hasCollapsed: false,
+    actionCooldowns: {},
+
+    // KEEP KNOWLEDGE/ACHIEVEMENTS - Player progression
+    experience: state.experience,
+    knowledgeLevel: state.knowledgeLevel,
+    achievements: state.achievements,
+
+    // KEEP UPGRADES - Optional: you could reset these too for harder prestige
+    // For now keeping them as Cookie Clicker does
+    upgrades: state.upgrades,
+
+    log: [
+      ...state.log,
+      {
+        timestamp: 0,
+        message: `✨ PRESTIGE: Gained ${pointsGained} Insight Points! (Total: ${newInsightPoints}) All production +${(pointsGained * 1)}%`,
+        type: 'info',
+      },
+    ],
+    distortionLevel: 0,
+    nightStartTime: Date.now(),
+  };
+}
+
+/**
+ * Check if prestige is available (would gain at least 1 point)
+ */
+export function canPrestige(state: GameState): boolean {
+  const potentialPoints = calculateInsightPoints(state.totalVibesEarned);
+  return potentialPoints > state.insightPoints;
+}
+
+/**
+ * Get prestige info for UI display
+ */
+export function getPrestigeInfo(state: GameState): {
+  currentPoints: number;
+  potentialPoints: number;
+  pointsToGain: number;
+  currentMultiplier: number;
+  nextMultiplier: number;
+  vibesNeededForNext: number;
+} {
+  const currentPoints = state.insightPoints;
+  const potentialPoints = calculateInsightPoints(state.totalVibesEarned);
+  const pointsToGain = Math.max(0, potentialPoints - currentPoints);
+
+  const currentMultiplier = calculateInsightMultiplier(currentPoints);
+  const nextMultiplier = calculateInsightMultiplier(potentialPoints);
+
+  // Calculate vibes needed for next insight point
+  const nextPointRequirement = Math.pow(potentialPoints + 1, 2) * 1000000;
+  const vibesNeededForNext = Math.max(0, nextPointRequirement - state.totalVibesEarned);
+
+  return {
+    currentPoints,
+    potentialPoints,
+    pointsToGain,
+    currentMultiplier,
+    nextMultiplier,
+    vibesNeededForNext,
+  };
+}

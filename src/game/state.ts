@@ -29,6 +29,7 @@ export function createInitialState(): GameState {
     timePlayed: 0,
     highestVibesPerSecond: 0,
     achievements: [],
+    insightPoints: 0, // Prestige currency
 
     // Runtime flags
     actionCooldowns: {},
@@ -69,6 +70,7 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.timePlayed = persistentState.timePlayed || 0;
   newState.highestVibesPerSecond = persistentState.highestVibesPerSecond || 0;
   newState.achievements = persistentState.achievements || [];
+  newState.insightPoints = persistentState.insightPoints || 0; // PRESTIGE CURRENCY
   newState.upgrades = persistentState.upgrades || [];
   newState.hasSeenDisclaimer = persistentState.hasSeenDisclaimer || false;
   newState.disableDistortion = persistentState.disableDistortion || false;

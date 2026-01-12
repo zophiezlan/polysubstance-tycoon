@@ -27,6 +27,7 @@ export interface GameState {
   timePlayed: number; // Total seconds played
   highestVibesPerSecond: number; // Peak passive vibes/sec
   achievements: string[]; // IDs of unlocked achievements
+  insightPoints: number; // PRESTIGE CURRENCY - Permanent multiplier from resets
 
   // Runtime flags
   actionCooldowns: Record<string, number>; // actionId -> seconds remaining
@@ -98,6 +99,7 @@ export interface MaintenanceAction {
     hydrationRestore?: number;
     memoryRestore?: number;
     timeBonus?: number;
+    sleepDebtReduction?: number; // COOKIE CLICKER MODE: Make sleep debt recoverable
   };
   unlockCondition?: number; // Knowledge level required
   requiresSubstance?: string; // Substance that must be owned
@@ -140,5 +142,6 @@ export interface Upgrade {
     totalVibes?: number;
     nightsCompleted?: number;
     upgradeOwned?: string; // Requires another upgrade first
+    totalClicks?: number; // COOKIE CLICKER MODE: Require certain number of clicks
   };
 }

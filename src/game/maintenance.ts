@@ -74,6 +74,21 @@ export const MAINTENANCE_ACTIONS: MaintenanceAction[] = [
     unlockCondition: 3,
     pausesProduction: 20,
   },
+  {
+    id: 'actualSleep',
+    name: 'Actually Sleep',
+    description: 'Revolutionary concept. Your body keeps suggesting it.',
+    cost: 100,
+    cooldown: 600,
+    effects: {
+      energyRestore: 50,
+      strainReduction: 40,
+      memoryRestore: 30,
+      sleepDebtReduction: 50, // COOKIE CLICKER MODE: Make sleep debt recoverable
+    },
+    unlockCondition: 4,
+    pausesProduction: 60,
+  },
 ];
 
 export function getAction(id: string): MaintenanceAction | undefined {

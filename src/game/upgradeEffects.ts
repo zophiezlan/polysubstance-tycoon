@@ -1,8 +1,9 @@
 import { GameState } from './types';
 import { getUpgrade } from './upgrades';
+import { calculateInsightMultiplier } from './prestige';
 
 /**
- * Calculate total click power based on upgrades
+ * Calculate total click power based on upgrades + prestige
  */
 export function calculateClickPower(state: GameState, baseClickPower: number = 10): number {
   let power = baseClickPower;
@@ -20,6 +21,10 @@ export function calculateClickPower(state: GameState, baseClickPower: number = 1
       multiplier *= upgrade.effects.clickMultiplier;
     }
   }
+
+  // PRESTIGE BONUS: Apply insight multiplier
+  const insightMultiplier = calculateInsightMultiplier(state.insightPoints);
+  multiplier *= insightMultiplier;
 
   return power * multiplier;
 }
@@ -43,7 +48,7 @@ export function calculateEnergyCost(state: GameState, baseCost: number = 5): num
 }
 
 /**
- * Calculate production multiplier for a specific substance
+ * Calculate production multiplier for a specific substance + prestige
  */
 export function calculateProductionMultiplier(state: GameState, substanceId: string): number {
   let multiplier = 1;
@@ -62,6 +67,10 @@ export function calculateProductionMultiplier(state: GameState, substanceId: str
       multiplier *= upgrade.effects.globalProductionMultiplier;
     }
   }
+
+  // PRESTIGE BONUS: Apply insight multiplier to ALL production
+  const insightMultiplier = calculateInsightMultiplier(state.insightPoints);
+  multiplier *= insightMultiplier;
 
   return multiplier;
 }
