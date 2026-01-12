@@ -211,7 +211,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.nightStartTime = Date.now();
 
     newState.log.push({
-      timestamp: 3600 - newState.timeRemaining,
+      timestamp: 3600,
       message: `⏳ A new day begins. +${xpGained} XP earned.`,
       type: 'info',
     });
