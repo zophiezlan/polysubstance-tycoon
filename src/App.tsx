@@ -45,6 +45,8 @@ function App() {
           achievements: parsed.achievements || [],
           actionCooldowns: parsed.actionCooldowns || {},
           log: parsed.log || baseState.log,
+          lastTickTime: Date.now(),
+          nightStartTime: Date.now(),
         };
       } catch (e) {
         console.error('Failed to parse save:', e);
@@ -74,7 +76,9 @@ function App() {
     const interval = setInterval(() => {
       setState(prevState => {
         const now = Date.now();
-        const deltaTime = now - prevState.lastTickTime;
+        const rawDelta = now - prevState.lastTickTime;
+        const safeDelta = Math.max(0, rawDelta);
+        const deltaTime = Math.min(safeDelta, TICK_INTERVAL);
         const newState = gameTick(prevState, deltaTime);
         newState.lastTickTime = now;
 
@@ -119,6 +123,7 @@ function App() {
   }, []);
 
   const handleMainClick = useCallback((event: React.MouseEvent) => {
+    const { clientX, clientY } = event;
     setState(prevState => {
       if (!prevState.isNightActive) return prevState;
 
@@ -168,8 +173,8 @@ function App() {
       setFloatingNumbers(prev => [...prev, {
         id: Date.now().toString() + Math.random(),
         value: vibesGained,
-        x: event.clientX,
-        y: event.clientY,
+        x: clientX,
+        y: clientY,
       }]);
 
       return newState;
