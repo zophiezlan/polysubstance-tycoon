@@ -1,5 +1,7 @@
 import { GameState } from './types';
 import { getSubstance } from './substances';
+import { createInitialState } from './state';
+import { calculateExperience, getKnowledgeLevel } from './prestige';
 import {
   calculateInteractionMultipliers,
   getAlcoholAmplification,
@@ -195,12 +197,41 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
 
   // 11. Check collapse condition
   if (checkCollapse(newState)) {
-    return handleCollapse(newState);
+    handleCollapse(newState);
   }
 
   // 12. Check time ended
   if (newState.timeRemaining <= 0) {
-    return handleNightEnd(newState);
+    const xpGained = calculateExperience(newState, newState.hasCollapsed);
+    const baseState = createInitialState();
+    const overtime = Math.abs(newState.timeRemaining);
+    const carryover = Math.min(overtime, 3599);
+
+    newState.experience += xpGained;
+    newState.knowledgeLevel = getKnowledgeLevel(newState.experience);
+    newState.nightsCompleted += 1;
+    newState.daysCompleted += 1;
+    newState.timeRemaining = 3600 - carryover;
+    newState.nightStartTime = Date.now();
+    newState.actionCooldowns = {};
+    newState.strain = baseState.strain;
+    newState.hydrationDebt = baseState.hydrationDebt;
+    newState.memoryIntegrity = baseState.memoryIntegrity;
+    newState.chaos = baseState.chaos;
+    newState.confidence = baseState.confidence;
+    newState.hasCollapsed = false;
+    newState.distortionLevel = baseState.distortionLevel;
+    newState.energy = baseState.energy;
+
+    if (newState.sleepDebt > 0) {
+      newState.energy = Math.max(20, 100 - newState.sleepDebt * 0.5);
+    }
+
+    newState.log.push({
+      timestamp: 0,
+      message: `⏳ A new day begins. +${xpGained} XP earned.`,
+      type: 'info',
+    });
   }
 
   return newState;
@@ -249,12 +280,10 @@ export function checkCollapse(state: GameState): boolean {
 }
 
 export function handleCollapse(state: GameState): GameState {
-  const newState = { ...state };
-  newState.isNightActive = false;
-  newState.hasCollapsed = true;
+  state.hasCollapsed = true;
 
   // Add log entry (unless memory is completely gone)
-  if (newState.memoryIntegrity > 5) {
+  if (state.memoryIntegrity > 5) {
     const messages = [
       'SYSTEM ALERT: Collapse threshold exceeded.',
       'Everything was going so well...',
@@ -263,26 +292,28 @@ export function handleCollapse(state: GameState): GameState {
     ];
     const message = messages[Math.floor(Math.random() * messages.length)];
 
-    newState.log.push({
-      timestamp: 3600 - newState.timeRemaining,
+    state.log.push({
+      timestamp: 3600 - state.timeRemaining,
       message,
       type: 'danger',
     });
   } else {
-    newState.log.push({
-      timestamp: 3600 - newState.timeRemaining,
+    state.log.push({
+      timestamp: 3600 - state.timeRemaining,
       message: '[DATA CORRUPTED]',
       type: 'danger',
       corrupted: true,
     });
   }
 
-  return newState;
+  state.strain = 0;
+  state.energy = Math.max(0, state.energy - 20);
+
+  return state;
 }
 
 export function handleNightEnd(state: GameState): GameState {
   const newState = { ...state };
-  newState.isNightActive = false;
   newState.timeRemaining = 0;
 
   if (newState.memoryIntegrity > 10) {

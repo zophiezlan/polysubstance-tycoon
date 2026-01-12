@@ -5,7 +5,6 @@ import { gameTick } from './game/tick';
 import { getSubstance, getSubstanceCost } from './game/substances';
 import { getAction } from './game/maintenance';
 import { checkAchievements, getAchievement } from './game/achievements';
-import { calculateExperience, getKnowledgeLevel } from './game/prestige';
 import { formatNumber } from './utils/formatter';
 import { StatPanel } from './components/StatPanel';
 import { MainButton } from './components/MainButton';
@@ -15,7 +14,6 @@ import { MaintenancePanel } from './components/MaintenancePanel';
 import { HiddenMeters } from './components/HiddenMeters';
 import { LogPanel } from './components/LogPanel';
 import { DisclaimerModal } from './components/DisclaimerModal';
-import { NightEndModal } from './components/NightEndModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FloatingNumber } from './components/FloatingNumber';
 import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
@@ -55,7 +53,6 @@ function App() {
     return createInitialState();
   });
 
-  const [showNightEnd, setShowNightEnd] = useState(false);
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
 
@@ -66,20 +63,13 @@ function App() {
 
   // Game loop
   useEffect(() => {
-    if (!state.isNightActive) {
-      if (!showNightEnd) {
-        setShowNightEnd(true);
-      }
-      return;
-    }
-
     const interval = setInterval(() => {
       setState(prevState => {
         const now = Date.now();
         const rawDelta = now - prevState.lastTickTime;
         const safeDelta = Math.max(0, rawDelta);
         const deltaTime = Math.min(safeDelta, TICK_INTERVAL);
-        const newState = gameTick(prevState, deltaTime);
+        let newState = gameTick(prevState, deltaTime);
         newState.lastTickTime = now;
 
         // Check for new achievements
@@ -106,7 +96,7 @@ function App() {
     }, TICK_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [state.isNightActive, showNightEnd]);
+  }, []);
 
   // Clear achievement notifications after a delay
   useEffect(() => {
@@ -125,8 +115,6 @@ function App() {
   const handleMainClick = useCallback((event: React.MouseEvent) => {
     const { clientX, clientY } = event;
     setState(prevState => {
-      if (!prevState.isNightActive) return prevState;
-
       const newState = { ...prevState };
       const energyCost = calculateEnergyCost(prevState);
       const baseClickPower = calculateClickPower(prevState);
@@ -273,34 +261,6 @@ function App() {
     });
   }, []);
 
-  const handleNewNight = useCallback(() => {
-    setState(prevState => {
-      const xpGained = calculateExperience(prevState, prevState.hasCollapsed);
-      const newTotalXP = prevState.experience + xpGained;
-      const newLevel = getKnowledgeLevel(newTotalXP);
-
-      const persistentData = {
-        experience: newTotalXP,
-        knowledgeLevel: newLevel,
-        nightsCompleted: prevState.nightsCompleted + 1,
-        daysCompleted: prevState.daysCompleted + 1,
-        totalVibesEarned: prevState.totalVibesEarned,
-        achievements: prevState.achievements,
-        upgrades: prevState.upgrades,
-        vibes: prevState.vibes,
-        substances: prevState.substances,
-        hasSeenDisclaimer: prevState.hasSeenDisclaimer,
-        disableDistortion: prevState.disableDistortion,
-        reducedMotion: prevState.reducedMotion,
-        fontSize: prevState.fontSize,
-        sleepDebt: prevState.sleepDebt,
-      };
-
-      return startNewNight(persistentData);
-    });
-    setShowNightEnd(false);
-  }, []);
-
   const handleDisclaimerAccept = useCallback(() => {
     setState(prevState => ({
       ...prevState,
@@ -340,7 +300,6 @@ function App() {
     if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
       localStorage.removeItem(STORAGE_KEY);
       setState(createInitialState());
-      setShowNightEnd(false);
     }
   }, []);
 
@@ -372,7 +331,7 @@ function App() {
           <div className="main-action-container">
             <MainButton
               onClick={handleMainClick}
-              disabled={!state.isNightActive}
+              disabled={false}
               distortionLevel={state.distortionLevel}
             />
           </div>
@@ -434,10 +393,6 @@ function App() {
       ))}
 
       {!state.hasSeenDisclaimer && <DisclaimerModal onAccept={handleDisclaimerAccept} />}
-
-      {showNightEnd && !state.hasSeenDisclaimer && (
-        <NightEndModal state={state} onNewNight={handleNewNight} />
-      )}
 
       {state.showSettings && (
         <SettingsModal
