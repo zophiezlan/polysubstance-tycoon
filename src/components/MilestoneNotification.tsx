@@ -88,8 +88,12 @@ export function MilestoneManager({ milestones, onClearMilestones }: MilestoneMan
 
   useEffect(() => {
     if (milestones.length > 0) {
-      // Show milestones one at a time
-      setVisibleMilestones((prev) => [...prev, ...milestones]);
+      // Limit to max 3 visible notifications to prevent UI clogging
+      setVisibleMilestones((prev) => {
+        const combined = [...prev, ...milestones];
+        // Keep only the most recent 3
+        return combined.slice(-3);
+      });
       onClearMilestones();
     }
   }, [milestones, onClearMilestones]);

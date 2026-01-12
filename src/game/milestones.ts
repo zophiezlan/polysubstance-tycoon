@@ -20,18 +20,21 @@ export const REPEATABLE_MILESTONES: Milestone[] = [
     },
     reward: {
       temporaryBonus: {
-        productionMultiplier: 1.05, // +5% for 60s
-        duration: 60,
+        productionMultiplier: 1.02, // Reduced from 1.05 to prevent feedback loops
+        duration: 30, // Reduced from 60s to prevent stacking
       },
     },
     repeatable: true,
     nextThreshold: (current) => {
       if (current === 0) return 1000;
-      // Exponential scaling: 1k, 2k, 5k, 10k, 20k, 50k, 100k...
+      // More aggressive scaling to prevent spam at high production
       if (current < 10000) return current + 1000; // +1k until 10k
       if (current < 100000) return current + 10000; // +10k until 100k
       if (current < 1000000) return current + 100000; // +100k until 1M
-      return current + 1000000; // +1M thereafter
+      if (current < 10000000) return current + 1000000; // +1M until 10M
+      if (current < 100000000) return current + 10000000; // +10M until 100M
+      if (current < 1000000000) return current + 50000000; // +50M until 1B
+      return current + 100000000; // +100M thereafter
     },
   },
 
@@ -442,14 +445,33 @@ export function awardMilestone(state: ExtendedGameState, milestone: Milestone): 
 }
 
 export function processMilestones(state: ExtendedGameState): void {
+  const now = Date.now();
+  const MILESTONE_COOLDOWN = 5000; // 5 second minimum between repeatable milestone awards
+  const MAX_BATCH_AWARDS = 10; // Max 10 milestone awards per tick to prevent offline floods
+
+  // Initialize lastMilestoneTime if not present
+  if (!(state as any).lastMilestoneTime) {
+    (state as any).lastMilestoneTime = 0;
+  }
+
+  // Check cooldown for repeatable milestones
+  const timeSinceLastMilestone = now - (state as any).lastMilestoneTime;
+  const canAwardRepeatable = timeSinceLastMilestone >= MILESTONE_COOLDOWN;
+
   const repeatableMilestones = ALL_MILESTONES.filter((milestone) => milestone.repeatable);
+  let totalAwardsThisTick = 0;
 
   for (const milestone of repeatableMilestones) {
+    if (!canAwardRepeatable) break; // Skip if on cooldown
+    if (totalAwardsThisTick >= MAX_BATCH_AWARDS) break; // Prevent floods
+
     let safetyCounter = 0;
-    while (milestone.checkCondition(state)) {
+    while (milestone.checkCondition(state) && totalAwardsThisTick < MAX_BATCH_AWARDS) {
       awardMilestone(state, milestone);
+      (state as any).lastMilestoneTime = now;
+      totalAwardsThisTick += 1;
       safetyCounter += 1;
-      if (safetyCounter > 1000) {
+      if (safetyCounter > MAX_BATCH_AWARDS) {
         break;
       }
     }
@@ -463,7 +485,9 @@ export function processMilestones(state: ExtendedGameState): void {
   });
 
   for (const milestone of completed) {
+    if (totalAwardsThisTick >= MAX_BATCH_AWARDS) break; // Apply limit to all milestones
     awardMilestone(state, milestone);
+    totalAwardsThisTick += 1;
   }
 }
 
