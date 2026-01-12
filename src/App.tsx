@@ -19,6 +19,16 @@ import { FloatingNumber } from './components/FloatingNumber';
 import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
 import { calculateClickPower, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
 import { updateCombo, calculateComboMultiplier } from './game/combos';
+// New progression system components
+import { ProgressionStatus } from './components/ProgressionStatus';
+import { MilestoneManager } from './components/MilestoneNotification';
+import { OfflineProgressManager } from './components/OfflineProgress';
+import { ActionPanels } from './components/ActionPanels';
+import { isExtendedGameState, ExtendedGameState, Milestone } from './game/progressionTypes';
+import { useEnergyBooster as applyEnergyBooster } from './game/energyManagement';
+import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
+import { claimOfflineProgress } from './game/progressionIntegration';
+import { checkMilestones } from './game/milestones';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -56,6 +66,7 @@ function App() {
 
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
+  const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]);
 
   // Save to localStorage whenever state changes
   useEffect(() => {
@@ -90,6 +101,14 @@ function App() {
               });
             }
           });
+        }
+
+        // Check for new milestones (if using extended state)
+        if (isExtendedGameState(newState)) {
+          const completedMilestones = checkMilestones(newState as ExtendedGameState);
+          if (completedMilestones.length > 0) {
+            setMilestoneQueue(prev => [...prev, ...completedMilestones]);
+          }
         }
 
         return newState;
@@ -317,6 +336,38 @@ function App() {
     }
   }, []);
 
+  // New progression system handlers
+  const handleUseEnergyBooster = useCallback((boosterId: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      applyEnergyBooster(extendedState, boosterId);
+      return extendedState;
+    });
+  }, []);
+
+  const handleUseChaosAction = useCallback((actionId: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      applyChaosAction(extendedState, actionId);
+      return extendedState;
+    });
+  }, []);
+
+  const handleClaimOfflineProgress = useCallback(() => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = prevState as ExtendedGameState;
+      claimOfflineProgress(extendedState);
+      return { ...extendedState };
+    });
+  }, []);
+
+  const handleClearMilestones = useCallback(() => {
+    setMilestoneQueue([]);
+  }, []);
+
   return (
     <div className={`app font-${state.fontSize} ${state.reducedMotion ? 'reduced-motion' : ''} distortion-${state.distortionLevel}`}>
       <header className="app-header">
@@ -357,10 +408,23 @@ function App() {
           <section className="stats-section">
             <StatPanel state={state} />
             <HiddenMeters state={state} />
+            {/* New Progression Status */}
+            {isExtendedGameState(state) && <ProgressionStatus gameState={state} />}
           </section>
 
           {/* Scrollable Content Area */}
           <div className="scrollable-content">
+            {/* New Action Panels */}
+            {isExtendedGameState(state) && (
+              <section className="action-panels-section">
+                <ActionPanels
+                  gameState={state as ExtendedGameState}
+                  onUseEnergyBooster={handleUseEnergyBooster}
+                  onUseChaosAction={handleUseChaosAction}
+                />
+              </section>
+            )}
+
             <section className="shop-section">
               <SubstanceShop state={state} onPurchase={handlePurchase} />
             </section>
@@ -405,6 +469,20 @@ function App() {
           onComplete={handleFloatingNumberComplete}
         />
       ))}
+
+      {/* Milestone Notifications */}
+      <MilestoneManager
+        milestones={milestoneQueue}
+        onClearMilestones={handleClearMilestones}
+      />
+
+      {/* Offline Progress Welcome */}
+      {isExtendedGameState(state) && (
+        <OfflineProgressManager
+          gameState={state as ExtendedGameState}
+          onClaimOfflineProgress={handleClaimOfflineProgress}
+        />
+      )}
 
       {!state.hasSeenDisclaimer && <DisclaimerModal onAccept={handleDisclaimerAccept} />}
 
