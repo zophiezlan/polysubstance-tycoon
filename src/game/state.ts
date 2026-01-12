@@ -70,6 +70,11 @@ export function createInitialState(): GameState {
     disableDistortion: false,
     reducedMotion: false,
     fontSize: 'default',
+    muteNotifications: false,
+    showFloatingNumbers: true,
+    compactLog: false,
+    showLogTimestamps: true,
+    disableLogCorruption: false,
   };
 }
 
@@ -92,6 +97,11 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.disableDistortion = persistentState.disableDistortion || false;
   newState.reducedMotion = persistentState.reducedMotion || false;
   newState.fontSize = persistentState.fontSize || 'default';
+  newState.muteNotifications = persistentState.muteNotifications || false;
+  newState.showFloatingNumbers = persistentState.showFloatingNumbers ?? true;
+  newState.compactLog = persistentState.compactLog || false;
+  newState.showLogTimestamps = persistentState.showLogTimestamps ?? true;
+  newState.disableLogCorruption = persistentState.disableLogCorruption || false;
 
   // Preserve vibes and substances for endless mode
   newState.vibes = persistentState.vibes || 0;

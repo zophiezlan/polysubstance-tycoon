@@ -62,6 +62,11 @@ export interface GameState {
   disableDistortion: boolean;
   reducedMotion: boolean;
   fontSize: 'small' | 'default' | 'large';
+  muteNotifications: boolean;
+  showFloatingNumbers: boolean;
+  compactLog: boolean;
+  showLogTimestamps: boolean;
+  disableLogCorruption: boolean;
 }
 
 export interface LogEntry {
