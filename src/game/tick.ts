@@ -7,6 +7,9 @@ import {
   getStimulantEnergyMod,
 } from './interactions';
 import { calculateProductionMultiplier } from './upgradeEffects';
+import { tickCombo } from './combos';
+import { checkGroupChatTriggers } from './groupChat';
+import { checkOrganComplaints } from './organCommentary';
 
 export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!state.isNightActive) {
@@ -69,35 +72,44 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.timePlayed += dt;
   newState.highestVibesPerSecond = Math.max(newState.highestVibesPerSecond, totalVibesPerSec);
 
-  // 2. Apply energy changes
+  // 2. Apply energy changes - ENERGY IS ALWAYS POSITIVE!
   newState.energy += totalEnergyMod * dt;
 
-  // COOKIE CLICKER MODE: Improved energy sustainability
-  // Base passive energy regen (always active, scales with progression)
-  const baseRegen = 0.3; // Increased from 0.1
-  const progressionBonus = Math.min(1.0, newState.knowledgeLevel * 0.1); // +0.1 per knowledge level
+  // COOKIE CLICKER MODE: Generous energy sustainability
+  // Energy always slowly regenerates - you can't get stuck at 0
+  const baseRegen = 0.5; // Increased - always recovering
+  const progressionBonus = Math.min(1.5, newState.knowledgeLevel * 0.15); // Better scaling
   const energyRegen = (baseRegen + progressionBonus) * dt;
 
-  // Apply regen when below max (not just when low)
+  // Apply regen when below max
   if (newState.energy < 100) {
     newState.energy += energyRegen;
   }
 
-  // Hydration debt reduces but doesn't eliminate regen
-  if (newState.hydrationDebt > 50) {
-    const penalty = Math.min(energyRegen, (newState.hydrationDebt - 50) * 0.01 * dt);
+  // Hydration debt SLIGHTLY reduces energy gain, but never below baseline regen
+  // This keeps the mechanic relevant without being punishing
+  if (newState.hydrationDebt > 70) {
+    const penalty = Math.min(energyRegen * 0.3, (newState.hydrationDebt - 70) * 0.005 * dt);
     newState.energy -= penalty;
   }
 
+  // Energy is always 0-100, but 0 energy just means no bonus (not a penalty)
   newState.energy = Math.max(0, Math.min(100, newState.energy));
 
-  // 3. Apply chaos changes
+  // 3. Apply chaos changes - EASY MODE
   newState.chaos += totalChaosMod * dt;
 
-  // Empathogen special: pulls chaos toward 50
+  // COOKIE CLICKER MODE: Chaos naturally decays slowly (always recoverable)
+  // This prevents chaos from becoming permanently high
+  const chaosDecay = 0.3 * dt; // Slow but steady decay
+  if (newState.chaos > 30) {
+    newState.chaos -= chaosDecay;
+  }
+
+  // Empathogen special: pulls chaos toward 50 (more strongly now)
   const empathogenCount = newState.substances.empathogen || 0;
   if (empathogenCount > 0) {
-    const pullStrength = 0.5 * empathogenCount * dt;
+    const pullStrength = 0.8 * empathogenCount * dt; // Increased from 0.5
     if (newState.chaos < 50) {
       newState.chaos += pullStrength;
     } else {
@@ -105,79 +117,99 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     }
   }
 
-  // Handle chaos randomization from dissociative + alcohol
+  // Handle chaos randomization from dissociative + alcohol (reduced intensity)
   if (interactions.specialEffects.includes('chaos_randomization')) {
-    const randomShift = (Math.random() - 0.5) * 5 * dt;
+    const randomShift = (Math.random() - 0.5) * 3 * dt; // Reduced from 5
     newState.chaos += randomShift;
   }
 
-  // Paradox anxiety from stimulant + sedative
+  // Paradox anxiety from stimulant + sedative (less frequent, less intense)
   if (interactions.specialEffects.includes('paradox_anxiety')) {
-    if (Math.random() < 0.1 * dt) {
-      newState.chaos += Math.random() * 20;
+    if (Math.random() < 0.05 * dt) { // Reduced from 0.1
+      newState.chaos += Math.random() * 10; // Reduced from 20
     }
   }
 
   newState.chaos = Math.max(0, Math.min(100, newState.chaos));
 
-  // 4. Update hidden meters
+  // 4. Update hidden meters - COOKIE CLICKER MODE: More forgiving
   newState.hydrationDebt += totalHydrationMod * dt;
+
+  // COOKIE CLICKER MODE: Passive hydration debt recovery (drinking water is implied)
+  // Slow passive recovery when not actively dehydrating heavily
+  if (totalHydrationMod < 2) {
+    newState.hydrationDebt = Math.max(0, newState.hydrationDebt - 0.15 * dt);
+  }
+
   newState.hydrationDebt = Math.max(0, newState.hydrationDebt);
 
-  // Triple hydration from stimulant + empathogen
+  // Triple hydration from stimulant + empathogen (but less punishing now)
   if (interactions.specialEffects.includes('triple_hydration')) {
-    newState.hydrationDebt += totalHydrationMod * 2 * dt; // Already added once, add 2x more
+    newState.hydrationDebt += totalHydrationMod * 1.5 * dt; // Reduced from 2x
   }
 
   newState.sleepDebt += totalSleepDebtMod * dt;
 
-  // Exponential sleep debt after 10 stimulants
+  // Exponential sleep debt after 10 stimulants (but less harsh)
   const stimulantCount = newState.substances.stimulant || 0;
   if (stimulantCount >= 10) {
-    newState.sleepDebt += Math.pow(stimulantCount - 9, 1.5) * 0.1 * dt;
+    newState.sleepDebt += Math.pow(stimulantCount - 9, 1.5) * 0.05 * dt; // Reduced from 0.1
   }
 
-  // COOKIE CLICKER MODE: Passive sleep debt recovery (very slow but allows endless play)
-  // Only recovers when not actively using stimulants heavily
-  if (stimulantCount < 5) {
-    newState.sleepDebt = Math.max(0, newState.sleepDebt - 0.05 * dt);
+  // COOKIE CLICKER MODE: Passive sleep debt recovery (allows endless play)
+  // Always recovering slowly, even with moderate stimulant use
+  if (stimulantCount < 8) { // Increased threshold from 5
+    newState.sleepDebt = Math.max(0, newState.sleepDebt - 0.1 * dt); // Increased from 0.05
   }
 
   newState.sleepDebt = Math.max(0, newState.sleepDebt);
 
-  // 5. Calculate strain with interactions
-  let strainAccumulation = totalStrainMod * dt;
+  // 5. Calculate strain with interactions - COOKIE CLICKER MODE: Slower accumulation
+  let strainAccumulation = totalStrainMod * dt * 0.7; // 30% reduction in base accumulation
 
-  // Apply alcohol amplification
-  strainAccumulation *= alcoholAmp;
+  // Apply alcohol amplification (but capped to stay reasonable)
+  strainAccumulation *= Math.min(alcoholAmp, 1.5); // Cap amplification at 1.5x
 
-  // Apply interaction multipliers
-  strainAccumulation *= interactions.strainMultiplier;
+  // Apply interaction multipliers (but reduced impact)
+  strainAccumulation *= Math.min(interactions.strainMultiplier, 2.0); // Cap at 2x
 
-  // High chaos penalty
-  if (newState.chaos > 70) {
-    strainAccumulation *= 1 + ((newState.chaos - 70) * 0.02);
+  // High chaos penalty (only at very high chaos, reduced impact)
+  if (newState.chaos > 85) {
+    strainAccumulation *= 1 + ((newState.chaos - 85) * 0.01); // Reduced from 0.02, higher threshold
   }
 
-  // Hydration debt increases strain
-  if (newState.hydrationDebt > 50) {
-    strainAccumulation += (newState.hydrationDebt - 50) * 0.01 * dt;
+  // Hydration debt increases strain (more forgiving threshold)
+  if (newState.hydrationDebt > 70) {
+    strainAccumulation += (newState.hydrationDebt - 70) * 0.005 * dt; // Reduced from 0.01
+  }
+
+  // COOKIE CLICKER MODE: Passive strain decay when low
+  // This prevents strain from being a one-way ticket to collapse
+  if (newState.strain > 20 && totalStrainMod < 0.5) {
+    const strainDecay = 0.2 * dt;
+    newState.strain -= strainDecay;
   }
 
   newState.strain += strainAccumulation;
   newState.strain = Math.max(0, newState.strain);
 
-  // 6. Update memory integrity
+  // 6. Update memory integrity - COOKIE CLICKER MODE: Recoverable
   newState.memoryIntegrity += totalMemoryMod * dt;
 
-  // Memory crash from alcohol + empathogen
-  if (interactions.specialEffects.includes('memory_crash')) {
-    newState.memoryIntegrity -= 0.8 * dt;
+  // COOKIE CLICKER MODE: Memory slowly recovers when not being actively damaged
+  // Your brain is trying its best to piece things together
+  if (totalMemoryMod > -1 && newState.memoryIntegrity < 100) {
+    newState.memoryIntegrity += 0.1 * dt; // Slow passive recovery
   }
 
-  // Memory blackout from dissociative + sedative
+  // Memory crash from alcohol + empathogen (reduced intensity)
+  if (interactions.specialEffects.includes('memory_crash')) {
+    newState.memoryIntegrity -= 0.5 * dt; // Reduced from 0.8
+  }
+
+  // Memory blackout from dissociative + sedative (reduced intensity)
   if (interactions.specialEffects.includes('memory_blackout')) {
-    newState.memoryIntegrity -= 1.5 * dt;
+    newState.memoryIntegrity -= 1.0 * dt; // Reduced from 1.5
   }
 
   newState.memoryIntegrity = Math.max(0, Math.min(100, newState.memoryIntegrity));
@@ -190,9 +222,10 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.confidence += Math.log10(newState.vibes / 1000) * 10;
   }
 
-  // Low energy/high chaos should reduce confidence, but we invert it (THE LIE)
-  if (newState.energy < 30) {
-    newState.confidence += (30 - newState.energy) * 0.5; // OPPOSITE of reality
+  // High energy provides a confidence boost (positive reinforcement!)
+  // Low energy just means no bonus, not a penalty
+  if (newState.energy > 60) {
+    newState.confidence += (newState.energy - 60) * 0.3;
   }
 
   newState.confidence = Math.max(0, Math.min(100, newState.confidence));
@@ -208,12 +241,21 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.actionCooldowns[actionId] = Math.max(0, newState.actionCooldowns[actionId] - dt);
   });
 
-  // 11. Check collapse condition - but don't end the game, just apply debuffs
+  // 11. COOKIE CLICKER MODE: Tick combo system
+  tickCombo(newState, dt);
+
+  // 12. PROGRESSIVE DISCLOSURE: Check for group chat triggers
+  checkGroupChatTriggers(newState, dt);
+
+  // 13. CURSED FEATURE: Organ complaints
+  checkOrganComplaints(newState, dt);
+
+  // 14. Check collapse condition - but don't end the game, just apply debuffs
   if (checkCollapse(newState)) {
     handleCollapse(newState);
   }
 
-  // 12. ENDLESS MODE: Time loops, days increment, but NO STATE RESET
+  // 15. ENDLESS MODE: Time loops, days increment, but NO STATE RESET
   // This is Cookie Clicker style - time is just a counter, not a game-ender
   if (newState.timeRemaining <= 0) {
     const xpGained = calculateExperience(newState, newState.hasCollapsed);
@@ -272,16 +314,17 @@ export function calculateDistortionLevel(state: GameState): number {
 }
 
 export function checkCollapse(state: GameState): boolean {
-  // Base Collapse = 100
+  // COOKIE CLICKER MODE: Much more forgiving collapse mechanic
+  // Base Collapse = 150 (increased from 100 to be more lenient)
   // Modified by:
-  //   - Energy: +0.5 per point above 50
-  //   - Hydration Debt: -0.3 per point
-  //   - Chaos: -0.2 per point above 70
+  //   - Energy: +0.3 per point above 40 (easier to maintain buffer)
+  //   - Hydration Debt: -0.2 per point (reduced penalty from 0.3)
+  //   - Chaos: -0.1 per point above 80 (only matters at very high chaos, reduced from 0.2)
 
-  const baseThreshold = 100;
-  const energyBonus = state.energy > 50 ? (state.energy - 50) * 0.5 : 0;
-  const hydrationPenalty = state.hydrationDebt * 0.3;
-  const chaosPenalty = state.chaos > 70 ? (state.chaos - 70) * 0.2 : 0;
+  const baseThreshold = 150; // More forgiving
+  const energyBonus = state.energy > 40 ? (state.energy - 40) * 0.3 : 0;
+  const hydrationPenalty = state.hydrationDebt * 0.2; // Reduced
+  const chaosPenalty = state.chaos > 80 ? (state.chaos - 80) * 0.1 : 0; // Only kicks in above 80
 
   const collapseThreshold = baseThreshold + energyBonus - hydrationPenalty - chaosPenalty;
 
@@ -289,8 +332,8 @@ export function checkCollapse(state: GameState): boolean {
 }
 
 export function handleCollapse(state: GameState): GameState {
-  // COOKIE CLICKER MODE: Collapse is a setback, not a game-over
-  // Apply harsh debuffs but allow recovery and continuation
+  // COOKIE CLICKER MODE: Collapse is a mild setback - annoying but not devastating
+  // This should feel like a "whoops" moment, not a punishment
 
   // Prevent spam-triggering: only trigger if not collapsed recently
   if (state.hasCollapsed) {
@@ -302,48 +345,48 @@ export function handleCollapse(state: GameState): GameState {
   // Add log entry (unless memory is completely gone)
   if (state.memoryIntegrity > 5) {
     const messages = [
-      '⚠️ COLLAPSE EVENT: Heavy penalties applied.',
-      'You pushed too hard. Everything slows down...',
-      'The Night fights back. Systems degrading...',
-      '[WARNING] Operating at reduced capacity.',
+      '⚠️ You overdid it a little. Take it easy.',
+      '💫 Maybe slow down? Just a thought.',
+      '🌊 That was a lot. Breathing recommended.',
+      '⚡ Systems need a moment to recalibrate.',
     ];
     const message = messages[Math.floor(Math.random() * messages.length)];
 
     state.log.push({
       timestamp: 3600 - state.timeRemaining,
       message,
-      type: 'danger',
+      type: 'warning', // Changed from 'danger' to 'warning'
     });
   } else {
     state.log.push({
       timestamp: 3600 - state.timeRemaining,
-      message: '[DATA CORRUPTED] - SYSTEM INSTABILITY',
-      type: 'danger',
+      message: '[...wait what just happened?]',
+      type: 'warning',
       corrupted: true,
     });
   }
 
-  // HARSH PENALTIES (but recoverable):
+  // MILD PENALTIES (easily recoverable):
 
-  // 1. Reset strain to 50 (not 0) - you're hurt but functional
-  state.strain = 50;
+  // 1. Reset strain to 60 (was 50) - barely a setback
+  state.strain = 60;
 
-  // 2. Heavy energy drain
-  state.energy = Math.max(0, state.energy - 40);
+  // 2. Minor energy dip (was -40, now -20)
+  state.energy = Math.max(20, state.energy - 20);
 
-  // 3. Memory damage
-  state.memoryIntegrity = Math.max(0, state.memoryIntegrity - 30);
+  // 3. Slight memory hiccup (was -30, now -15)
+  state.memoryIntegrity = Math.max(30, state.memoryIntegrity - 15);
 
-  // 4. Chaos spike
-  state.chaos = Math.min(100, state.chaos + 25);
+  // 4. Small chaos bump (was +25, now +10)
+  state.chaos = Math.min(100, state.chaos + 10);
 
-  // 5. Hydration crisis
-  state.hydrationDebt = Math.min(100, state.hydrationDebt + 20);
+  // 5. Hydration notice (was +20, now +10)
+  state.hydrationDebt = Math.min(100, state.hydrationDebt + 10);
 
-  // 6. Sleep debt penalty (for future cycles)
-  state.sleepDebt = Math.min(200, state.sleepDebt + 15);
+  // 6. Minor sleep debt (was +15, now +5)
+  state.sleepDebt = Math.min(200, state.sleepDebt + 5);
 
-  // NOTE: Production continues but at reduced efficiency due to debuffs
+  // NOTE: Production continues at full efficiency - collapse is just a tap on the shoulder
   // hasCollapsed flag clears on day rollover, allowing endless play
 
   return state;

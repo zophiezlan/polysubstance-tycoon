@@ -470,6 +470,285 @@ export const UPGRADES: Upgrade[] = [
       upgradeOwned: 'heat-death',
     },
   },
+
+  // ===== AUTOMATION / IDLE UPGRADES =====
+
+  {
+    id: 'auto-clicker-1',
+    name: 'Autoclicker Script',
+    description: 'Generates 1 click per second automatically. Very legitimate.',
+    cost: 5000,
+    tier: 2,
+    effects: {
+      clickPower: 0, // Special: handled in App.tsx
+    },
+    requirement: {
+      totalClicks: 500,
+    },
+  },
+  {
+    id: 'auto-clicker-2',
+    name: 'Macro Optimization',
+    description: '5 clicks per second. Your fingers thank you.',
+    cost: 50000,
+    tier: 3,
+    effects: {
+      clickPower: 0,
+    },
+    requirement: {
+      totalClicks: 2500,
+      upgradeOwned: 'auto-clicker-1',
+    },
+  },
+  {
+    id: 'auto-clicker-3',
+    name: 'Neural Interface',
+    description: '20 clicks per second. Think and it clicks.',
+    cost: 500000,
+    tier: 4,
+    effects: {
+      clickPower: 0,
+    },
+    requirement: {
+      totalClicks: 10000,
+      upgradeOwned: 'auto-clicker-2',
+    },
+  },
+  {
+    id: 'auto-clicker-4',
+    name: 'Quantum Clicking',
+    description: 'Clicks in all timelines simultaneously. 100/sec.',
+    cost: 10000000,
+    tier: 5,
+    effects: {
+      clickPower: 0,
+    },
+    requirement: {
+      totalClicks: 50000,
+      upgradeOwned: 'auto-clicker-3',
+    },
+  },
+
+  {
+    id: 'idle-bonus-1',
+    name: 'Passive Income',
+    description: 'Vibes accumulate while you\'re away. +50% idle bonus.',
+    cost: 25000,
+    tier: 3,
+    effects: {
+      globalProductionMultiplier: 1.5, // Applied when away
+    },
+  },
+  {
+    id: 'idle-bonus-2',
+    name: 'Compounding Interest',
+    description: 'Time away = more vibes. +100% idle bonus.',
+    cost: 250000,
+    tier: 4,
+    effects: {
+      globalProductionMultiplier: 2,
+    },
+    requirement: {
+      upgradeOwned: 'idle-bonus-1',
+    },
+  },
+  {
+    id: 'idle-bonus-3',
+    name: 'Time Dilation',
+    description: 'Reality bends to your idle game. +300% idle bonus.',
+    cost: 5000000,
+    tier: 5,
+    effects: {
+      globalProductionMultiplier: 4,
+    },
+    requirement: {
+      upgradeOwned: 'idle-bonus-2',
+    },
+  },
+
+  // ===== SYNERGY UPGRADES =====
+
+  {
+    id: 'cocktail-theory',
+    name: 'Cocktail Theory',
+    description: 'Mixing alcohol + empathogen is... strategic? Both +30%.',
+    cost: 10000,
+    tier: 3,
+    effects: {
+      productionMultiplier: 1.3,
+    },
+    requirement: {
+      substanceOwned: { id: 'alcohol', count: 5 },
+    },
+  },
+  {
+    id: 'speedball-dynamics',
+    name: 'Speedball Dynamics',
+    description: 'Stimulant + sedative creates... balance? Both +40%.',
+    cost: 25000,
+    tier: 3,
+    effects: {
+      productionMultiplier: 1.4,
+    },
+    requirement: {
+      substanceOwned: { id: 'stimulant', count: 5 },
+    },
+  },
+  {
+    id: 'candy-flip-protocol',
+    name: 'Candy Flip Protocol',
+    description: 'Empathogen + psychedelic = transcendence. Both +50%.',
+    cost: 100000,
+    tier: 4,
+    effects: {
+      productionMultiplier: 1.5,
+    },
+    requirement: {
+      substanceOwned: { id: 'empathogen', count: 3 },
+    },
+  },
+  {
+    id: 'jedi-flip-mastery',
+    name: 'Jedi Flip Mastery',
+    description: 'Three substances at once. You\'re a chemist now. +100% global.',
+    cost: 1000000,
+    tier: 5,
+    effects: {
+      globalProductionMultiplier: 2,
+    },
+    requirement: {
+      upgradeOwned: 'candy-flip-protocol',
+    },
+  },
+
+  // ===== HARM REDUCTION TECH TREE =====
+
+  {
+    id: 'test-kit-pro',
+    name: 'Test Kit Pro',
+    description: 'Actually test your substances. Strain +30% slower.',
+    cost: 15000,
+    tier: 3,
+    effects: {
+      chaosDampening: 0.3,
+    },
+  },
+  {
+    id: 'supplements',
+    name: 'Supplement Regimen',
+    description: 'Vitamins, antioxidants, magnesium. Strain +40% slower.',
+    cost: 50000,
+    tier: 4,
+    effects: {
+      chaosDampening: 0.4,
+    },
+    requirement: {
+      upgradeOwned: 'test-kit-pro',
+    },
+  },
+  {
+    id: 'medical-supervision',
+    name: 'Medical Supervision',
+    description: 'Having a doctor on speed dial. Strain +50% slower.',
+    cost: 500000,
+    tier: 5,
+    effects: {
+      chaosDampening: 0.5,
+    },
+    requirement: {
+      upgradeOwned: 'supplements',
+    },
+  },
+
+  // ===== CURSED FEATURES =====
+
+  {
+    id: 'memory-suppression',
+    name: 'Selective Memory Suppression',
+    description: 'Forget the bad parts. Keep the vibes. Memory damage -50%.',
+    cost: 75000,
+    tier: 4,
+    effects: {
+      chaosDampening: 0.3,
+    },
+  },
+  {
+    id: 'reality-distortion-field',
+    name: 'Reality Distortion Field',
+    description: 'Confidence isn\'t lying if you believe it. Distortion = vibes.',
+    cost: 250000,
+    tier: 4,
+    effects: {
+      globalProductionMultiplier: 1.2,
+    },
+    requirement: {
+      totalVibes: 1000000,
+    },
+  },
+  {
+    id: 'denial-mechanism',
+    name: 'Industrial Denial Mechanism',
+    description: 'Nothing is a problem if you refuse to acknowledge it. Chaos means nothing now.',
+    cost: 1000000,
+    tier: 5,
+    effects: {
+      chaosDampening: 0.6,
+    },
+  },
+  {
+    id: 'perspective-hack',
+    name: 'Perspective Hacking',
+    description: 'It\'s not addiction, it\'s passion. It\'s not a problem, it\'s a lifestyle. Production +25%.',
+    cost: 2500000,
+    tier: 5,
+    effects: {
+      globalProductionMultiplier: 1.25,
+    },
+  },
+
+  // ===== COMBO UPGRADES =====
+
+  {
+    id: 'combo-master',
+    name: 'Combo Mastery',
+    description: 'Your fingers are now independently sentient. Combo timer +1 second.',
+    cost: 10000,
+    tier: 3,
+    effects: {
+      clickPower: 5,
+    },
+    requirement: {
+      totalClicks: 1000,
+    },
+  },
+  {
+    id: 'combo-god',
+    name: 'Combo Deity',
+    description: 'Time bends to your rhythm. Combo timer +2 seconds.',
+    cost: 100000,
+    tier: 4,
+    effects: {
+      clickPower: 10,
+    },
+    requirement: {
+      totalClicks: 5000,
+      upgradeOwned: 'combo-master',
+    },
+  },
+  {
+    id: 'eternal-combo',
+    name: 'Eternal Combo',
+    description: 'Your combo never dies. It merely... waits. Combo timer +5 seconds.',
+    cost: 1000000,
+    tier: 5,
+    effects: {
+      clickPower: 25,
+    },
+    requirement: {
+      totalClicks: 25000,
+      upgradeOwned: 'combo-god',
+    },
+  },
 ];
 
 export function getUpgrade(id: string): Upgrade | undefined {
@@ -501,6 +780,10 @@ export function canPurchaseUpgrade(upgrade: Upgrade, state: any): boolean {
     }
 
     if (req.upgradeOwned && !state.upgrades.includes(req.upgradeOwned)) {
+      return false;
+    }
+
+    if (req.totalClicks && state.totalClicks < req.totalClicks) {
       return false;
     }
   }

@@ -36,6 +36,22 @@ export interface GameState {
   isNightActive: boolean;
   hasCollapsed: boolean;
 
+  // COOKIE CLICKER MODE: Active clicking features
+  comboCount: number; // Current click streak
+  comboTimer: number; // Seconds until combo expires
+  maxCombo: number; // Lifetime max combo
+  lastClickTime: number; // timestamp for combo detection
+
+  // PROGRESSIVE DISCLOSURE: Hidden features
+  unlockedFeatures: string[]; // IDs of discovered features
+  groupChatMessages: GroupChatMessage[]; // Narrative messages from friends
+  organComplaints: OrganComplaint[]; // Body parts complaining
+  ritualProgress: Record<string, number>; // Secret pattern detection
+
+  // Automation/Idle features
+  autoClickerLevel: number; // 0 = none, 1+ = tiers of automation
+  idleMultiplier: number; // Bonus for time away
+
   // UI state
   distortionLevel: number;
   log: LogEntry[];
@@ -112,6 +128,23 @@ export interface Achievement {
   description: string;
   checkCondition: (state: GameState) => boolean;
   hidden?: boolean;
+}
+
+export interface GroupChatMessage {
+  id: string;
+  sender: string; // Friend's name
+  message: string;
+  timestamp: number; // When it was sent
+  substance?: string; // If triggered by specific substance
+  read: boolean;
+}
+
+export interface OrganComplaint {
+  id: string;
+  organ: string; // 'liver', 'brain', 'kidneys', 'heart', 'lungs'
+  message: string;
+  severity: 'mild' | 'concerning' | 'critical';
+  timestamp: number;
 }
 
 export interface KnowledgeLevel {

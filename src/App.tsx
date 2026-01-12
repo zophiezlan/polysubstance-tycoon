@@ -17,7 +17,8 @@ import { DisclaimerModal } from './components/DisclaimerModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FloatingNumber } from './components/FloatingNumber';
 import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
-import { calculateClickPower, calculateEnergyCost, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
+import { calculateClickPower, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
+import { updateCombo, calculateComboMultiplier } from './game/combos';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -115,48 +116,56 @@ function App() {
   const handleMainClick = useCallback((event: React.MouseEvent) => {
     const { clientX, clientY } = event;
     setState(prevState => {
-      const newState = { ...prevState };
-      const energyCost = calculateEnergyCost(prevState);
+      let newState = { ...prevState };
+
+      // COOKIE CLICKER MODE: Update combo system
+      newState = updateCombo(newState);
+      const comboMultiplier = calculateComboMultiplier(newState.comboCount);
+
       const baseClickPower = calculateClickPower(prevState);
 
-      // COOKIE CLICKER MODE: Always clickable at full power
-      // Energy provides a bonus multiplier instead of blocking
-      let vibesGained = baseClickPower;
-      let energyBonus = 1;
-      let hasEnergy = false;
+      // COOKIE CLICKER MODE: Clicks NEVER cost energy!
+      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-2.0x)
+      // This makes energy a pure positive mechanic
+      const energyBonus = 1 + (newState.energy / 100); // 0 energy = 1x, 100 energy = 2x
 
-      if (newState.energy >= energyCost) {
-        // Full energy: get bonus multiplier
-        energyBonus = 1.5;
-        hasEnergy = true;
-        newState.energy -= energyCost;
-      }
-      // No energy penalty - always get base power minimum
-
-      vibesGained = Math.floor(baseClickPower * energyBonus);
+      // Apply combo multiplier!
+      let vibesGained = Math.floor(baseClickPower * energyBonus * comboMultiplier);
       vibesGained = Math.max(1, vibesGained); // Minimum 1 vibe per click
 
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
       newState.totalClicks += 1;
 
-      const chaosIncrease = Math.random() * 3 * (1 - calculateChaosDampening(prevState));
-      newState.chaos += chaosIncrease;
+      // Minimal chaos increase - make it VERY easy to manage
+      const chaosIncrease = Math.random() * 1.5 * (1 - calculateChaosDampening(prevState));
+      newState.chaos = Math.min(100, newState.chaos + chaosIncrease);
 
       // Lore-appropriate messages based on state
       let message = 'Running the night.';
-      if (!hasEnergy) {
-        message = 'Pure vibes, no fuel needed.';
+      const energyLevel = newState.energy;
+      if (energyLevel > 80) {
+        message = 'Vibing hard.';
+      } else if (energyLevel < 30) {
+        message = 'Coasting on fumes.';
       }
       if (newState.chaos > 80) {
         message = 'Everything is fine.';
       }
+      if (newState.comboCount > 50) {
+        message = `${newState.comboCount}x COMBO!!!`;
+      }
 
-      newState.log.push({
-        timestamp: 3600 - newState.timeRemaining,
-        message: `${message} Vibes +${vibesGained}${hasEnergy ? ' (⚡ energized!)' : ''}`,
-        type: 'info',
-      });
+      // Only log occasionally to reduce spam
+      if (Math.random() < 0.15) {
+        const bonusText = energyLevel > 50 ? ` (⚡${(energyBonus * 100).toFixed(0)}%)` : '';
+        const comboText = newState.comboCount > 5 ? ` 🔥${newState.comboCount}x` : '';
+        newState.log.push({
+          timestamp: 3600 - newState.timeRemaining,
+          message: `${message} Vibes +${vibesGained}${bonusText}${comboText}`,
+          type: 'info',
+        });
+      }
 
       // Create floating number
       setFloatingNumbers(prev => [...prev, {
