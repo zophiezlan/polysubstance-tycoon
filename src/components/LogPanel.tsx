@@ -7,18 +7,21 @@ interface LogPanelProps {
 
 export function LogPanel({ state }: LogPanelProps) {
   // Show most recent entries first (reverse chronological)
-  const recentLogs = [...state.log].reverse().slice(0, 15);
+  const maxEntries = state.compactLog ? 8 : 15;
+  const recentLogs = [...state.log].reverse().slice(0, maxEntries);
+
+  const isCorruptionEnabled = !state.disableLogCorruption;
 
   return (
-    <div className="log-panel">
+    <div className={`log-panel ${state.compactLog ? 'compact' : ''} ${state.showLogTimestamps ? '' : 'hide-time'}`}>
       <h3>📜 LOG</h3>
       <div className="log-entries">
         {recentLogs.map((entry, index) => {
-          const timeDisplay = entry.corrupted || state.memoryIntegrity < 30
+          const timeDisplay = isCorruptionEnabled && (entry.corrupted || state.memoryIntegrity < 30)
             ? '~??:??'
             : formatTime(entry.timestamp);
 
-          const messageDisplay = entry.corrupted || (state.memoryIntegrity < 50 && Math.random() > 0.7)
+          const messageDisplay = isCorruptionEnabled && (entry.corrupted || (state.memoryIntegrity < 50 && Math.random() > 0.7))
             ? '[CORRUPTED] ' + entry.message.substring(0, Math.floor(Math.random() * entry.message.length))
             : entry.message;
 
@@ -27,7 +30,7 @@ export function LogPanel({ state }: LogPanelProps) {
               key={`${entry.timestamp}-${index}`}
               className={`log-entry log-${entry.type} ${entry.corrupted ? 'corrupted' : ''}`}
             >
-              <span className="log-time">{timeDisplay}</span>
+              {state.showLogTimestamps && <span className="log-time">{timeDisplay}</span>}
               <span className="log-message">{messageDisplay}</span>
             </div>
           );

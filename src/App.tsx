@@ -93,11 +93,13 @@ function App() {
           if (achievementsToAdd.length > 0) {
             newState.achievements = [...prevState.achievements, ...achievementsToAdd];
 
-            setAchievementQueue(prev => {
-              const queued = new Set(prev);
-              const additions = achievementsToAdd.filter(achId => !queued.has(achId));
-              return additions.length > 0 ? [...prev, ...additions] : prev;
-            });
+            if (!newState.muteNotifications) {
+              setAchievementQueue(prev => {
+                const queued = new Set(prev);
+                const additions = achievementsToAdd.filter(achId => !queued.has(achId));
+                return additions.length > 0 ? [...prev, ...additions] : prev;
+              });
+            }
 
             // Log achievements
             achievementsToAdd.forEach(achId => {
@@ -116,7 +118,7 @@ function App() {
         // Check for new milestones (if using extended state)
         if (isExtendedGameState(newState)) {
           const completedMilestones = checkMilestones(newState as ExtendedGameState);
-          if (completedMilestones.length > 0) {
+          if (completedMilestones.length > 0 && !newState.muteNotifications) {
             setMilestoneQueue(prev => [...prev, ...completedMilestones]);
           }
         }
@@ -197,12 +199,14 @@ function App() {
       }
 
       // Create floating number
-      setFloatingNumbers(prev => [...prev, {
-        id: Date.now().toString() + Math.random(),
-        value: vibesGained,
-        x: clientX,
-        y: clientY,
-      }]);
+      if (prevState.showFloatingNumbers) {
+        setFloatingNumbers(prev => [...prev, {
+          id: Date.now().toString() + Math.random(),
+          value: vibesGained,
+          x: clientX,
+          y: clientY,
+        }]);
+      }
 
       return newState;
     });
@@ -332,6 +336,48 @@ function App() {
     }));
   }, []);
 
+  const handleToggleNotifications = useCallback(() => {
+    setState(prevState => {
+      const nextMute = !prevState.muteNotifications;
+      if (nextMute) {
+        setAchievementQueue([]);
+        setMilestoneQueue([]);
+      }
+      return {
+        ...prevState,
+        muteNotifications: nextMute,
+      };
+    });
+  }, []);
+
+  const handleToggleFloatingNumbers = useCallback(() => {
+    setState(prevState => ({
+      ...prevState,
+      showFloatingNumbers: !prevState.showFloatingNumbers,
+    }));
+  }, []);
+
+  const handleToggleCompactLog = useCallback(() => {
+    setState(prevState => ({
+      ...prevState,
+      compactLog: !prevState.compactLog,
+    }));
+  }, []);
+
+  const handleToggleLogTimestamps = useCallback(() => {
+    setState(prevState => ({
+      ...prevState,
+      showLogTimestamps: !prevState.showLogTimestamps,
+    }));
+  }, []);
+
+  const handleToggleLogCorruption = useCallback(() => {
+    setState(prevState => ({
+      ...prevState,
+      disableLogCorruption: !prevState.disableLogCorruption,
+    }));
+  }, []);
+
   const handleChangeFontSize = useCallback((size: 'small' | 'default' | 'large') => {
     setState(prevState => ({
       ...prevState,
@@ -454,7 +500,7 @@ function App() {
         </div>
       </main>
 
-      {achievementQueue.length > 0 && (
+      {!state.muteNotifications && achievementQueue.length > 0 && (
         <div className="achievement-toast">
           {achievementQueue.slice(0, 3).map((achId, index) => {
             const ach = getAchievement(achId);
@@ -481,10 +527,12 @@ function App() {
       ))}
 
       {/* Milestone Notifications */}
-      <MilestoneManager
-        milestones={milestoneQueue}
-        onClearMilestones={handleClearMilestones}
-      />
+      {!state.muteNotifications && (
+        <MilestoneManager
+          milestones={milestoneQueue}
+          onClearMilestones={handleClearMilestones}
+        />
+      )}
 
       {/* Offline Progress Welcome */}
       {isExtendedGameState(state) && (
@@ -502,6 +550,11 @@ function App() {
           onClose={handleToggleSettings}
           onToggleDistortion={handleToggleDistortion}
           onToggleMotion={handleToggleMotion}
+          onToggleNotifications={handleToggleNotifications}
+          onToggleFloatingNumbers={handleToggleFloatingNumbers}
+          onToggleCompactLog={handleToggleCompactLog}
+          onToggleLogTimestamps={handleToggleLogTimestamps}
+          onToggleLogCorruption={handleToggleLogCorruption}
           onChangeFontSize={handleChangeFontSize}
           onReset={handleReset}
         />

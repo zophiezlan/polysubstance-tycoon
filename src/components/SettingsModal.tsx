@@ -6,6 +6,11 @@ interface SettingsModalProps {
   onClose: () => void;
   onToggleDistortion: () => void;
   onToggleMotion: () => void;
+  onToggleNotifications: () => void;
+  onToggleFloatingNumbers: () => void;
+  onToggleCompactLog: () => void;
+  onToggleLogTimestamps: () => void;
+  onToggleLogCorruption: () => void;
   onChangeFontSize: (size: 'small' | 'default' | 'large') => void;
   onReset: () => void;
 }
@@ -15,6 +20,11 @@ export function SettingsModal({
   onClose,
   onToggleDistortion,
   onToggleMotion,
+  onToggleNotifications,
+  onToggleFloatingNumbers,
+  onToggleCompactLog,
+  onToggleLogTimestamps,
+  onToggleLogCorruption,
   onChangeFontSize,
   onReset,
 }: SettingsModalProps) {
@@ -67,6 +77,70 @@ export function SettingsModal({
                   Large
                 </button>
               </div>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3>Notifications & UI</h3>
+
+            <label className="setting-item">
+              <input
+                type="checkbox"
+                checked={state.muteNotifications}
+                onChange={onToggleNotifications}
+              />
+              <span>Mute Pop-up Notifications</span>
+            </label>
+            <div className="setting-description">
+              Hide achievement toasts and milestone pop-ups.
+            </div>
+
+            <label className="setting-item">
+              <input
+                type="checkbox"
+                checked={state.showFloatingNumbers}
+                onChange={onToggleFloatingNumbers}
+              />
+              <span>Show Floating Click Numbers</span>
+            </label>
+            <div className="setting-description">
+              Toggle the on-click vibe number bursts.
+            </div>
+
+            <label className="setting-item">
+              <input
+                type="checkbox"
+                checked={state.compactLog}
+                onChange={onToggleCompactLog}
+              />
+              <span>Compact Log View</span>
+            </label>
+            <div className="setting-description">
+              Tighter spacing and fewer entries for quick scanning.
+            </div>
+
+            <label className="setting-item">
+              <input
+                type="checkbox"
+                checked={state.showLogTimestamps}
+                onChange={onToggleLogTimestamps}
+              />
+              <span>Show Log Timestamps</span>
+            </label>
+            <div className="setting-description">
+              Toggle the time column in the log panel.
+            </div>
+
+            <label className="setting-item">
+              <input
+                type="checkbox"
+                checked={state.disableLogCorruption}
+                onChange={onToggleLogCorruption}
+              />
+              <span>Stabilize Log Readability</span>
+            </label>
+            <div className="setting-description">
+              Prevent memory corruption effects in log entries.
             </div>
           </div>
 
