@@ -6,22 +6,23 @@ Realistic progression simulation - calculates actual time to milestones
 import math
 
 SUBSTANCES = [
-    {"id": "alcohol", "baseCost": 10, "costMult": 1.15, "baseVibes": 0.5},
-    {"id": "stimulant", "baseCost": 25, "costMult": 1.2, "baseVibes": 1.5},
-    {"id": "empathogen", "baseCost": 50, "costMult": 1.25, "baseVibes": 3},
-    {"id": "dissociative", "baseCost": 40, "costMult": 1.18, "baseVibes": 1},
-    {"id": "sedative", "baseCost": 35, "costMult": 1.2, "baseVibes": 0.8},
-    {"id": "nootropic", "baseCost": 100, "costMult": 1.15, "baseVibes": 2.5},
-    {"id": "deliriant", "baseCost": 250, "costMult": 1.18, "baseVibes": 4.5},
-    {"id": "psychedelic", "baseCost": 750, "costMult": 1.22, "baseVibes": 8},
-    {"id": "synthetic", "baseCost": 2500, "costMult": 1.25, "baseVibes": 15},
-    {"id": "research", "baseCost": 10000, "costMult": 1.3, "baseVibes": 30},
-    # NEW BALANCED COSTS
-    {"id": "exotic", "baseCost": 50000, "costMult": 1.25, "baseVibes": 60},
-    {"id": "experimental", "baseCost": 250000, "costMult": 1.28, "baseVibes": 125},
-    {"id": "forbidden", "baseCost": 1000000, "costMult": 1.3, "baseVibes": 250},
-    {"id": "eldritch", "baseCost": 10000000, "costMult": 1.32, "baseVibes": 500},
-    {"id": "void", "baseCost": 100000000, "costMult": 1.35, "baseVibes": 1000},
+    # REBALANCED - Reduced production by ~35-40%
+    {"id": "alcohol", "baseCost": 10, "costMult": 1.15, "baseVibes": 0.3},
+    {"id": "stimulant", "baseCost": 25, "costMult": 1.2, "baseVibes": 1.0},
+    {"id": "empathogen", "baseCost": 50, "costMult": 1.25, "baseVibes": 2.0},
+    {"id": "dissociative", "baseCost": 40, "costMult": 1.18, "baseVibes": 0.7},
+    {"id": "sedative", "baseCost": 35, "costMult": 1.2, "baseVibes": 0.5},
+    {"id": "nootropic", "baseCost": 100, "costMult": 1.15, "baseVibes": 1.6},
+    {"id": "deliriant", "baseCost": 250, "costMult": 1.18, "baseVibes": 3.0},
+    {"id": "psychedelic", "baseCost": 750, "costMult": 1.22, "baseVibes": 5.0},
+    {"id": "synthetic", "baseCost": 2500, "costMult": 1.25, "baseVibes": 10.0},
+    {"id": "research", "baseCost": 10000, "costMult": 1.3, "baseVibes": 20.0},
+    # Reverted cost multipliers + reduced production
+    {"id": "exotic", "baseCost": 50000, "costMult": 1.35, "baseVibes": 40.0},
+    {"id": "experimental", "baseCost": 250000, "costMult": 1.4, "baseVibes": 80.0},
+    {"id": "forbidden", "baseCost": 1000000, "costMult": 1.45, "baseVibes": 160.0},
+    {"id": "eldritch", "baseCost": 10000000, "costMult": 1.5, "baseVibes": 320.0},
+    {"id": "void", "baseCost": 100000000, "costMult": 1.55, "baseVibes": 600.0},
 ]
 
 def cost_of_next(sub, owned):

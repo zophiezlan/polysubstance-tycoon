@@ -370,6 +370,59 @@ export const UPGRADES: Upgrade[] = [
     },
   },
 
+  // ===== PROGRESSION GATES - Required to unlock substance tiers =====
+  {
+    id: 'tier-2-license',
+    name: 'Advanced Procurement License',
+    description: 'Unlocks access to high-tier substances (Research Chemicals onwards). Required to purchase exotic and beyond.',
+    cost: 25000,
+    tier: 3,
+    effects: {},
+    requirement: {
+      totalVibes: 100000,
+      substanceOwned: { id: 'research', count: 1 },
+    },
+  },
+  {
+    id: 'tier-3-connections',
+    name: 'Underground Network Access',
+    description: 'Connects you to the darkest markets. Required to purchase experimental and beyond.',
+    cost: 500000,
+    tier: 4,
+    effects: {},
+    requirement: {
+      totalVibes: 2000000,
+      upgradeOwned: 'tier-2-license',
+      substanceOwned: { id: 'exotic', count: 5 },
+    },
+  },
+  {
+    id: 'tier-4-clearance',
+    name: 'Forbidden Knowledge',
+    description: 'You know too much. Required to purchase forbidden and beyond.',
+    cost: 5000000,
+    tier: 5,
+    effects: {},
+    requirement: {
+      totalVibes: 20000000,
+      upgradeOwned: 'tier-3-connections',
+      substanceOwned: { id: 'experimental', count: 5 },
+    },
+  },
+  {
+    id: 'tier-5-transcendence',
+    name: 'Reality Breach Protocol',
+    description: 'You\'ve pierced the veil. Required to purchase eldritch and void substances.',
+    cost: 50000000,
+    tier: 5,
+    effects: {},
+    requirement: {
+      totalVibes: 200000000,
+      upgradeOwned: 'tier-4-clearance',
+      substanceOwned: { id: 'forbidden', count: 3 },
+    },
+  },
+
   // Late Game Global Upgrades
   {
     id: 'tolerance-management',
