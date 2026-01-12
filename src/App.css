@@ -45,6 +45,7 @@
   overflow: hidden;
   gap: 0.5rem;
   padding: 0.5rem;
+  min-height: 0;
 }
 
 /* Left Panel - Big Clicker */
@@ -59,6 +60,7 @@
   border-radius: 8px;
   padding: 1rem;
   position: relative;
+  min-height: 0;
 }
 
 /* Vibes Display */
@@ -103,8 +105,10 @@
   flex: 0 0 60%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   gap: 0.5rem;
+  min-height: 0;
 }
 
 /* Stats Section - Fixed at Top of Right Panel */
@@ -114,17 +118,20 @@
   border: 2px solid var(--purple);
   border-radius: 8px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 /* Scrollable Content Area */
 .scrollable-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  flex: 0 0 auto;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding-right: 0.3rem;
+  min-height: 0;
 }
 
 /* Section Styling */
@@ -914,9 +921,6 @@ section {
     padding: 1.5rem;
   }
 
-  .scrollable-content {
-    max-height: 50vh;
-  }
 }
 
 /* Scrollbar styling */
