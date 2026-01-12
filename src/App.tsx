@@ -91,12 +91,6 @@ function App() {
           });
         }
 
-        if (!newState.isNightActive) {
-          const rolledState = startNewNight(newState);
-          rolledState.lastTickTime = now;
-          return rolledState;
-        }
-
         return newState;
       });
     }, TICK_INTERVAL);
