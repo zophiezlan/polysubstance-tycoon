@@ -87,20 +87,30 @@ function App() {
         // Check for new achievements
         const newAchievements = checkAchievements(newState, prevState.achievements);
         if (newAchievements.length > 0) {
-          newState.achievements = [...newState.achievements, ...newAchievements];
-          setAchievementQueue(prev => [...prev, ...newAchievements]);
+          const previouslyUnlocked = new Set(prevState.achievements);
+          const achievementsToAdd = newAchievements.filter(achId => !previouslyUnlocked.has(achId));
 
-          // Log achievements
-          newAchievements.forEach(achId => {
-            const ach = getAchievement(achId);
-            if (ach) {
-              newState.log.push({
-                timestamp: 3600 - newState.timeRemaining,
-                message: `🏆 ${ach.name}`,
-                type: 'achievement',
-              });
-            }
-          });
+          if (achievementsToAdd.length > 0) {
+            newState.achievements = [...prevState.achievements, ...achievementsToAdd];
+
+            setAchievementQueue(prev => {
+              const queued = new Set(prev);
+              const additions = achievementsToAdd.filter(achId => !queued.has(achId));
+              return additions.length > 0 ? [...prev, ...additions] : prev;
+            });
+
+            // Log achievements
+            achievementsToAdd.forEach(achId => {
+              const ach = getAchievement(achId);
+              if (ach) {
+                newState.log.push({
+                  timestamp: 3600 - newState.timeRemaining,
+                  message: `🏆 ${ach.name}`,
+                  type: 'achievement',
+                });
+              }
+            });
+          }
         }
 
         // Check for new milestones (if using extended state)
