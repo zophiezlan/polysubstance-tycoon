@@ -1,5 +1,6 @@
 import { GameState } from './types';
 import { getSubstance } from './substances';
+import { createInitialState } from './state';
 import { calculateExperience, getKnowledgeLevel } from './prestige';
 import {
   calculateInteractionMultipliers,
