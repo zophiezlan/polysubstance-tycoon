@@ -782,6 +782,10 @@ export function canPurchaseUpgrade(upgrade: Upgrade, state: any): boolean {
     if (req.upgradeOwned && !state.upgrades.includes(req.upgradeOwned)) {
       return false;
     }
+
+    if (req.totalClicks && state.totalClicks < req.totalClicks) {
+      return false;
+    }
   }
 
   return true;

@@ -3,11 +3,6 @@ import { GameState, GroupChatMessage } from './types';
 // PROGRESSIVE DISCLOSURE: Group chat unlocks at knowledge level 2
 // Friends send messages based on your substance use and game state
 
-const FRIEND_NAMES = [
-  'Alex', 'Jordan', 'Sam', 'Casey', 'Taylor', 'Morgan',
-  'Riley', 'Avery', 'Quinn', 'Blake'
-];
-
 let messageIdCounter = 0;
 
 interface ChatTrigger {
@@ -185,7 +180,7 @@ const CHAT_TRIGGERS: ChatTrigger[] = [
 /**
  * Check triggers and generate new group chat messages
  */
-export function checkGroupChatTriggers(state: GameState, deltaTime: number): GameState {
+export function checkGroupChatTriggers(state: GameState, _deltaTime: number): GameState {
   // Feature locked until knowledge level 2
   if (state.knowledgeLevel < 2) return state;
 

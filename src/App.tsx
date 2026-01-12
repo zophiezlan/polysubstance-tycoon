@@ -17,7 +17,7 @@ import { DisclaimerModal } from './components/DisclaimerModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FloatingNumber } from './components/FloatingNumber';
 import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
-import { calculateClickPower, calculateEnergyCost, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
+import { calculateClickPower, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
 import { updateCombo, calculateComboMultiplier } from './game/combos';
 import './App.css';
 

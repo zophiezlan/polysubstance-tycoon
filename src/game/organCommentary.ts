@@ -5,12 +5,6 @@ import { GameState, OrganComplaint } from './types';
 
 let complaintIdCounter = 0;
 
-interface OrganState {
-  lastComplaintTime: number;
-  complaintCooldown: number; // Base cooldown in seconds
-  triggerThreshold: number; // How bad things need to be
-}
-
 const ORGAN_COOLDOWNS: Record<string, number> = {
   liver: 300,    // 5 minutes
   brain: 400,    // 6.7 minutes
@@ -22,7 +16,7 @@ const ORGAN_COOLDOWNS: Record<string, number> = {
 /**
  * Generate organ complaints based on game state
  */
-export function checkOrganComplaints(state: GameState, deltaTime: number): GameState {
+export function checkOrganComplaints(state: GameState, _deltaTime: number): GameState {
   // Feature locked until knowledge level 3
   if (state.knowledgeLevel < 3) return state;
 
