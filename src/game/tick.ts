@@ -7,6 +7,9 @@ import {
   getStimulantEnergyMod,
 } from './interactions';
 import { calculateProductionMultiplier } from './upgradeEffects';
+import { tickCombo } from './combos';
+import { checkGroupChatTriggers } from './groupChat';
+import { checkOrganComplaints } from './organCommentary';
 
 export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!state.isNightActive) {
@@ -238,12 +241,21 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.actionCooldowns[actionId] = Math.max(0, newState.actionCooldowns[actionId] - dt);
   });
 
-  // 11. Check collapse condition - but don't end the game, just apply debuffs
+  // 11. COOKIE CLICKER MODE: Tick combo system
+  tickCombo(newState, dt);
+
+  // 12. PROGRESSIVE DISCLOSURE: Check for group chat triggers
+  checkGroupChatTriggers(newState, dt);
+
+  // 13. CURSED FEATURE: Organ complaints
+  checkOrganComplaints(newState, dt);
+
+  // 14. Check collapse condition - but don't end the game, just apply debuffs
   if (checkCollapse(newState)) {
     handleCollapse(newState);
   }
 
-  // 12. ENDLESS MODE: Time loops, days increment, but NO STATE RESET
+  // 15. ENDLESS MODE: Time loops, days increment, but NO STATE RESET
   // This is Cookie Clicker style - time is just a counter, not a game-ender
   if (newState.timeRemaining <= 0) {
     const xpGained = calculateExperience(newState, newState.hasCollapsed);

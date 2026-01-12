@@ -38,6 +38,22 @@ export function createInitialState(): GameState {
     isNightActive: true,
     hasCollapsed: false,
 
+    // COOKIE CLICKER MODE: Active clicking features
+    comboCount: 0,
+    comboTimer: 0,
+    maxCombo: 0,
+    lastClickTime: Date.now(),
+
+    // PROGRESSIVE DISCLOSURE: Hidden features
+    unlockedFeatures: [],
+    groupChatMessages: [],
+    organComplaints: [],
+    ritualProgress: {},
+
+    // Automation/Idle features
+    autoClickerLevel: 0,
+    idleMultiplier: 1,
+
     // UI state
     distortionLevel: 0,
     log: [
@@ -80,6 +96,14 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   // Preserve vibes and substances for endless mode
   newState.vibes = persistentState.vibes || 0;
   newState.substances = persistentState.substances || {};
+
+  // COOKIE CLICKER MODE: Preserve progression features
+  newState.maxCombo = persistentState.maxCombo || 0;
+  newState.unlockedFeatures = persistentState.unlockedFeatures || [];
+  newState.groupChatMessages = persistentState.groupChatMessages || [];
+  newState.organComplaints = persistentState.organComplaints || [];
+  newState.ritualProgress = persistentState.ritualProgress || {};
+  newState.autoClickerLevel = persistentState.autoClickerLevel || 0;
 
   // Apply sleep debt penalty from previous night
   if (persistentState.sleepDebt && persistentState.sleepDebt > 0) {

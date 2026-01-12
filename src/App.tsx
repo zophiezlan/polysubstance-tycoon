@@ -18,6 +18,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { FloatingNumber } from './components/FloatingNumber';
 import { canPurchaseUpgrade, getUpgrade } from './game/upgrades';
 import { calculateClickPower, calculateEnergyCost, calculateChaosDampening, calculateProductionMultiplier } from './game/upgradeEffects';
+import { updateCombo, calculateComboMultiplier } from './game/combos';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -115,7 +116,12 @@ function App() {
   const handleMainClick = useCallback((event: React.MouseEvent) => {
     const { clientX, clientY } = event;
     setState(prevState => {
-      const newState = { ...prevState };
+      let newState = { ...prevState };
+
+      // COOKIE CLICKER MODE: Update combo system
+      newState = updateCombo(newState);
+      const comboMultiplier = calculateComboMultiplier(newState.comboCount);
+
       const baseClickPower = calculateClickPower(prevState);
 
       // COOKIE CLICKER MODE: Clicks NEVER cost energy!
@@ -123,7 +129,8 @@ function App() {
       // This makes energy a pure positive mechanic
       const energyBonus = 1 + (newState.energy / 100); // 0 energy = 1x, 100 energy = 2x
 
-      let vibesGained = Math.floor(baseClickPower * energyBonus);
+      // Apply combo multiplier!
+      let vibesGained = Math.floor(baseClickPower * energyBonus * comboMultiplier);
       vibesGained = Math.max(1, vibesGained); // Minimum 1 vibe per click
 
       newState.vibes += vibesGained;
@@ -145,13 +152,17 @@ function App() {
       if (newState.chaos > 80) {
         message = 'Everything is fine.';
       }
+      if (newState.comboCount > 50) {
+        message = `${newState.comboCount}x COMBO!!!`;
+      }
 
       // Only log occasionally to reduce spam
       if (Math.random() < 0.15) {
         const bonusText = energyLevel > 50 ? ` (⚡${(energyBonus * 100).toFixed(0)}%)` : '';
+        const comboText = newState.comboCount > 5 ? ` 🔥${newState.comboCount}x` : '';
         newState.log.push({
           timestamp: 3600 - newState.timeRemaining,
-          message: `${message} Vibes +${vibesGained}${bonusText}`,
+          message: `${message} Vibes +${vibesGained}${bonusText}${comboText}`,
           type: 'info',
         });
       }

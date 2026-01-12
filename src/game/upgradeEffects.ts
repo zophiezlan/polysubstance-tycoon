@@ -92,3 +92,27 @@ export function calculateChaosDampening(state: GameState): number {
 
   return Math.min(0.9, dampening); // Cap at 90% reduction
 }
+
+/**
+ * Calculate autoclicker rate (clicks per second)
+ */
+export function calculateAutoClickerRate(state: GameState): number {
+  if (state.upgrades.includes('auto-clicker-4')) return 100;
+  if (state.upgrades.includes('auto-clicker-3')) return 20;
+  if (state.upgrades.includes('auto-clicker-2')) return 5;
+  if (state.upgrades.includes('auto-clicker-1')) return 1;
+  return 0;
+}
+
+/**
+ * Calculate combo timer extension from upgrades
+ */
+export function calculateComboTimerExtension(state: GameState): number {
+  let extension = 0;
+
+  if (state.upgrades.includes('eternal-combo')) extension += 5;
+  else if (state.upgrades.includes('combo-god')) extension += 2;
+  else if (state.upgrades.includes('combo-master')) extension += 1;
+
+  return extension;
+}
