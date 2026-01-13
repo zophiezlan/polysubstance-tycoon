@@ -1,0 +1,217 @@
+.organ-complaints-panel {
+  background: rgba(35, 20, 20, 0.9);
+  border: 1px solid var(--neon-pink);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 10px rgba(255, 0, 150, 0.2);
+  transition: all 0.3s ease;
+}
+
+.organ-complaints-panel:hover {
+  box-shadow: 0 0 15px rgba(255, 0, 150, 0.4);
+}
+
+.complaints-header {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid rgba(255, 0, 150, 0.2);
+  gap: 0.5rem;
+}
+
+.complaints-header:hover {
+  background: rgba(255, 0, 150, 0.05);
+}
+
+.complaints-title {
+  font-weight: bold;
+  color: var(--neon-pink);
+  flex-shrink: 0;
+}
+
+.status-summary {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.85em;
+  flex-grow: 1;
+}
+
+.critical-count {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.concerning-count {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.mild-count {
+  color: #ffeb3b;
+}
+
+.status-indicator.all-clear {
+  color: #4caf50;
+  font-size: 0.85em;
+}
+
+.complaints-list {
+  padding: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.complaint-item {
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.complaint-item:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateX(2px);
+}
+
+.complaint-item.severity-mild {
+  border-left-color: #ffeb3b;
+}
+
+.complaint-item.severity-concerning {
+  border-left-color: #ff9800;
+}
+
+.complaint-item.severity-critical {
+  border-left-color: #f44336;
+  animation: criticalPulse 2s ease-in-out infinite;
+}
+
+@keyframes criticalPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(244, 67, 54, 0.6);
+  }
+}
+
+.complaint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.organ-name {
+  font-weight: bold;
+  color: var(--neon-cyan);
+  text-transform: capitalize;
+  font-size: 0.9em;
+}
+
+.severity-badge {
+  font-size: 0.7em;
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.severity-badge.mild {
+  background: rgba(255, 235, 59, 0.2);
+  color: #ffeb3b;
+  border: 1px solid #ffeb3b;
+}
+
+.severity-badge.concerning {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+  border: 1px solid #ff9800;
+}
+
+.severity-badge.critical {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 1px solid #f44336;
+}
+
+.complaint-message {
+  color: var(--text-primary);
+  line-height: 1.4;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+.complaint-history {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.complaint-history summary {
+  cursor: pointer;
+  color: var(--neon-cyan);
+  font-size: 0.85em;
+  padding: 0.5rem;
+  user-select: none;
+}
+
+.complaint-history summary:hover {
+  color: var(--neon-pink);
+}
+
+.history-list {
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.history-organ {
+  flex-shrink: 0;
+}
+
+.history-message {
+  flex-grow: 1;
+}
+
+/* Scrollbar styling */
+.complaints-list::-webkit-scrollbar,
+.history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.complaints-list::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.complaints-list::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--neon-pink);
+  border-radius: 3px;
+}
+
+.complaints-list::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
+
+/* Reduced motion support */
+.reduced-motion .complaint-item.severity-critical {
+  animation: none;
+}

@@ -30,11 +30,25 @@ import { ProgressionStatus } from './components/ProgressionStatus';
 import { MilestoneManager } from './components/MilestoneNotification';
 import { OfflineProgressManager } from './components/OfflineProgress';
 import { ActionPanels } from './components/ActionPanels';
+import { GroupChatPanel } from './components/GroupChatPanel';
+import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
+import { StrategySelector } from './components/StrategySelector';
+import { BuildManagerPanel } from './components/BuildManagerPanel';
 import { isExtendedGameState, ExtendedGameState, Milestone } from './game/progressionTypes';
-import { useEnergyBooster as applyEnergyBooster } from './game/energyManagement';
-import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
+import { useEnergyBooster as applyEnergyBooster, switchEnergyMode } from './game/energyManagement';
+import { useChaosAction as applyChaosAction, switchChaosStrategy } from './game/chaosStrategy';
+import {
+  saveBuild,
+  swapToBuild,
+  deleteBuild,
+  overwriteBuild,
+  updateBuildName,
+  importBuild,
+  loadStarterBuild,
+} from './game/buildManager';
 import { claimOfflineProgress } from './game/progressionIntegration';
 import { checkMilestones } from './game/milestones';
+import { markMessagesAsRead } from './game/groupChat';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -470,6 +484,93 @@ function App() {
     setMilestoneQueue([]);
   }, []);
 
+  const handleMarkMessagesAsRead = useCallback(() => {
+    setState(prevState => {
+      return markMessagesAsRead(prevState);
+    });
+  }, []);
+
+  const handleSwitchEnergyMode = useCallback((modeId: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      switchEnergyMode(extendedState, modeId);
+      return extendedState;
+    });
+  }, []);
+
+  const handleSwitchChaosStrategy = useCallback((strategyId: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      switchChaosStrategy(extendedState, strategyId);
+      return extendedState;
+    });
+  }, []);
+
+  const handleSaveBuild = useCallback((name: string, notes?: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      saveBuild(extendedState, name, notes);
+      return extendedState;
+    });
+  }, []);
+
+  const handleSwapBuild = useCallback((buildIndex: number) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      swapToBuild(extendedState, buildIndex);
+      return extendedState;
+    });
+  }, []);
+
+  const handleDeleteBuild = useCallback((buildId: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      deleteBuild(extendedState, buildId);
+      return extendedState;
+    });
+  }, []);
+
+  const handleOverwriteBuild = useCallback((buildIndex: number) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      overwriteBuild(extendedState, buildIndex);
+      return extendedState;
+    });
+  }, []);
+
+  const handleUpdateBuildName = useCallback((buildId: string, newName: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      updateBuildName(extendedState, buildId, newName);
+      return extendedState;
+    });
+  }, []);
+
+  const handleImportBuild = useCallback((buildJson: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      importBuild(extendedState, buildJson);
+      return extendedState;
+    });
+  }, []);
+
+  const handleLoadStarterBuild = useCallback((presetId: string) => {
+    setState(prevState => {
+      if (!isExtendedGameState(prevState)) return prevState;
+      const extendedState = { ...prevState } as ExtendedGameState;
+      loadStarterBuild(extendedState, presetId);
+      return extendedState;
+    });
+  }, []);
+
   // Memoize vibes per second calculation for performance
   const vibesPerSecond = useMemo(() => {
     return Object.entries(state.substances).reduce((total: number, [id, count]: [string, number]) => {
@@ -497,6 +598,11 @@ function App() {
             <div className="vibes-value">{formatNumber(state.vibes)}</div>
             <div className="vibes-per-second">
               per second: {formatNumber(vibesPerSecond, 1)}
+              {state.autoClickerLevel > 0 && (
+                <span className="auto-clicker-badge" title={`Auto-clicker active (Tier ${state.autoClickerLevel})`}>
+                  🤖 AUTO
+                </span>
+              )}
             </div>
           </div>
 
@@ -521,6 +627,42 @@ function App() {
 
           {/* Scrollable Content Area */}
           <div className="scrollable-content">
+            {/* Strategy Selector - Energy Modes & Chaos Strategies */}
+            {isExtendedGameState(state) && (
+              <section className="strategy-selector-section">
+                <StrategySelector
+                  gameState={state as ExtendedGameState}
+                  onSwitchEnergyMode={handleSwitchEnergyMode}
+                  onSwitchChaosStrategy={handleSwitchChaosStrategy}
+                />
+              </section>
+            )}
+
+            {/* Build Manager - Save/Load Configurations */}
+            {isExtendedGameState(state) && (
+              <section className="build-manager-section">
+                <BuildManagerPanel
+                  gameState={state as ExtendedGameState}
+                  onSaveBuild={handleSaveBuild}
+                  onSwapBuild={handleSwapBuild}
+                  onDeleteBuild={handleDeleteBuild}
+                  onOverwriteBuild={handleOverwriteBuild}
+                  onUpdateBuildName={handleUpdateBuildName}
+                  onImportBuild={handleImportBuild}
+                  onLoadStarterBuild={handleLoadStarterBuild}
+                />
+              </section>
+            )}
+
+            {/* Group Chat & Organ Complaints - Social Feedback */}
+            <section className="social-feedback-section">
+              <GroupChatPanel
+                state={state}
+                onMarkAsRead={handleMarkMessagesAsRead}
+              />
+              <OrganComplaintsPanel state={state} />
+            </section>
+
             {/* New Action Panels */}
             {isExtendedGameState(state) && (
               <section className="action-panels-section">
