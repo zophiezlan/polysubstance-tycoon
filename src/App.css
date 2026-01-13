@@ -50,7 +50,7 @@
 
 /* Left Panel - Big Clicker */
 .left-panel {
-  flex: 0 0 40%;
+  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -135,7 +135,7 @@
 
 /* Right Panel - Stats & Scrollable Content */
 .right-panel {
-  flex: 0 0 60%;
+  flex: 0 0 70%;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -158,10 +158,10 @@
 
 /* Scrollable Content Area */
 .scrollable-content {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   overflow: visible;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.4rem;
   padding-right: 0.3rem;
   min-height: 0;
@@ -547,9 +547,16 @@ section {
   margin-top: 0.5rem;
 }
 
+/* Full Width Sections in Grid */
+.strategy-selector-section,
+.build-manager-section,
+.log-section {
+  grid-column: 1 / -1;
+}
+
 /* Log Panel */
 .log-entries {
-  max-height: 250px;
+  max-height: 400px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -972,6 +979,10 @@ section {
 
   .modal {
     padding: 1.5rem;
+  }
+
+  .scrollable-content {
+    grid-template-columns: 1fr;
   }
 
 }
