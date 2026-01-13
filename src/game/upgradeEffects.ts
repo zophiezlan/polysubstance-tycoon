@@ -5,7 +5,7 @@ import { calculateInsightMultiplier } from './prestige';
 /**
  * Calculate total click power based on upgrades + prestige
  */
-export function calculateClickPower(state: GameState, baseClickPower: number = 10): number {
+export function calculateClickPower(state: GameState, baseClickPower: number = 1): number {
   let power = baseClickPower;
   let multiplier = 1;
 

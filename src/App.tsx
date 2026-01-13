@@ -216,9 +216,9 @@ function App() {
       const baseClickPower = calculateClickPower(prevState);
 
       // COOKIE CLICKER MODE: Clicks NEVER cost energy!
-      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-2.0x)
+      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-1.2x)
       // This makes energy a pure positive mechanic
-      const energyBonus = 1 + (newState.energy / 100); // 0 energy = 1x, 100 energy = 2x
+      const energyBonus = 1 + (newState.energy / 500); // 0 energy = 1x, 100 energy = 1.2x
 
       // Apply combo multiplier!
       let vibesGained = Math.floor(baseClickPower * energyBonus * comboMultiplier);
@@ -243,14 +243,14 @@ function App() {
       if (newState.chaos > 80) {
         message = 'Everything is fine.';
       }
-      if (newState.comboCount > 50) {
+      if (newState.comboCount > 100) {
         message = `${newState.comboCount}x COMBO!!!`;
       }
 
       // Only log occasionally to reduce spam
       if (Math.random() < 0.15) {
         const bonusText = energyLevel > 50 ? ` (⚡${(energyBonus * 100).toFixed(0)}%)` : '';
-        const comboText = newState.comboCount > 5 ? ` 🔥${newState.comboCount}x` : '';
+        const comboText = newState.comboCount > 25 ? ` 🔥${newState.comboCount}x` : '';
         newState.log.push({
           timestamp: 3600 - newState.timeRemaining,
           message: `${message} Vibes +${vibesGained}${bonusText}${comboText}`,
