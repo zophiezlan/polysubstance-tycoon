@@ -26,14 +26,14 @@ import { calculateClickPower, calculateChaosDampening, calculateProductionMultip
 import { updateCombo, calculateComboMultiplier } from './game/combos';
 // New progression system components
 import { ProgressionStatus } from './components/ProgressionStatus';
-import { MilestoneManager } from './components/MilestoneNotification';
+// import { MilestoneManager } from './components/MilestoneNotification'; // Disabled - redundant with Active Bonuses
 import { OfflineProgressManager } from './components/OfflineProgress';
 import { ActionPanels } from './components/ActionPanels';
 import { GroupChatPanel } from './components/GroupChatPanel';
 import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
 import { StrategySelector } from './components/StrategySelector';
 import { BuildManagerPanel } from './components/BuildManagerPanel';
-import { isExtendedGameState, ExtendedGameState, Milestone } from './game/progressionTypes';
+import { isExtendedGameState, ExtendedGameState } from './game/progressionTypes';
 import { useEnergyBooster as applyEnergyBooster, switchEnergyMode } from './game/energyManagement';
 import { useChaosAction as applyChaosAction, switchChaosStrategy } from './game/chaosStrategy';
 import {
@@ -46,7 +46,7 @@ import {
   loadStarterBuild,
 } from './game/buildManager';
 import { claimOfflineProgress } from './game/progressionIntegration';
-import { checkMilestones } from './game/milestones';
+// import { checkMilestones } from './game/milestones'; // Disabled - redundant with Active Bonuses
 import { markMessagesAsRead } from './game/groupChat';
 import './App.css';
 
@@ -94,7 +94,7 @@ function App() {
 
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
-  const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]);
+  // const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]); // Disabled - redundant with Active Bonuses
 
   // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
@@ -175,12 +175,13 @@ function App() {
         }
 
         // Check for new milestones (if using extended state)
-        if (isExtendedGameState(newState)) {
-          const completedMilestones = checkMilestones(newState as ExtendedGameState);
-          if (completedMilestones.length > 0 && !newState.muteNotifications) {
-            setMilestoneQueue(prev => [...prev, ...completedMilestones]);
-          }
-        }
+        // Milestone notifications disabled - redundant with Active Bonuses section
+        // if (isExtendedGameState(newState)) {
+        //   const completedMilestones = checkMilestones(newState as ExtendedGameState);
+        //   if (completedMilestones.length > 0 && !newState.muteNotifications) {
+        //     setMilestoneQueue(prev => [...prev, ...completedMilestones]);
+        //   }
+        // }
 
         return newState;
       });
@@ -400,7 +401,7 @@ function App() {
       const nextMute = !prevState.muteNotifications;
       if (nextMute) {
         setAchievementQueue([]);
-        setMilestoneQueue([]);
+        // setMilestoneQueue([]); // Disabled - redundant with Active Bonuses
       }
       return {
         ...prevState,
@@ -479,9 +480,10 @@ function App() {
     });
   }, []);
 
-  const handleClearMilestones = useCallback(() => {
-    setMilestoneQueue([]);
-  }, []);
+  // Disabled - redundant with Active Bonuses section
+  // const handleClearMilestones = useCallback(() => {
+  //   setMilestoneQueue([]);
+  // }, []);
 
   const handleMarkMessagesAsRead = useCallback(() => {
     setState(prevState => {
@@ -755,13 +757,13 @@ function App() {
         />
       ))}
 
-      {/* Milestone Notifications */}
-      {!state.muteNotifications && (
+      {/* Milestone Notifications - Disabled (redundant with Active Bonuses section) */}
+      {/* {!state.muteNotifications && (
         <MilestoneManager
           milestones={milestoneQueue}
           onClearMilestones={handleClearMilestones}
         />
-      )}
+      )} */}
 
       {/* Offline Progress Welcome */}
       {isExtendedGameState(state) && (
