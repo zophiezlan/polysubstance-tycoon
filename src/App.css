@@ -50,7 +50,7 @@
 
 /* Left Panel - Big Clicker */
 .left-panel {
-  flex: 0 0 40%;
+  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -135,7 +135,7 @@
 
 /* Right Panel - Stats & Scrollable Content */
 .right-panel {
-  flex: 0 0 60%;
+  flex: 0 0 70%;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -158,10 +158,10 @@
 
 /* Scrollable Content Area */
 .scrollable-content {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   overflow: visible;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.4rem;
   padding-right: 0.3rem;
   min-height: 0;
@@ -547,15 +547,33 @@ section {
   margin-top: 0.5rem;
 }
 
-/* Log Panel */
+/* Full Width Sections in Grid - Only Complex Management UIs */
+.strategy-selector-section,
+.build-manager-section {
+  grid-column: 1 / -1;
+}
+
+/* Compact Log - Takes Minimal Space (Single Column) */
+.log-section {
+  background: rgba(107, 76, 154, 0.05);
+  padding: 0.4rem;
+}
+
+.log-section h3 {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  opacity: 0.7;
+}
+
+/* Log Panel - Minimal, Not Interactive */
 .log-entries {
-  max-height: 250px;
+  max-height: 180px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.25rem;
   font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 .log-entry {
@@ -972,6 +990,10 @@ section {
 
   .modal {
     padding: 1.5rem;
+  }
+
+  .scrollable-content {
+    grid-template-columns: 1fr;
   }
 
 }
