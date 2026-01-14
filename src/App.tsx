@@ -594,7 +594,7 @@ function App() {
           </section>
         </div>
 
-        {/* Column 2 - Central TSP Button */}
+        {/* Column 2 - Central TSP Button (desktop) / Floating Button (mobile) */}
         <div className="column column-center">
           <div className="tsp-button-container">
             <MainButton
@@ -616,6 +616,15 @@ function App() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Floating Button */}
+        <button
+          className="mobile-tap-button"
+          onClick={handleMainClick}
+          disabled={false}
+        >
+          🌙
+        </button>
 
         {/* Column 3 - Actions & Management */}
         <div className="column column-middle scrollable">

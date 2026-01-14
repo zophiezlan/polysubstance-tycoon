@@ -989,7 +989,7 @@ section {
 
 /* Responsive */
 @media (max-width: 1400px) {
-  /* On smaller screens, switch to 2-column layout */
+  /* On medium screens, switch to 2-column layout with button at top */
   .app-main.four-column-layout {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
@@ -999,7 +999,7 @@ section {
     grid-column: 1 / -1;
     grid-row: 1;
     min-width: auto;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
   }
 
   .column-left {
@@ -1018,52 +1018,113 @@ section {
   }
 }
 
+/* Mobile Floating Tap Button */
+.mobile-tap-button {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  /* On mobile, switch to single column */
+  /* On mobile, hide the center button column and show 2-column layout */
   .app-main.four-column-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto auto;
-    padding: 0.5rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    padding: 0.3rem;
+    gap: 0.3rem;
   }
 
+  /* Hide the desktop centered TSP button on mobile */
   .column-center {
-    grid-column: 1;
-    grid-row: 1;
-    padding: 1rem 0;
+    display: none;
   }
 
+  /* Show mobile floating button */
+  .mobile-tap-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    border: 3px solid var(--text-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--purple);
+    z-index: 999;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mobile-tap-button:active {
+    transform: scale(0.9);
+  }
+
+  /* Show all interactive sections in 2-column grid */
   .column-left {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   .column-middle {
-    grid-column: 1;
-    grid-row: 3;
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .column-right {
-    grid-column: 1;
-    grid-row: 4;
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   .header-stats {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .header-stat {
+    gap: 0.05rem;
+  }
+
+  .header-stat-label {
+    font-size: 0.55rem;
+  }
+
+  .header-stat-value {
+    font-size: 0.8rem;
+  }
+
+  .compact-stat-bar {
+    width: 40px;
+    height: 6px;
+  }
+
+  .app-header {
+    padding: 0.3rem 0.5rem;
     gap: 0.5rem;
   }
 
-  .main-button {
-    width: 220px;
-    height: 220px;
-    font-size: 1.4rem;
+  .app-header h1 {
+    font-size: 0.9rem;
   }
 
-  .app-header h1 {
-    font-size: 1rem;
+  .settings-button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
   }
 
   .modal {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+
+  section {
+    padding: 0.4rem;
+  }
+
+  section h3 {
+    font-size: 0.85rem;
   }
 }
 
