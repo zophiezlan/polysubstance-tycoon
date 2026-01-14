@@ -6,22 +6,108 @@
   overflow: hidden;
 }
 
-/* Header - Fixed at Top */
+/* Header - Fixed at Top with Stats */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding: 0.5rem 1rem;
   background: var(--bg-panel);
   border-bottom: 2px solid var(--purple);
   flex-shrink: 0;
 }
 
+.header-left {
+  flex: 0 0 auto;
+}
+
 .app-header h1 {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--text-cyan);
   text-shadow: 0 0 10px var(--text-cyan);
   font-family: 'Courier New', monospace;
+  margin: 0;
+}
+
+.header-stats {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.header-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.header-stat-label {
+  color: var(--text-cyan);
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.header-stat-value {
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.header-stat-value.vibes {
+  color: var(--success);
+}
+
+.header-stat-value.time {
+  color: var(--warning);
+}
+
+.header-stat-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 100px;
+}
+
+.header-stat-label-small {
+  color: var(--text-cyan);
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+.header-bar {
+  height: 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--purple);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.header-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.header-bar-fill.normal {
+  background: var(--purple);
+}
+
+.header-bar-fill.warning {
+  background: var(--warning);
+}
+
+.header-bar-fill.danger {
+  background: var(--danger);
+}
+
+.header-bar-fill.low {
+  background: var(--purple-dark);
+}
+
+.header-right {
+  flex: 0 0 auto;
 }
 
 .settings-button {
@@ -29,8 +115,9 @@
   color: var(--text-white);
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .settings-button:hover:not(:disabled) {
@@ -50,17 +137,27 @@
 
 /* Left Panel - Big Clicker */
 .left-panel {
-  flex: 0 0 30%;
+  flex: 0 0 22%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: var(--bg-panel);
   border: 2px solid var(--purple);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.8rem;
   position: relative;
   min-height: 0;
+  overflow-y: auto;
+  gap: 0.8rem;
+}
+
+.left-panel-meters {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.75rem;
 }
 
 /* Vibes Display */
@@ -133,38 +230,46 @@
   align-items: center;
 }
 
-/* Right Panel - Stats & Scrollable Content */
+/* Right Panel - 3-Column Interactive Content */
 .right-panel {
-  flex: 0 0 70%;
+  flex: 0 0 78%;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  gap: 0.4rem;
   min-height: 0;
 }
 
-/* Stats Section - Fixed at Top of Right Panel */
-.stats-section {
-  background: var(--bg-panel);
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--purple);
-  border-radius: 6px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-/* Scrollable Content Area */
+/* Scrollable Content Area - 3 Columns */
 .scrollable-content {
   flex: 1 1 auto;
   overflow: visible;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.4rem;
-  padding-right: 0.3rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.4rem;
   min-height: 0;
+  align-items: start;
+}
+
+/* Content Columns */
+.content-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+}
+
+.column-purchasing {
+  /* Core purchasing - shops and upgrades */
+}
+
+.column-actions {
+  /* Core actions - energy boosters, chaos actions, maintenance */
+}
+
+.column-info {
+  /* Strategy, build manager, group chat, log */
 }
 
 /* Section Styling */
@@ -265,18 +370,18 @@ section {
   margin-top: 0.15rem;
 }
 
-/* Main Button - Massive Cookie Clicker Style */
+/* Main Button - Cookie Clicker Style */
 .main-button {
-  width: 240px;
-  height: 240px;
-  font-size: 1.6rem;
+  width: 180px;
+  height: 180px;
+  font-size: 1.3rem;
   font-weight: bold;
   background: linear-gradient(135deg, var(--purple), var(--purple-light));
   color: var(--text-white);
-  border: 4px solid var(--text-cyan);
+  border: 3px solid var(--text-cyan);
   border-radius: 50%;
   text-shadow: 0 0 10px var(--text-cyan);
-  box-shadow: 0 0 40px var(--purple), inset 0 0 40px rgba(107, 76, 154, 0.3);
+  box-shadow: 0 0 30px var(--purple), inset 0 0 30px rgba(107, 76, 154, 0.3);
   transition: all 0.15s;
   cursor: pointer;
   position: relative;
@@ -284,8 +389,8 @@ section {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 1.5rem;
-  line-height: 1.3;
+  padding: 1rem;
+  line-height: 1.2;
 }
 
 .main-button:hover:not(:disabled) {
@@ -547,10 +652,12 @@ section {
   margin-top: 0.5rem;
 }
 
-/* Full Width Sections in Grid - Only Complex Management UIs */
+/* Sections are no longer full width - they fit within their columns */
 .strategy-selector-section,
-.build-manager-section {
-  grid-column: 1 / -1;
+.build-manager-section,
+.action-panels-section,
+.social-feedback-section {
+  /* Removed grid-column spanning - sections now fit within their columns */
 }
 
 /* Compact Log - Takes Minimal Space (Single Column) */
@@ -953,47 +1060,93 @@ section {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  /* 2-column layout for medium screens */
+  .scrollable-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .column-info {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 768px) {
   .app-main {
     flex-direction: column;
-    padding: 0.5rem;
+    padding: 0.3rem;
+    gap: 0.3rem;
   }
 
   .left-panel {
     flex: 0 0 auto;
-    padding: 1rem;
+    padding: 0.8rem;
+    flex-direction: row;
+    justify-content: space-around;
   }
 
   .right-panel {
     flex: 1;
   }
 
+  .vibes-display {
+    order: 1;
+  }
+
+  .main-action-container {
+    order: 2;
+  }
+
+  .left-panel-meters {
+    order: 3;
+    flex: 1;
+  }
+
   .vibes-value {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .main-button {
-    width: 250px;
-    height: 250px;
-    font-size: 1.5rem;
-    padding: 1.5rem;
+    width: 150px;
+    height: 150px;
+    font-size: 1.1rem;
+    padding: 0.8rem;
+  }
+
+  .app-header {
+    flex-wrap: wrap;
+    padding: 0.4rem 0.6rem;
   }
 
   .app-header h1 {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .header-stats {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .header-stat-bar {
+    min-width: 80px;
   }
 
   .achievement-toast {
-    left: 1rem;
-    right: 1rem;
+    left: 0.5rem;
+    right: 0.5rem;
   }
 
   .modal {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .scrollable-content {
     grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .content-column {
+    gap: 0.4rem;
   }
 
 }
