@@ -27,14 +27,13 @@ import { calculateClickPower, calculateChaosDampening, calculateProductionMultip
 import { updateCombo, calculateComboMultiplier } from './game/combos';
 // New progression system components
 import { ProgressionStatus } from './components/ProgressionStatus';
-import { MilestoneManager } from './components/MilestoneNotification';
 import { OfflineProgressManager } from './components/OfflineProgress';
 import { ActionPanels } from './components/ActionPanels';
 import { GroupChatPanel } from './components/GroupChatPanel';
 import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
 import { StrategySelector } from './components/StrategySelector';
 import { BuildManagerPanel } from './components/BuildManagerPanel';
-import { isExtendedGameState, ExtendedGameState, Milestone } from './game/progressionTypes';
+import { isExtendedGameState, ExtendedGameState } from './game/progressionTypes';
 import { useEnergyBooster as applyEnergyBooster, switchEnergyMode } from './game/energyManagement';
 import { useChaosAction as applyChaosAction, switchChaosStrategy } from './game/chaosStrategy';
 import {
@@ -93,9 +92,7 @@ function App() {
     return createInitialState();
   });
 
-  const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
-  const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]);
 
   // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
@@ -144,7 +141,7 @@ function App() {
         let newState = gameTick(prevState, deltaTime);
         newState.lastTickTime = now;
 
-        // Check for new achievements
+        // Check for new achievements and log them
         const newAchievements = checkAchievements(newState, prevState.achievements);
         if (newAchievements.length > 0) {
           const previouslyUnlocked = new Set(prevState.achievements);
@@ -153,15 +150,7 @@ function App() {
           if (achievementsToAdd.length > 0) {
             newState.achievements = [...prevState.achievements, ...achievementsToAdd];
 
-            if (!newState.muteNotifications) {
-              setAchievementQueue(prev => {
-                const queued = new Set(prev);
-                const additions = achievementsToAdd.filter(achId => !queued.has(achId));
-                return additions.length > 0 ? [...prev, ...additions] : prev;
-              });
-            }
-
-            // Log achievements
+            // Log achievements (notifications removed - redundant with log)
             achievementsToAdd.forEach(achId => {
               const ach = getAchievement(achId);
               if (ach) {
@@ -175,11 +164,17 @@ function App() {
           }
         }
 
-        // Check for new milestones (if using extended state)
+        // Check for new milestones and log them (notifications removed)
         if (isExtendedGameState(newState)) {
           const completedMilestones = checkMilestones(newState as ExtendedGameState);
-          if (completedMilestones.length > 0 && !newState.muteNotifications) {
-            setMilestoneQueue(prev => [...prev, ...completedMilestones]);
+          if (completedMilestones.length > 0) {
+            completedMilestones.forEach(milestone => {
+              newState.log.push({
+                timestamp: 3600 - newState.timeRemaining,
+                message: `⭐ Milestone: ${milestone.title}`,
+                type: 'achievement',
+              });
+            });
           }
         }
 
@@ -189,16 +184,6 @@ function App() {
 
     return () => clearInterval(interval);
   }, []);
-
-  // Clear achievement notifications after a delay
-  useEffect(() => {
-    if (achievementQueue.length > 0) {
-      const timeout = setTimeout(() => {
-        setAchievementQueue(prev => prev.slice(1));
-      }, 3000);
-      return () => clearTimeout(timeout);
-    }
-  }, [achievementQueue]);
 
   const handleFloatingNumberComplete = useCallback((id: string) => {
     setFloatingNumbers(prev => prev.filter(fn => fn.id !== id));
@@ -480,10 +465,6 @@ function App() {
     });
   }, []);
 
-  const handleClearMilestones = useCallback(() => {
-    setMilestoneQueue([]);
-  }, []);
-
   const handleMarkMessagesAsRead = useCallback(() => {
     setState(prevState => {
       return markMessagesAsRead(prevState);
@@ -585,19 +566,55 @@ function App() {
     <div className={`app font-${state.fontSize} ${state.reducedMotion ? 'reduced-motion' : ''} distortion-${state.distortionLevel}`}>
       <header className="app-header">
         <h1>🌙 THE NIGHT MANAGER™</h1>
+
+        {/* Compact Stats in Header */}
+        <div className="header-stats">
+          <div className="header-stat">
+            <span className="header-stat-label">VIBES</span>
+            <span className="header-stat-value vibes">{formatNumber(state.vibes)}</span>
+          </div>
+          <div className="header-stat">
+            <span className="header-stat-label">per/sec</span>
+            <span className="header-stat-value">{formatNumber(vibesPerSecond, 1)}</span>
+          </div>
+          <div className="header-stat">
+            <span className="header-stat-label">Time</span>
+            <span className="header-stat-value time">{Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')}</span>
+          </div>
+          <StatPanel state={state} compact={true} />
+        </div>
+
         <button className="settings-button" onClick={handleToggleSettings}>
           ⚙️ Settings
         </button>
       </header>
 
-      <main className="app-main">
-        {/* Left Panel - Big Clicker & Vibes */}
-        <div className="left-panel">
-          <div className="vibes-display">
-            <div className="vibes-label">VIBES</div>
-            <div className="vibes-value">{formatNumber(state.vibes)}</div>
-            <div className="vibes-per-second">
-              per second: {formatNumber(vibesPerSecond, 1)}
+      <main className="app-main four-column-layout">
+        {/* Column 1 - Shops & Upgrades */}
+        <div className="column column-left scrollable">
+          <section className="shop-section">
+            <SubstanceShop state={state} onPurchase={handlePurchase} />
+          </section>
+
+          <section className="upgrade-section">
+            <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+          </section>
+        </div>
+
+        {/* Column 2 - Central TSP Button */}
+        <div className="column column-center">
+          <div className="tsp-button-container">
+            <MainButton
+              onClick={handleMainClick}
+              disabled={false}
+              distortionLevel={state.distortionLevel}
+            />
+            <div className="button-combo-display">
+              {state.comboCount > 5 && (
+                <div className="combo-indicator">
+                  🔥 {state.comboCount}x COMBO
+                </div>
+              )}
               {state.autoClickerLevel > 0 && (
                 <span className="auto-clicker-badge" title={`Auto-clicker active (Tier ${state.autoClickerLevel})`}>
                   🤖 AUTO
@@ -605,107 +622,75 @@ function App() {
               )}
             </div>
           </div>
-
-          <div className="main-action-container">
-            <MainButton
-              onClick={handleMainClick}
-              disabled={false}
-              distortionLevel={state.distortionLevel}
-            />
-          </div>
         </div>
 
-        {/* Right Panel - Stats & Scrollable Content */}
-        <div className="right-panel">
-          {/* Fixed Stats at Top */}
-          <section className="stats-section">
-            <StatPanel state={state} />
-            <HiddenMeters state={state} />
-            {/* New Progression Status */}
-            {isExtendedGameState(state) && <ProgressionStatus gameState={state} />}
+        {/* Column 3 - Actions & Management */}
+        <div className="column column-middle scrollable">
+          <section className="maintenance-section">
+            <MaintenancePanel state={state} onAction={handleMaintenance} />
           </section>
 
-          {/* Scrollable Content Area */}
-          <div className="scrollable-content">
-            {/* Strategy Selector - Energy Modes & Chaos Strategies */}
-            {isExtendedGameState(state) && (
-              <section className="strategy-selector-section">
-                <StrategySelector
-                  gameState={state as ExtendedGameState}
-                  onSwitchEnergyMode={handleSwitchEnergyMode}
-                  onSwitchChaosStrategy={handleSwitchChaosStrategy}
-                />
-              </section>
-            )}
-
-            {/* Build Manager - Save/Load Configurations */}
-            {isExtendedGameState(state) && (
-              <section className="build-manager-section">
-                <BuildManagerPanel
-                  gameState={state as ExtendedGameState}
-                  onSaveBuild={handleSaveBuild}
-                  onSwapBuild={handleSwapBuild}
-                  onDeleteBuild={handleDeleteBuild}
-                  onOverwriteBuild={handleOverwriteBuild}
-                  onUpdateBuildName={handleUpdateBuildName}
-                  onImportBuild={handleImportBuild}
-                  onLoadStarterBuild={handleLoadStarterBuild}
-                />
-              </section>
-            )}
-
-            {/* Group Chat & Organ Complaints - Social Feedback */}
-            <section className="social-feedback-section">
-              <GroupChatPanel
-                state={state}
-                onMarkAsRead={handleMarkMessagesAsRead}
+          {/* New Action Panels */}
+          {isExtendedGameState(state) && (
+            <section className="action-panels-section">
+              <ActionPanels
+                gameState={state as ExtendedGameState}
+                onUseEnergyBooster={handleUseEnergyBooster}
+                onUseChaosAction={handleUseChaosAction}
               />
-              <OrganComplaintsPanel state={state} />
             </section>
+          )}
 
-            {/* New Action Panels */}
-            {isExtendedGameState(state) && (
-              <section className="action-panels-section">
-                <ActionPanels
-                  gameState={state as ExtendedGameState}
-                  onUseEnergyBooster={handleUseEnergyBooster}
-                  onUseChaosAction={handleUseChaosAction}
-                />
-              </section>
-            )}
-
-            <section className="shop-section">
-              <SubstanceShop state={state} onPurchase={handlePurchase} />
+          {/* Strategy Selector - Energy Modes & Chaos Strategies */}
+          {isExtendedGameState(state) && (
+            <section className="strategy-selector-section">
+              <StrategySelector
+                gameState={state as ExtendedGameState}
+                onSwitchEnergyMode={handleSwitchEnergyMode}
+                onSwitchChaosStrategy={handleSwitchChaosStrategy}
+              />
             </section>
+          )}
 
-            <section className="upgrade-section">
-              <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+          {/* Build Manager - Save/Load Configurations */}
+          {isExtendedGameState(state) && (
+            <section className="build-manager-section">
+              <BuildManagerPanel
+                gameState={state as ExtendedGameState}
+                onSaveBuild={handleSaveBuild}
+                onSwapBuild={handleSwapBuild}
+                onDeleteBuild={handleDeleteBuild}
+                onOverwriteBuild={handleOverwriteBuild}
+                onUpdateBuildName={handleUpdateBuildName}
+                onImportBuild={handleImportBuild}
+                onLoadStarterBuild={handleLoadStarterBuild}
+              />
             </section>
+          )}
+        </div>
 
-            <section className="maintenance-section">
-              <MaintenancePanel state={state} onAction={handleMaintenance} />
-            </section>
+        {/* Column 4 - Social & Log */}
+        <div className="column column-right scrollable">
+          {/* Group Chat & Organ Complaints - Social Feedback */}
+          <section className="social-feedback-section">
+            <GroupChatPanel
+              state={state}
+              onMarkAsRead={handleMarkMessagesAsRead}
+            />
+            <OrganComplaintsPanel state={state} />
+          </section>
 
-            <section className="log-section">
-              <LogPanel state={state} />
-            </section>
-          </div>
+          <section className="log-section">
+            <LogPanel state={state} />
+          </section>
+
+          {/* Hidden Meters & Progression Status */}
+          <section className="meters-section">
+            <HiddenMeters state={state} />
+            {isExtendedGameState(state) && <ProgressionStatus gameState={state} />}
+          </section>
         </div>
       </main>
-
-      {!state.muteNotifications && achievementQueue.length > 0 && (
-        <div className="achievement-toast">
-          {achievementQueue.slice(0, 3).map((achId, index) => {
-            const ach = getAchievement(achId);
-            return ach ? (
-              <div key={achId} className="achievement-item" style={{ opacity: 1 - index * 0.3 }}>
-                🏆 <strong>{ach.name}</strong>
-                <div className="achievement-description">{ach.description}</div>
-              </div>
-            ) : null;
-          })}
-        </div>
-      )}
 
       {/* Floating numbers on click */}
       {floatingNumbers.map(fn => (
@@ -718,14 +703,6 @@ function App() {
           onComplete={handleFloatingNumberComplete}
         />
       ))}
-
-      {/* Milestone Notifications */}
-      {!state.muteNotifications && (
-        <MilestoneManager
-          milestones={milestoneQueue}
-          onClearMilestones={handleClearMilestones}
-        />
-      )}
 
       {/* Offline Progress Welcome */}
       {isExtendedGameState(state) && (
