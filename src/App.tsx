@@ -171,7 +171,7 @@ function App() {
             completedMilestones.forEach(milestone => {
               newState.log.push({
                 timestamp: 3600 - newState.timeRemaining,
-                message: `⭐ Milestone: ${milestone.title}`,
+                message: `⭐ Milestone: ${milestone.name}`,
                 type: 'achievement',
               });
             });
@@ -382,17 +382,10 @@ function App() {
   }, []);
 
   const handleToggleNotifications = useCallback(() => {
-    setState(prevState => {
-      const nextMute = !prevState.muteNotifications;
-      if (nextMute) {
-        setAchievementQueue([]);
-        setMilestoneQueue([]);
-      }
-      return {
-        ...prevState,
-        muteNotifications: nextMute,
-      };
-    });
+    setState(prevState => ({
+      ...prevState,
+      muteNotifications: !prevState.muteNotifications,
+    }));
   }, []);
 
   const handleToggleFloatingNumbers = useCallback(() => {
