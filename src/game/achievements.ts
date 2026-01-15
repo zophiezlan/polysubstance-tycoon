@@ -191,6 +191,281 @@ export const ACHIEVEMENTS: Achievement[] = [
     hidden: true,
     checkCondition: () => false, // Checked separately in game logic
   },
+
+  // ===== CLICKING ACHIEVEMENTS (Cookie Clicker-inspired) =====
+  {
+    id: 'clickNovice',
+    name: 'Click Novice',
+    description: 'Click 100 times',
+    checkCondition: (state) => state.totalClicks >= 100,
+  },
+  {
+    id: 'clickJourneyman',
+    name: 'Click Journeyman',
+    description: 'Click 1,000 times',
+    checkCondition: (state) => state.totalClicks >= 1_000,
+  },
+  {
+    id: 'clickMaster',
+    name: 'Click Master',
+    description: 'Click 10,000 times',
+    checkCondition: (state) => state.totalClicks >= 10_000,
+  },
+  {
+    id: 'clickGrandmaster',
+    name: 'Click Grandmaster',
+    description: 'Click 100,000 times',
+    checkCondition: (state) => state.totalClicks >= 100_000,
+  },
+  {
+    id: 'clickAscended',
+    name: 'Click Ascended',
+    description: 'Click 1,000,000 times. Your fingers are beyond mortal comprehension.',
+    checkCondition: (state) => state.totalClicks >= 1_000_000,
+  },
+  {
+    id: 'comboStarter',
+    name: 'Combo Starter',
+    description: 'Reach a 25x combo',
+    checkCondition: (state) => state.maxCombo >= 25,
+  },
+  {
+    id: 'comboExpert',
+    name: 'Combo Expert',
+    description: 'Reach a 100x combo',
+    checkCondition: (state) => state.maxCombo >= 100,
+  },
+  {
+    id: 'comboLegend',
+    name: 'Combo Legend',
+    description: 'Reach a 500x combo. The rhythm consumes you.',
+    checkCondition: (state) => state.maxCombo >= 500,
+  },
+  {
+    id: 'clickPower',
+    name: 'Raw Power',
+    description: 'Gain 1000+ vibes from a single click',
+    checkCondition: () => false, // Checked separately when clicking
+  },
+
+  // ===== RANDOM EVENT ACHIEVEMENTS =====
+  {
+    id: 'luckyClick',
+    name: 'Lucky Click',
+    description: 'Click your first random event',
+    checkCondition: () => false, // Checked when activating events
+  },
+  {
+    id: 'eventCollector',
+    name: 'Event Collector',
+    description: 'Click 10 random events',
+    checkCondition: () => false, // Tracked in event manager
+  },
+  {
+    id: 'eventExpert',
+    name: 'Event Expert',
+    description: 'Click 50 random events',
+    checkCondition: () => false, // Tracked in event manager
+  },
+  {
+    id: 'eventMaster',
+    name: 'Event Master',
+    description: 'Click 100 random events',
+    checkCondition: () => false, // Tracked in event manager
+  },
+  {
+    id: 'legendaryLuck',
+    name: 'Legendary Luck',
+    description: 'Click a legendary random event',
+    checkCondition: () => false, // Checked when activating legendary event
+  },
+  {
+    id: 'fastHands',
+    name: 'Fast Hands',
+    description: 'Click a random event with less than 2 seconds remaining',
+    checkCondition: () => false, // Checked during event activation
+  },
+
+  // ===== SYNERGY ACHIEVEMENTS =====
+  {
+    id: 'firstSynergy',
+    name: 'First Synergy',
+    description: 'Activate your first synergy bonus',
+    checkCondition: (state) => {
+      // Check if player has any synergy upgrade
+      return state.upgrades.some(id => ['cocktail-theory', 'speedball-dynamics', 'candy-flip-protocol', 'jedi-flip-mastery'].includes(id));
+    },
+  },
+  {
+    id: 'synergyCollector',
+    name: 'Synergy Collector',
+    description: 'Own all basic synergy upgrades (Cocktail, Speedball, Candy Flip)',
+    checkCondition: (state) => {
+      return state.upgrades.includes('cocktail-theory') &&
+             state.upgrades.includes('speedball-dynamics') &&
+             state.upgrades.includes('candy-flip-protocol');
+    },
+  },
+  {
+    id: 'synergyMaster',
+    name: 'Synergy Master',
+    description: 'Own all synergy upgrades including Jedi Flip',
+    checkCondition: (state) => {
+      return state.upgrades.includes('cocktail-theory') &&
+             state.upgrades.includes('speedball-dynamics') &&
+             state.upgrades.includes('candy-flip-protocol') &&
+             state.upgrades.includes('jedi-flip-mastery');
+    },
+  },
+  {
+    id: 'polypharmacy',
+    name: 'Polypharmacy',
+    description: 'Have 5+ substance types active with at least one synergy bonus',
+    checkCondition: (state) => {
+      const activeTypes = Object.keys(state.substances).filter(id => state.substances[id] > 0);
+      const hasSynergy = state.upgrades.some(id => ['cocktail-theory', 'speedball-dynamics', 'candy-flip-protocol', 'jedi-flip-mastery'].includes(id));
+      return activeTypes.length >= 5 && hasSynergy;
+    },
+  },
+
+  // ===== PRODUCTION ACHIEVEMENTS =====
+  {
+    id: 'passiveIncome',
+    name: 'Passive Income',
+    description: 'Reach 10 vibes per second',
+    checkCondition: () => false, // Checked separately with vibesPerSecond calculation
+  },
+  {
+    id: 'vibeFactory',
+    name: 'Vibe Factory',
+    description: 'Reach 100 vibes per second',
+    checkCondition: () => false, // Checked separately
+  },
+  {
+    id: 'vibeEmpire',
+    name: 'Vibe Empire',
+    description: 'Reach 1,000 vibes per second',
+    checkCondition: () => false, // Checked separately
+  },
+  {
+    id: 'vibeGod',
+    name: 'Vibe God',
+    description: 'Reach 10,000 vibes per second. Reality bends to your will.',
+    checkCondition: () => false, // Checked separately
+  },
+
+  // ===== AUTOMATION ACHIEVEMENTS =====
+  {
+    id: 'firstBot',
+    name: 'First Bot',
+    description: 'Purchase your first auto-clicker',
+    checkCondition: (state) => state.autoClickerLevel >= 1,
+  },
+  {
+    id: 'fullyAutomated',
+    name: 'Fully Automated',
+    description: 'Reach max auto-clicker tier',
+    checkCondition: (state) => state.autoClickerLevel >= 4,
+  },
+  {
+    id: 'idleTycoon',
+    name: 'Idle Tycoon',
+    description: 'Earn 100,000 vibes without clicking (auto-clicker + passive only)',
+    checkCondition: () => false, // Tracked separately
+  },
+
+  // ===== SPEED/CHALLENGE ACHIEVEMENTS =====
+  {
+    id: 'speedRunner',
+    name: 'Speed Runner',
+    description: 'Reach 10,000 vibes in under 5 minutes',
+    checkCondition: () => false, // Checked with timestamp tracking
+  },
+  {
+    id: 'marathoner',
+    name: 'Marathoner',
+    description: 'Extend night beyond 90 minutes',
+    checkCondition: (state) => state.timeRemaining > 3600 + (30 * 60), // 1h + 30min
+  },
+  {
+    id: 'minimalist',
+    name: 'Minimalist',
+    description: 'Complete night with only 2 substance types',
+    checkCondition: () => false, // Checked at night end
+  },
+  {
+    id: 'collector',
+    name: 'Collector',
+    description: 'Own at least one of every substance type in a single night',
+    checkCondition: (state) => {
+      const substanceTypes = ['alcohol', 'stimulant', 'sedative', 'empathogen', 'psychedelic',
+                              'dissociative', 'deliriant', 'nootropic', 'synthetic', 'research',
+                              'exotic', 'experimental', 'forbidden', 'eldritch', 'void'];
+      return substanceTypes.every(id => (state.substances[id] || 0) > 0);
+    },
+  },
+
+  // ===== UPGRADE MASTERY =====
+  {
+    id: 'upgradeDedication',
+    name: 'Upgrade Dedication',
+    description: 'Own 50 upgrades',
+    checkCondition: (state) => state.upgrades.length >= 50,
+  },
+  {
+    id: 'upgradePerfection',
+    name: 'Upgrade Perfection',
+    description: 'Own all available upgrades (100+)',
+    checkCondition: (state) => state.upgrades.length >= 100,
+  },
+  {
+    id: 'harmReductionExpert',
+    name: 'Harm Reduction Expert',
+    description: 'Own all harm reduction upgrades',
+    checkCondition: (state) => {
+      return state.upgrades.includes('test-kit-pro') &&
+             state.upgrades.includes('supplements') &&
+             state.upgrades.includes('medical-supervision');
+    },
+  },
+
+  // ===== META/PRESTIGE ACHIEVEMENTS =====
+  {
+    id: 'veteran',
+    name: 'Veteran',
+    description: 'Complete 25 nights',
+    checkCondition: (state) => state.nightsCompleted >= 25,
+  },
+  {
+    id: 'expert',
+    name: 'Expert',
+    description: 'Complete 50 nights',
+    checkCondition: (state) => state.nightsCompleted >= 50,
+  },
+  {
+    id: 'master',
+    name: 'Master',
+    description: 'Complete 100 nights. You know this game too well.',
+    checkCondition: (state) => state.nightsCompleted >= 100,
+  },
+  {
+    id: 'insightful',
+    name: 'Insightful',
+    description: 'Earn your first insight point',
+    checkCondition: (state) => state.insightPoints >= 1,
+  },
+  {
+    id: 'enlightened',
+    name: 'Enlightened',
+    description: 'Accumulate 10 insight points',
+    checkCondition: (state) => state.insightPoints >= 10,
+  },
+  {
+    id: 'transcendent',
+    name: 'Transcendent',
+    description: 'Accumulate 100 insight points. You\'ve seen it all.',
+    checkCondition: (state) => state.insightPoints >= 100,
+  },
 ];
 
 export function checkAchievements(state: GameState, previousAchievements: string[]): string[] {
