@@ -29,6 +29,16 @@ export interface GameState {
   achievements: string[]; // IDs of unlocked achievements
   insightPoints: number; // PRESTIGE CURRENCY - Permanent multiplier from resets
 
+  // Comprehensive Statistics (Cookie Clicker-inspired)
+  totalSubstancesPurchased: number; // Total substance purchases across all types
+  totalUpgradesPurchased: number; // Total upgrades bought
+  totalRandomEventsClicked: number; // Random events activated
+  totalMaintenanceActionsUsed: number; // Maintenance actions performed
+  totalEnergyGenerated: number; // Cumulative energy from all sources
+  totalChaosAccumulated: number; // Cumulative chaos over all time
+  highestSingleClick: number; // Most vibes from one click
+  substanceStats: Record<string, number>; // Per-substance total vibes generated
+
   // Runtime flags
   actionCooldowns: Record<string, number>; // actionId -> seconds remaining
   nightStartTime: number; // timestamp

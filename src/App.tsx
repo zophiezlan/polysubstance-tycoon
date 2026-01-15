@@ -223,6 +223,7 @@ function App() {
 
       // HYBRID MODEL: Clicking GENERATES energy (+0.5 per click)
       newState.energy = Math.min(100, newState.energy + 0.5);
+      newState.totalEnergyGenerated += 0.5; // Track energy generation
 
       // COOKIE CLICKER MODE: Update combo system
       newState = updateCombo(newState);
@@ -240,6 +241,11 @@ function App() {
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
       newState.totalClicks += 1;
+
+      // Track highest single click
+      if (vibesGained > newState.highestSingleClick) {
+        newState.highestSingleClick = vibesGained;
+      }
 
       // Minimal chaos increase - make it VERY easy to manage
       const chaosIncrease = Math.random() * 1.5 * (1 - calculateChaosDampening(prevState));
@@ -302,6 +308,9 @@ function App() {
       newState.energy = Math.max(0, newState.energy - energyCost);
       newState.substances[substanceId] = owned + 1;
 
+      // Track statistics
+      newState.totalSubstancesPurchased += 1;
+
       // Apply time extension immediately
       if (substance.timeExtension) {
         newState.timeRemaining += substance.timeExtension;
@@ -328,6 +337,9 @@ function App() {
       newState.vibes -= upgrade.cost;
       newState.upgrades.push(upgradeId);
 
+      // Track statistics
+      newState.totalUpgradesPurchased += 1;
+
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
         message: `🔬 Unlocked: ${upgrade.name}`,
@@ -349,6 +361,9 @@ function App() {
       const newState = { ...prevState };
       newState.vibes -= action.cost;
       newState.actionCooldowns[actionId] = action.cooldown;
+
+      // Track statistics
+      newState.totalMaintenanceActionsUsed += 1;
 
       // Apply effects
       if (action.effects.energyRestore) {
@@ -514,16 +529,20 @@ function App() {
         // Clear the active event display
         setActiveRandomEvent(null);
 
+        // Track statistics
+        const newState = { ...prevState };
+        newState.totalRandomEventsClicked += 1;
+
         // Show success message in log
         if (result.message) {
-          const newState = { ...prevState };
           newState.log.push({
             timestamp: 3600 - newState.timeRemaining,
             message: result.message,
             type: 'achievement',
           });
-          return newState;
         }
+
+        return newState;
       }
       return prevState;
     });
