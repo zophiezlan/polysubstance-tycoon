@@ -554,8 +554,8 @@ function App() {
       </header>
 
       <main className="app-main">
-        {/* Left Panel - Big Clicker & Vibes */}
-        <div className="left-panel">
+        {/* Column 1: Vibes - Big Clicker */}
+        <div className="game-column column-vibes">
           <div className="vibes-display">
             <div className="vibes-label">VIBES</div>
             <div className="vibes-value">{formatNumber(state.vibes)}</div>
@@ -577,61 +577,57 @@ function App() {
             />
           </div>
 
-          {/* Hidden Meters moved to left panel */}
+          {/* Hidden Meters */}
           <div className="left-panel-meters">
             <HiddenMeters state={state} />
             {isExtendedGameState(state) && <ProgressionStatus gameState={state} />}
           </div>
         </div>
 
-        {/* Right Panel - Now 2-Column Interactive Content */}
-        <div className="right-panel">
-          {/* Scrollable Content Area - 2 Columns */}
-          <div className="scrollable-content">
-            {/* Column 1: Core Purchasing (Acquisitions & Upgrades Side by Side) */}
-            <div className="content-column column-purchasing">
-              <div className="acquisitions-upgrades-container">
-                <section className="shop-section">
-                  <SubstanceShop state={state} onPurchase={handlePurchase} />
-                </section>
+        {/* Column 2: Acquisitions */}
+        <div className="game-column column-acquisitions">
+          <SubstanceShop state={state} onPurchase={handlePurchase} />
+        </div>
 
-                <section className="upgrade-section">
-                  <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
-                </section>
-              </div>
+        {/* Column 3: Upgrades */}
+        <div className="game-column column-upgrades">
+          <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+        </div>
 
-              {/* Energy Boosters & Chaos Actions in 2x Grid */}
-              {isExtendedGameState(state) && (
-                <section className="action-panels-section">
-                  <ActionPanels
-                    gameState={state as ExtendedGameState}
-                    onUseEnergyBooster={handleUseEnergyBooster}
-                    onUseChaosAction={handleUseChaosAction}
-                  />
-                </section>
-              )}
+        {/* Column 4: Everything Else */}
+        <div className="game-column column-everything-else">
+          {/* Energy Boosters & Chaos Actions */}
+          {isExtendedGameState(state) && (
+            <section className="section-card">
+              <ActionPanels
+                gameState={state as ExtendedGameState}
+                onUseEnergyBooster={handleUseEnergyBooster}
+                onUseChaosAction={handleUseChaosAction}
+              />
+            </section>
+          )}
 
-              <section className="maintenance-section">
-                <MaintenancePanel state={state} onAction={handleMaintenance} />
-              </section>
-            </div>
+          {/* Maintenance Actions */}
+          <section className="section-card">
+            <MaintenancePanel state={state} onAction={handleMaintenance} />
+          </section>
 
-            {/* Column 2: Social Feedback & Info */}
-            <div className="content-column column-info">
-              {/* Group Chat & Organ Complaints - Social Feedback */}
-              <section className="social-feedback-section">
-                <GroupChatPanel
-                  state={state}
-                  onMarkAsRead={handleMarkMessagesAsRead}
-                />
-                <OrganComplaintsPanel state={state} />
-              </section>
+          {/* Group Chat & Organ Complaints */}
+          <section className="section-card">
+            <GroupChatPanel
+              state={state}
+              onMarkAsRead={handleMarkMessagesAsRead}
+            />
+          </section>
 
-              <section className="log-section">
-                <LogPanel state={state} />
-              </section>
-            </div>
-          </div>
+          <section className="section-card">
+            <OrganComplaintsPanel state={state} />
+          </section>
+
+          {/* Log */}
+          <section className="section-card">
+            <LogPanel state={state} />
+          </section>
         </div>
       </main>
 

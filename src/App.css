@@ -125,31 +125,63 @@
   box-shadow: 0 0 10px var(--purple);
 }
 
-/* Main Layout - Two Panels Side-by-Side */
+/* Main Layout - 4 Column Layout */
 .app-main {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr);
   flex: 1;
   overflow: hidden;
-  gap: 0.4rem;
-  padding: 0.4rem;
+  gap: 0.8rem;
+  padding: 0.8rem;
   min-height: 0;
 }
 
-/* Left Panel - Big Clicker */
-.left-panel {
-  flex: 0 0 22%;
+/* Game Columns - Normalized Card Styles */
+.game-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   background: var(--bg-panel);
   border: 2px solid var(--purple);
   border-radius: 8px;
-  padding: 0.8rem;
-  position: relative;
-  min-height: 0;
+  padding: 1rem;
   overflow-y: auto;
-  gap: 0.8rem;
+  overflow-x: hidden;
+  gap: 1rem;
+  min-height: 0;
+}
+
+/* Column 1: Vibes */
+.column-vibes {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Columns 2 & 3: Acquisitions & Upgrades */
+.column-acquisitions,
+.column-upgrades {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+/* Column 4: Everything Else */
+.column-everything-else {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Section Cards for Everything Else column */
+.section-card {
+  background: var(--bg-panel);
+  border: 2px solid var(--purple);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.section-card:last-child {
+  margin-bottom: 0;
 }
 
 .left-panel-meters {
@@ -231,54 +263,30 @@
 }
 
 /* Right Panel - 3-Column Interactive Content */
-.right-panel {
-  flex: 0 0 78%;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
-}
-
-/* Scrollable Content Area - 3 Columns */
-.scrollable-content {
-  flex: 1 1 auto;
-  overflow: visible;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  padding: 0.4rem;
-  min-height: 0;
-  align-items: start;
-}
-
-/* Content Columns */
-.content-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-height: 0;
-}
-
-.column-purchasing {
-  /* Core purchasing - shops and upgrades */
-}
-
-.column-actions {
-  /* Core actions - energy boosters, chaos actions, maintenance */
-}
-
-.column-info {
-  /* Strategy, build manager, group chat, log */
-}
-
-/* Section Styling */
-section {
+/* Substance Shop & Upgrade Shop - Normalized Card Styles */
+.substance-shop,
+.upgrade-shop {
   background: var(--bg-panel);
-  padding: 0.55rem;
-  border: 1px solid var(--purple-dark);
-  border-radius: 6px;
-  flex-shrink: 0;
+  border: 2px solid var(--purple);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Consistent h3 styling across all panels */
+.substance-shop h3,
+.upgrade-shop h3,
+.maintenance-panel h3,
+.section-card h3,
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-cyan);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Stat Panel */
@@ -614,10 +622,9 @@ section {
 
 /* Maintenance Panel */
 .maintenance-panel {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .maintenance-description {
@@ -1163,47 +1170,56 @@ section {
   95% { transform: translate(-2px, 3px); filter: blur(0.5px); }
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-  /* 2-column layout for medium screens */
-  .scrollable-content {
-    grid-template-columns: repeat(2, 1fr);
+/* Responsive - 4 Column Layout */
+@media (max-width: 1400px) {
+  /* 3 columns for medium-large screens */
+  .app-main {
+    grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr);
   }
 
-  .column-info {
+  .column-everything-else {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1100px) {
+  /* 2 columns for medium screens */
+  .app-main {
+    grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr);
+  }
+
+  .column-upgrades,
+  .column-everything-else {
     grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 768px) {
+  /* Single column for mobile */
   .app-main {
-    flex-direction: column;
-    padding: 0.3rem;
-    gap: 0.3rem;
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+    gap: 0.5rem;
   }
 
-  .left-panel {
-    flex: 0 0 auto;
+  .game-column {
     padding: 0.8rem;
-    flex-direction: row;
-    justify-content: space-around;
   }
 
-  .right-panel {
-    flex: 1;
-  }
-
-  .vibes-display {
+  .column-vibes {
     order: 1;
   }
 
-  .main-action-container {
+  .column-acquisitions {
     order: 2;
   }
 
-  .left-panel-meters {
+  .column-upgrades {
     order: 3;
-    flex: 1;
+  }
+
+  .column-everything-else {
+    order: 4;
   }
 
   .vibes-value {
@@ -1244,15 +1260,10 @@ section {
     padding: 1rem;
   }
 
-  .scrollable-content {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
+  .section-card {
+    padding: 0.8rem;
+    margin-bottom: 0.5rem;
   }
-
-  .content-column {
-    gap: 0.4rem;
-  }
-
 }
 
 /* Footer - Fixed at Bottom with Stats */
@@ -1281,19 +1292,6 @@ section {
   white-space: nowrap;
 }
 
-/* Acquisitions and Upgrades Side by Side */
-.acquisitions-upgrades-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-@media (max-width: 1200px) {
-  .acquisitions-upgrades-container {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
