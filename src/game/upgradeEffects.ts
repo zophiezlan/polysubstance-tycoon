@@ -49,6 +49,7 @@ export function calculateEnergyCost(state: GameState, baseCost: number = 5): num
 
 /**
  * Calculate production multiplier for a specific substance + prestige
+ * Now includes synergy bonuses!
  */
 export function calculateProductionMultiplier(state: GameState, substanceId: string): number {
   let multiplier = 1;
@@ -60,6 +61,19 @@ export function calculateProductionMultiplier(state: GameState, substanceId: str
     // Substance-specific multiplier
     if (upgrade.substanceId === substanceId && upgrade.effects.productionMultiplier) {
       multiplier *= upgrade.effects.productionMultiplier;
+    }
+
+    // Synergy multiplier - applies if this substance is in the synergy list
+    // AND player owns ALL substances in the synergy
+    if (upgrade.synergySubstances?.includes(substanceId) && upgrade.effects.productionMultiplier) {
+      // Check if player owns all substances in the synergy
+      const ownsAllSynergySubstances = upgrade.synergySubstances.every(
+        sId => (state.substances[sId] || 0) > 0
+      );
+
+      if (ownsAllSynergySubstances) {
+        multiplier *= upgrade.effects.productionMultiplier;
+      }
     }
 
     // Global production multiplier

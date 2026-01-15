@@ -610,6 +610,70 @@
   background: rgba(0, 255, 255, 0.2);
 }
 
+/* Synergy Upgrades */
+.synergy-badge {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.synergy-badge.active {
+  background: rgba(0, 255, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.6);
+  animation: synergy-pulse 2s ease-in-out infinite;
+}
+
+.synergy-badge.inactive {
+  background: rgba(255, 136, 0, 0.2);
+  border: 1px solid rgba(255, 136, 0, 0.4);
+  opacity: 0.7;
+}
+
+@keyframes synergy-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+  }
+}
+
+.synergy-requirements {
+  font-size: 0.75rem;
+  margin: 0.3rem 0;
+  padding: 0.3rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  border-left: 3px solid rgba(138, 43, 226, 0.5);
+}
+
+.synergy-label {
+  color: var(--text-cyan);
+  font-weight: bold;
+  margin-right: 0.4rem;
+}
+
+.synergy-substance {
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  margin: 0 0.15rem;
+  font-size: 0.7rem;
+}
+
+.synergy-substance.owned {
+  background: rgba(0, 255, 0, 0.2);
+  color: var(--success);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.synergy-substance.missing {
+  background: rgba(255, 136, 0, 0.2);
+  color: var(--warning);
+  border: 1px solid rgba(255, 136, 0, 0.3);
+}
+
 .no-upgrades {
   color: var(--text-white);
   font-style: italic;
