@@ -252,3 +252,27 @@ export function getSubstance(id: string): SubstanceDefinition | undefined {
 export function getSubstanceCost(substance: SubstanceDefinition, owned: number): number {
   return Math.floor(substance.baseCost * Math.pow(substance.costMultiplier, owned));
 }
+
+// HYBRID MODEL: Energy costs for purchasing substances
+export function getSubstanceEnergyCost(substance: SubstanceDefinition): number {
+  // Energy cost based on substance tier/complexity
+  const costMap: Record<string, number> = {
+    'alcohol': 5,
+    'stimulant': 10,
+    'empathogen': 20,
+    'dissociative': 15,
+    'sedative': 15,
+    'nootropic': 25,
+    'deliriant': 30,
+    'psychedelic': 35,
+    'synthetic': 40,
+    'research': 45,
+    'exotic': 50,
+    'experimental': 60,
+    'forbidden': 70,
+    'eldritch': 80,
+    'void': 90,
+  };
+
+  return costMap[substance.id] || 10;
+}

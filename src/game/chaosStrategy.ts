@@ -231,84 +231,19 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
 };
 
 // ============================================================================
-// CHAOS STRATEGIES - Passive modifiers for chaos behavior
+// CHAOS STRATEGIES - SIMPLIFIED: Only baseline strategy for now
 // ============================================================================
 
 export const CHAOS_STRATEGIES: Record<string, ChaosStrategy> = {
   none: {
     id: 'none',
-    name: 'No Strategy',
-    description: 'Default chaos behavior. No modifiers.',
+    name: 'Baseline',
+    description: 'Standard chaos mechanics. Risk and reward in balance.',
     unlockCondition: () => true,
     effects: {
       chaosThresholdMultiplier: 1.0,
       chaosDecayMultiplier: 1.0,
       chaosGenerationMultiplier: 1.0,
-    },
-  },
-
-  stabilizer: {
-    id: 'stabilizer',
-    name: '🔒 Chaos Stabilizer',
-    description: 'Keep chaos under control. +100% decay rate, -50% generation. Threshold bonuses unchanged.',
-    unlockCondition: (state: GameState) => state.totalVibesEarned >= 500000,
-    effects: {
-      chaosThresholdMultiplier: 1.0,
-      chaosDecayMultiplier: 2.0,
-      chaosGenerationMultiplier: 0.5,
-    },
-  },
-
-  amplifier: {
-    id: 'amplifier',
-    name: '📈 Chaos Amplifier',
-    description: 'Maximize chaos benefits! +50% threshold bonuses, normal generation/decay.',
-    unlockCondition: (state: GameState) => state.totalVibesEarned >= 1000000,
-    effects: {
-      chaosThresholdMultiplier: 1.5,
-      chaosDecayMultiplier: 1.0,
-      chaosGenerationMultiplier: 1.0,
-    },
-  },
-
-  safeZone: {
-    id: 'safeZone',
-    name: '🛡️ Safe Zone',
-    description: 'Cap chaos at 60. Never enter Volatile or Transcendent. -50% generation, normal decay.',
-    unlockCondition: (state: GameState) => state.totalVibesEarned >= 250000,
-    effects: {
-      chaosThresholdMultiplier: 1.0,
-      chaosDecayMultiplier: 1.0,
-      chaosGenerationMultiplier: 0.5,
-      chaosCapOverride: 60,
-    },
-  },
-
-  riskyBusiness: {
-    id: 'riskyBusiness',
-    name: '🎲 Risky Business',
-    description: 'Keep chaos high! Chaos cannot fall below 40. +50% generation, -50% decay. +25% threshold bonuses.',
-    unlockCondition: (state: GameState) => state.totalVibesEarned >= 2500000,
-    effects: {
-      chaosThresholdMultiplier: 1.25,
-      chaosDecayMultiplier: 0.5,
-      chaosGenerationMultiplier: 1.5,
-      chaosFloorOverride: 40,
-    },
-  },
-
-  wildcard: {
-    id: 'wildcard',
-    name: '🃏 Wildcard',
-    description: 'Embrace chaos! +100% threshold bonuses, +100% generation, -50% decay. Chaos swings wildly. Prestige 2+ only.',
-    unlockCondition: (state: GameState) => {
-      const extended = state as ExtendedGameState;
-      return extended.prestigeTier >= 2;
-    },
-    effects: {
-      chaosThresholdMultiplier: 2.0,
-      chaosDecayMultiplier: 0.5,
-      chaosGenerationMultiplier: 2.0,
     },
   },
 };
