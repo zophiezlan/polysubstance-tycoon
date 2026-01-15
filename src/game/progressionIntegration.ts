@@ -5,7 +5,6 @@ import { GameState } from './types';
 import { ExtendedGameState, upgradeToExtendedGameState, isExtendedGameState } from './progressionTypes';
 import {
   calculateEnergyRegen,
-  calculateEnergyHarvest,
   getEnergyClickMultiplier,
   getEnergyProductionMultiplier,
   getActiveEnergyMode,

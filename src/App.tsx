@@ -31,11 +31,11 @@ import { OfflineProgressManager } from './components/OfflineProgress';
 import { ActionPanels } from './components/ActionPanels';
 import { GroupChatPanel } from './components/GroupChatPanel';
 import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
-import { StrategySelector } from './components/StrategySelector';
+// import { StrategySelector } from './components/StrategySelector'; // DISABLED FOR HYBRID MODEL TESTING
 import { BuildManagerPanel } from './components/BuildManagerPanel';
 import { isExtendedGameState, ExtendedGameState } from './game/progressionTypes';
-import { useEnergyBooster as applyEnergyBooster, switchEnergyMode } from './game/energyManagement';
-import { useChaosAction as applyChaosAction, switchChaosStrategy } from './game/chaosStrategy';
+import { useEnergyBooster as applyEnergyBooster } from './game/energyManagement';
+import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
 import {
   saveBuild,
   swapToBuild,
@@ -495,23 +495,24 @@ function App() {
     });
   }, []);
 
-  const handleSwitchEnergyMode = useCallback((modeId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      switchEnergyMode(extendedState, modeId);
-      return extendedState;
-    });
-  }, []);
+  // DISABLED FOR HYBRID MODEL TESTING - Strategy selector is commented out
+  // const handleSwitchEnergyMode = useCallback((modeId: string) => {
+  //   setState(prevState => {
+  //     if (!isExtendedGameState(prevState)) return prevState;
+  //     const extendedState = { ...prevState } as ExtendedGameState;
+  //     switchEnergyMode(extendedState, modeId);
+  //     return extendedState;
+  //   });
+  // }, []);
 
-  const handleSwitchChaosStrategy = useCallback((strategyId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      switchChaosStrategy(extendedState, strategyId);
-      return extendedState;
-    });
-  }, []);
+  // const handleSwitchChaosStrategy = useCallback((strategyId: string) => {
+  //   setState(prevState => {
+  //     if (!isExtendedGameState(prevState)) return prevState;
+  //     const extendedState = { ...prevState } as ExtendedGameState;
+  //     switchChaosStrategy(extendedState, strategyId);
+  //     return extendedState;
+  //   });
+  // }, []);
 
   const handleSaveBuild = useCallback((name: string, notes?: string) => {
     setState(prevState => {
