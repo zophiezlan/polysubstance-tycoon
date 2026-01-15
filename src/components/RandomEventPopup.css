@@ -1,0 +1,145 @@
+.random-event-popup {
+  position: fixed;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-panel);
+  border-radius: 12px;
+  border: 3px solid;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: float 3s ease-in-out infinite;
+
+  /* Default glow */
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.random-event-popup:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.random-event-popup:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0px);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-10px);
+  }
+}
+
+/* Shake animation when time is running out */
+.random-event-popup.shake {
+  animation: float 3s ease-in-out infinite, shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+  25% { transform: translate(-50%, -50%) translateX(-5px); }
+  75% { transform: translate(-50%, -50%) translateX(5px); }
+}
+
+/* Rarity-based styling */
+.random-event-popup.rarity-common {
+  border-color: #aaa;
+  box-shadow: 0 0 20px rgba(170, 170, 170, 0.6);
+}
+
+.random-event-popup.rarity-rare {
+  border-color: #4a9eff;
+  box-shadow: 0 0 30px rgba(74, 158, 255, 0.8);
+}
+
+.random-event-popup.rarity-epic {
+  border-color: #a335ee;
+  box-shadow: 0 0 40px rgba(163, 53, 238, 0.9);
+}
+
+.random-event-popup.rarity-legendary {
+  border-color: #ff8000;
+  box-shadow: 0 0 50px rgba(255, 128, 0, 1);
+  animation: float 3s ease-in-out infinite, legendaryPulse 2s ease-in-out infinite;
+}
+
+@keyframes legendaryPulse {
+  0%, 100% {
+    box-shadow: 0 0 50px rgba(255, 128, 0, 1);
+  }
+  50% {
+    box-shadow: 0 0 70px rgba(255, 200, 0, 1);
+  }
+}
+
+/* Event icon */
+.event-icon {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Event content */
+.event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.event-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.event-timer {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+/* Glow overlay (for extra visual flair) */
+.event-glow {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: 0.3;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .random-event-popup {
+    padding: 10px 12px;
+  }
+
+  .event-icon {
+    font-size: 28px;
+  }
+
+  .event-name {
+    font-size: 12px;
+  }
+
+  .event-timer {
+    font-size: 11px;
+  }
+}

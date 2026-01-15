@@ -31,6 +31,16 @@ export function createInitialState(): GameState {
     achievements: [],
     insightPoints: 0, // Prestige currency
 
+    // Comprehensive Statistics
+    totalSubstancesPurchased: 0,
+    totalUpgradesPurchased: 0,
+    totalRandomEventsClicked: 0,
+    totalMaintenanceActionsUsed: 0,
+    totalEnergyGenerated: 0,
+    totalChaosAccumulated: 0,
+    highestSingleClick: 0,
+    substanceStats: {},
+
     // Runtime flags
     actionCooldowns: {},
     nightStartTime: Date.now(),
@@ -93,6 +103,16 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.achievements = persistentState.achievements || [];
   newState.insightPoints = persistentState.insightPoints || 0; // PRESTIGE CURRENCY
   newState.upgrades = persistentState.upgrades || [];
+
+  // Preserve comprehensive statistics
+  newState.totalSubstancesPurchased = persistentState.totalSubstancesPurchased || 0;
+  newState.totalUpgradesPurchased = persistentState.totalUpgradesPurchased || 0;
+  newState.totalRandomEventsClicked = persistentState.totalRandomEventsClicked || 0;
+  newState.totalMaintenanceActionsUsed = persistentState.totalMaintenanceActionsUsed || 0;
+  newState.totalEnergyGenerated = persistentState.totalEnergyGenerated || 0;
+  newState.totalChaosAccumulated = persistentState.totalChaosAccumulated || 0;
+  newState.highestSingleClick = persistentState.highestSingleClick || 0;
+  newState.substanceStats = persistentState.substanceStats || {};
   newState.hasSeenDisclaimer = persistentState.hasSeenDisclaimer || false;
   newState.disableDistortion = persistentState.disableDistortion || false;
   newState.reducedMotion = persistentState.reducedMotion || false;

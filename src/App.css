@@ -125,31 +125,70 @@
   box-shadow: 0 0 10px var(--purple);
 }
 
-/* Main Layout - Two Panels Side-by-Side */
+/* Main Layout - 4 Column Layout */
 .app-main {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   flex: 1;
   overflow: hidden;
-  gap: 0.4rem;
-  padding: 0.4rem;
+  gap: 0.8rem;
+  padding: 0.8rem;
   min-height: 0;
 }
 
-/* Left Panel - Big Clicker */
-.left-panel {
-  flex: 0 0 22%;
+/* Game Columns - Normalized Card Styles */
+.game-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   background: var(--bg-panel);
   border: 2px solid var(--purple);
   border-radius: 8px;
-  padding: 0.8rem;
-  position: relative;
-  min-height: 0;
+  padding: 1rem;
   overflow-y: auto;
-  gap: 0.8rem;
+  overflow-x: hidden;
+  gap: 1rem;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Column 1: Vibes */
+.column-vibes {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Columns 2 & 3: Acquisitions & Upgrades */
+.column-acquisitions,
+.column-upgrades {
+  padding: 0;
+  /* Keep border and background so it extends full scroll length */
+}
+
+/* Column 4: Everything Else */
+.column-everything-else {
+  /* Keep border and background so it extends full scroll length */
+  padding: 1rem;
+  grid-column: auto; /* Prevent spanning on desktop */
+}
+
+/* Section Cards for Everything Else column - subtle separators */
+.section-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+  border-radius: 0;
+  padding: 1rem 0;
+  margin-bottom: 0.8rem;
+}
+
+.section-card:first-child {
+  padding-top: 0;
+}
+
+.section-card:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .left-panel-meters {
@@ -231,54 +270,30 @@
 }
 
 /* Right Panel - 3-Column Interactive Content */
-.right-panel {
-  flex: 0 0 78%;
+/* Substance Shop & Upgrade Shop - No borders needed, parent has them */
+.substance-shop,
+.upgrade-shop {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
+  height: 100%;
 }
 
-/* Scrollable Content Area - 3 Columns */
-.scrollable-content {
-  flex: 1 1 auto;
-  overflow: visible;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  padding: 0.4rem;
-  min-height: 0;
-  align-items: start;
-}
-
-/* Content Columns */
-.content-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-height: 0;
-}
-
-.column-purchasing {
-  /* Core purchasing - shops and upgrades */
-}
-
-.column-actions {
-  /* Core actions - energy boosters, chaos actions, maintenance */
-}
-
-.column-info {
-  /* Strategy, build manager, group chat, log */
-}
-
-/* Section Styling */
-section {
-  background: var(--bg-panel);
-  padding: 0.55rem;
-  border: 1px solid var(--purple-dark);
-  border-radius: 6px;
-  flex-shrink: 0;
+/* Consistent h3 styling across all panels */
+.substance-shop h3,
+.upgrade-shop h3,
+.maintenance-panel h3,
+.section-card h3,
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-cyan);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Stat Panel */
@@ -595,6 +610,70 @@ section {
   background: rgba(0, 255, 255, 0.2);
 }
 
+/* Synergy Upgrades */
+.synergy-badge {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.synergy-badge.active {
+  background: rgba(0, 255, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.6);
+  animation: synergy-pulse 2s ease-in-out infinite;
+}
+
+.synergy-badge.inactive {
+  background: rgba(255, 136, 0, 0.2);
+  border: 1px solid rgba(255, 136, 0, 0.4);
+  opacity: 0.7;
+}
+
+@keyframes synergy-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+  }
+}
+
+.synergy-requirements {
+  font-size: 0.75rem;
+  margin: 0.3rem 0;
+  padding: 0.3rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  border-left: 3px solid rgba(138, 43, 226, 0.5);
+}
+
+.synergy-label {
+  color: var(--text-cyan);
+  font-weight: bold;
+  margin-right: 0.4rem;
+}
+
+.synergy-substance {
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  margin: 0 0.15rem;
+  font-size: 0.7rem;
+}
+
+.synergy-substance.owned {
+  background: rgba(0, 255, 0, 0.2);
+  color: var(--success);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.synergy-substance.missing {
+  background: rgba(255, 136, 0, 0.2);
+  color: var(--warning);
+  border: 1px solid rgba(255, 136, 0, 0.3);
+}
+
 .no-upgrades {
   color: var(--text-white);
   font-style: italic;
@@ -613,38 +692,141 @@ section {
 }
 
 /* Maintenance Panel */
+.maintenance-panel {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.maintenance-description {
+  font-size: 0.85rem;
+  color: var(--text-cyan);
+  margin: -8px 0 12px 0;
+  font-style: italic;
+  opacity: 0.8;
+}
+
 .maintenance-actions {
   display: grid;
-  gap: 0.4rem;
+  gap: 12px;
 }
 
 .maintenance-action {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  padding: 10px;
+  border: 2px solid rgba(138, 43, 226, 0.3);
+  transition: all 0.2s;
+}
+
+.maintenance-action.available {
+  border-color: rgba(138, 43, 226, 0.5);
+}
+
+.maintenance-action.available:hover {
+  border-color: rgba(138, 43, 226, 0.8);
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+}
+
+.maintenance-action.disabled {
+  opacity: 0.6;
 }
 
 .maintenance-button {
-  background: var(--purple-dark);
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.2));
   color: var(--text-white);
-  padding: 0.4rem 0.7rem;
-  border-radius: 4px;
+  padding: 12px;
+  border-radius: 6px;
   text-align: left;
   transition: all 0.2s;
-  border: 1px solid var(--purple);
-  font-size: 0.8rem;
+  border: 1px solid rgba(138, 43, 226, 0.4);
+  font-size: 0.9rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .maintenance-button:hover:not(:disabled) {
-  background: var(--purple);
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.5), rgba(138, 43, 226, 0.3));
   border-color: var(--text-cyan);
+  transform: translateY(-1px);
+}
+
+.maintenance-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.button-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.button-name {
+  color: var(--text-cyan);
+  font-size: 1em;
+}
+
+.button-cost {
+  color: var(--success);
+  font-size: 0.9em;
+  font-family: 'Courier New', monospace;
+}
+
+.cooldown-bar-container {
+  margin-top: 8px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.cooldown-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f80, #f40);
+  transition: width 0.5s linear;
+  box-shadow: 0 0 8px rgba(255, 136, 0, 0.5);
+}
+
+.action-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .action-description {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  color: rgba(68, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+.action-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.effect-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  background: rgba(138, 43, 226, 0.3);
+  border: 1px solid rgba(138, 43, 226, 0.5);
+  border-radius: 12px;
   color: var(--text-cyan);
-  font-style: italic;
-  padding-left: 0.8rem;
+  white-space: nowrap;
+}
+
+.cooldown-text {
+  font-size: 0.75rem;
+  color: #f80;
+  font-weight: bold;
 }
 
 /* Hidden Meters */
@@ -1059,47 +1241,48 @@ section {
   95% { transform: translate(-2px, 3px); filter: blur(0.5px); }
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-  /* 2-column layout for medium screens */
-  .scrollable-content {
+/* Responsive - 4 Column Layout */
+@media (max-width: 900px) {
+  /* 2 columns for tablets */
+  .app-main {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .column-info {
+  .column-vibes {
+    grid-column: 1 / -1;
+  }
+
+  .column-everything-else {
     grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 768px) {
+  /* Single column for mobile */
   .app-main {
-    flex-direction: column;
-    padding: 0.3rem;
-    gap: 0.3rem;
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+    gap: 0.5rem;
   }
 
-  .left-panel {
-    flex: 0 0 auto;
+  .game-column {
     padding: 0.8rem;
-    flex-direction: row;
-    justify-content: space-around;
   }
 
-  .right-panel {
-    flex: 1;
-  }
-
-  .vibes-display {
+  .column-vibes {
     order: 1;
   }
 
-  .main-action-container {
+  .column-acquisitions {
     order: 2;
   }
 
-  .left-panel-meters {
+  .column-upgrades {
     order: 3;
-    flex: 1;
+  }
+
+  .column-everything-else {
+    order: 4;
   }
 
   .vibes-value {
@@ -1140,16 +1323,38 @@ section {
     padding: 1rem;
   }
 
-  .scrollable-content {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
+  .section-card {
+    padding: 0.8rem;
+    margin-bottom: 0.5rem;
   }
-
-  .content-column {
-    gap: 0.4rem;
-  }
-
 }
+
+/* Footer - Fixed at Bottom with Stats */
+.app-footer {
+  background: var(--bg-panel);
+  border-top: 2px solid var(--purple);
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.footer-content {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-stat {
+  color: var(--text-cyan);
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {

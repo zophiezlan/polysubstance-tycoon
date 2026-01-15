@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { GameState } from './game/types';
 import { createInitialState, startNewNight } from './game/state';
 import { gameTick } from './game/tick';
@@ -32,22 +32,15 @@ import { ActionPanels } from './components/ActionPanels';
 import { GroupChatPanel } from './components/GroupChatPanel';
 import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
 // import { StrategySelector } from './components/StrategySelector'; // DISABLED FOR HYBRID MODEL TESTING
-import { BuildManagerPanel } from './components/BuildManagerPanel';
 import { isExtendedGameState, ExtendedGameState } from './game/progressionTypes';
 import { useEnergyBooster as applyEnergyBooster } from './game/energyManagement';
 import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
-import {
-  saveBuild,
-  swapToBuild,
-  deleteBuild,
-  overwriteBuild,
-  updateBuildName,
-  importBuild,
-  loadStarterBuild,
-} from './game/buildManager';
 import { claimOfflineProgress } from './game/progressionIntegration';
 // import { checkMilestones } from './game/milestones'; // Disabled - redundant with Active Bonuses
 import { markMessagesAsRead } from './game/groupChat';
+// Random Events (Golden Cookie equivalent)
+import { RandomEventManager } from './game/randomEvents';
+import { RandomEventPopup } from './components/RandomEventPopup';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -96,6 +89,17 @@ function App() {
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
   // const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]); // Disabled - redundant with Active Bonuses
 
+  // Random Event Manager (Golden Cookie equivalent)
+  const randomEventManager = useRef<RandomEventManager>(new RandomEventManager());
+  const [activeRandomEvent, setActiveRandomEvent] = useState<{ event: any; timeRemaining: number } | null>(null);
+
+  // Initialize RandomEventManager from saved state
+  useEffect(() => {
+    if (state.randomEventData) {
+      randomEventManager.current.deserialize(state.randomEventData);
+    }
+  }, []); // Only run on mount
+
   // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -142,6 +146,14 @@ function App() {
         const deltaTime = Math.min(safeDelta, TICK_INTERVAL);
         let newState = gameTick(prevState, deltaTime);
         newState.lastTickTime = now;
+
+        // Update random events
+        randomEventManager.current.update(newState, now / 1000); // Convert to seconds
+        const activeEvent = randomEventManager.current.getActiveEvent();
+        setActiveRandomEvent(activeEvent);
+
+        // Save random event state
+        newState.randomEventData = randomEventManager.current.serialize();
 
         // Check for new achievements
         const newAchievements = checkAchievements(newState, prevState.achievements);
@@ -211,6 +223,7 @@ function App() {
 
       // HYBRID MODEL: Clicking GENERATES energy (+0.5 per click)
       newState.energy = Math.min(100, newState.energy + 0.5);
+      newState.totalEnergyGenerated += 0.5; // Track energy generation
 
       // COOKIE CLICKER MODE: Update combo system
       newState = updateCombo(newState);
@@ -228,6 +241,11 @@ function App() {
       newState.vibes += vibesGained;
       newState.totalVibesEarned += vibesGained;
       newState.totalClicks += 1;
+
+      // Track highest single click
+      if (vibesGained > newState.highestSingleClick) {
+        newState.highestSingleClick = vibesGained;
+      }
 
       // Minimal chaos increase - make it VERY easy to manage
       const chaosIncrease = Math.random() * 1.5 * (1 - calculateChaosDampening(prevState));
@@ -290,6 +308,9 @@ function App() {
       newState.energy = Math.max(0, newState.energy - energyCost);
       newState.substances[substanceId] = owned + 1;
 
+      // Track statistics
+      newState.totalSubstancesPurchased += 1;
+
       // Apply time extension immediately
       if (substance.timeExtension) {
         newState.timeRemaining += substance.timeExtension;
@@ -316,6 +337,9 @@ function App() {
       newState.vibes -= upgrade.cost;
       newState.upgrades.push(upgradeId);
 
+      // Track statistics
+      newState.totalUpgradesPurchased += 1;
+
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
         message: `🔬 Unlocked: ${upgrade.name}`,
@@ -337,6 +361,9 @@ function App() {
       const newState = { ...prevState };
       newState.vibes -= action.cost;
       newState.actionCooldowns[actionId] = action.cooldown;
+
+      // Track statistics
+      newState.totalMaintenanceActionsUsed += 1;
 
       // Apply effects
       if (action.effects.energyRestore) {
@@ -495,6 +522,32 @@ function App() {
     });
   }, []);
 
+  const handleActivateRandomEvent = useCallback(() => {
+    setState(prevState => {
+      const result = randomEventManager.current.activateEvent(prevState);
+      if (result.success) {
+        // Clear the active event display
+        setActiveRandomEvent(null);
+
+        // Track statistics
+        const newState = { ...prevState };
+        newState.totalRandomEventsClicked += 1;
+
+        // Show success message in log
+        if (result.message) {
+          newState.log.push({
+            timestamp: 3600 - newState.timeRemaining,
+            message: result.message,
+            type: 'achievement',
+          });
+        }
+
+        return newState;
+      }
+      return prevState;
+    });
+  }, []);
+
   // DISABLED FOR HYBRID MODEL TESTING - Strategy selector is commented out
   // const handleSwitchEnergyMode = useCallback((modeId: string) => {
   //   setState(prevState => {
@@ -514,69 +567,6 @@ function App() {
   //   });
   // }, []);
 
-  const handleSaveBuild = useCallback((name: string, notes?: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      saveBuild(extendedState, name, notes);
-      return extendedState;
-    });
-  }, []);
-
-  const handleSwapBuild = useCallback((buildIndex: number) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      swapToBuild(extendedState, buildIndex);
-      return extendedState;
-    });
-  }, []);
-
-  const handleDeleteBuild = useCallback((buildId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      deleteBuild(extendedState, buildId);
-      return extendedState;
-    });
-  }, []);
-
-  const handleOverwriteBuild = useCallback((buildIndex: number) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      overwriteBuild(extendedState, buildIndex);
-      return extendedState;
-    });
-  }, []);
-
-  const handleUpdateBuildName = useCallback((buildId: string, newName: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      updateBuildName(extendedState, buildId, newName);
-      return extendedState;
-    });
-  }, []);
-
-  const handleImportBuild = useCallback((buildJson: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      importBuild(extendedState, buildJson);
-      return extendedState;
-    });
-  }, []);
-
-  const handleLoadStarterBuild = useCallback((presetId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      loadStarterBuild(extendedState, presetId);
-      return extendedState;
-    });
-  }, []);
-
   // Memoize vibes per second calculation for performance
   const vibesPerSecond = useMemo(() => {
     return Object.entries(state.substances).reduce((total: number, [id, count]: [string, number]) => {
@@ -585,7 +575,7 @@ function App() {
       const multiplier = calculateProductionMultiplier(state, id);
       return total + (substance.baseVibes * count * multiplier);
     }, 0);
-  }, [state.substances, state.upgrades, state.insightPoints]);
+  }, [state.substances, state.upgrades, state.insightPoints, state.energy, state.chaos]);
 
   return (
     <div className={`app font-${state.fontSize} ${state.reducedMotion ? 'reduced-motion' : ''} distortion-${state.distortionLevel}`}>
@@ -627,8 +617,8 @@ function App() {
       </header>
 
       <main className="app-main">
-        {/* Left Panel - Big Clicker & Vibes */}
-        <div className="left-panel">
+        {/* Column 1: Vibes - Big Clicker */}
+        <div className="game-column column-vibes">
           <div className="vibes-display">
             <div className="vibes-label">VIBES</div>
             <div className="vibes-value">{formatNumber(state.vibes)}</div>
@@ -650,91 +640,70 @@ function App() {
             />
           </div>
 
-          {/* Hidden Meters moved to left panel */}
+          {/* Hidden Meters */}
           <div className="left-panel-meters">
             <HiddenMeters state={state} />
             {isExtendedGameState(state) && <ProgressionStatus gameState={state} />}
           </div>
         </div>
 
-        {/* Right Panel - Now 3-Column Interactive Content */}
-        <div className="right-panel">
-          {/* Scrollable Content Area - 3 Columns */}
-          <div className="scrollable-content">
-            {/* Column 1: Core Purchasing (Shops & Upgrades) */}
-            <div className="content-column column-purchasing">
-              <section className="shop-section">
-                <SubstanceShop state={state} onPurchase={handlePurchase} />
-              </section>
+        {/* Column 2: Acquisitions */}
+        <div className="game-column column-acquisitions">
+          <SubstanceShop state={state} onPurchase={handlePurchase} />
+        </div>
 
-              <section className="upgrade-section">
-                <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
-              </section>
-            </div>
+        {/* Column 3: Upgrades */}
+        <div className="game-column column-upgrades">
+          <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+        </div>
 
-            {/* Column 2: Core Actions (Energy, Chaos, Maintenance) */}
-            <div className="content-column column-actions">
-              {/* New Action Panels */}
-              {isExtendedGameState(state) && (
-                <section className="action-panels-section">
-                  <ActionPanels
-                    gameState={state as ExtendedGameState}
-                    onUseEnergyBooster={handleUseEnergyBooster}
-                    onUseChaosAction={handleUseChaosAction}
-                  />
-                </section>
-              )}
+        {/* Column 4: Everything Else */}
+        <div className="game-column column-everything-else">
+          {/* Energy Boosters & Chaos Actions */}
+          {isExtendedGameState(state) && (
+            <section className="section-card">
+              <ActionPanels
+                gameState={state as ExtendedGameState}
+                onUseEnergyBooster={handleUseEnergyBooster}
+                onUseChaosAction={handleUseChaosAction}
+              />
+            </section>
+          )}
 
-              <section className="maintenance-section">
-                <MaintenancePanel state={state} onAction={handleMaintenance} />
-              </section>
-            </div>
+          {/* Maintenance Actions */}
+          <section className="section-card">
+            <MaintenancePanel state={state} onAction={handleMaintenance} />
+          </section>
 
-            {/* Column 3: Strategy & Info */}
-            <div className="content-column column-info">
-              {/* Strategy Selector - DISABLED FOR HYBRID MODEL TESTING */}
-              {/* {isExtendedGameState(state) && (
-                <section className="strategy-selector-section">
-                  <StrategySelector
-                    gameState={state as ExtendedGameState}
-                    onSwitchEnergyMode={handleSwitchEnergyMode}
-                    onSwitchChaosStrategy={handleSwitchChaosStrategy}
-                  />
-                </section>
-              )} */}
+          {/* Group Chat & Organ Complaints */}
+          <section className="section-card">
+            <GroupChatPanel
+              state={state}
+              onMarkAsRead={handleMarkMessagesAsRead}
+            />
+          </section>
 
-              {/* Build Manager - Save/Load Configurations */}
-              {isExtendedGameState(state) && (
-                <section className="build-manager-section">
-                  <BuildManagerPanel
-                    gameState={state as ExtendedGameState}
-                    onSaveBuild={handleSaveBuild}
-                    onSwapBuild={handleSwapBuild}
-                    onDeleteBuild={handleDeleteBuild}
-                    onOverwriteBuild={handleOverwriteBuild}
-                    onUpdateBuildName={handleUpdateBuildName}
-                    onImportBuild={handleImportBuild}
-                    onLoadStarterBuild={handleLoadStarterBuild}
-                  />
-                </section>
-              )}
+          <section className="section-card">
+            <OrganComplaintsPanel state={state} />
+          </section>
 
-              {/* Group Chat & Organ Complaints - Social Feedback */}
-              <section className="social-feedback-section">
-                <GroupChatPanel
-                  state={state}
-                  onMarkAsRead={handleMarkMessagesAsRead}
-                />
-                <OrganComplaintsPanel state={state} />
-              </section>
-
-              <section className="log-section">
-                <LogPanel state={state} />
-              </section>
-            </div>
-          </div>
+          {/* Log */}
+          <section className="section-card">
+            <LogPanel state={state} />
+          </section>
         </div>
       </main>
+
+      <footer className="app-footer">
+        <div className="footer-content">
+          <span className="footer-stat">Nights Completed: {state.nightsCompleted || 0}</span>
+          <span className="footer-stat">Total Vibes Earned: {formatNumber(state.totalVibesEarned)}</span>
+          <span className="footer-stat">Total Clicks: {formatNumber(state.totalClicks)}</span>
+          {state.achievements && state.achievements.length > 0 && (
+            <span className="footer-stat">Achievements: {state.achievements.length}</span>
+          )}
+        </div>
+      </footer>
 
       {!state.muteNotifications && achievementQueue.length > 0 && (
         <div className="achievement-toast">
@@ -761,6 +730,15 @@ function App() {
           onComplete={handleFloatingNumberComplete}
         />
       ))}
+
+      {/* Random Event Popup (Golden Cookie equivalent) */}
+      {activeRandomEvent && (
+        <RandomEventPopup
+          event={activeRandomEvent.event}
+          timeRemaining={activeRandomEvent.timeRemaining}
+          onActivate={handleActivateRandomEvent}
+        />
+      )}
 
       {/* Milestone Notifications - Disabled (redundant with Active Bonuses section) */}
       {/* {!state.muteNotifications && (

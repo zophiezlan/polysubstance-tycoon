@@ -40,7 +40,9 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   const alcoholAmp = getAlcoholAmplification(alcoholCount);
 
   // Track cumulative time extension for stimulant flip
-  let cumulativeTimeExtension = 3600 - newState.timeRemaining;
+  // Each stimulant provides +5 seconds, so total bonus time = count * 5
+  const stimulantCount = newState.substances.stimulant || 0;
+  const cumulativeTimeExtension = stimulantCount * 5;
 
   // 1. Passive vibe generation from substances
   let totalVibesPerSec = 0;
@@ -167,7 +169,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.sleepDebt += totalSleepDebtMod * dt;
 
   // Exponential sleep debt after 10 stimulants (but less harsh)
-  const stimulantCount = newState.substances.stimulant || 0;
+  // stimulantCount already declared at line 44
   if (stimulantCount >= 10) {
     newState.sleepDebt += Math.pow(stimulantCount - 9, 1.5) * 0.05 * dt; // Reduced from 0.1
   }
