@@ -32,19 +32,9 @@ import { ActionPanels } from './components/ActionPanels';
 import { GroupChatPanel } from './components/GroupChatPanel';
 import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
 // import { StrategySelector } from './components/StrategySelector'; // DISABLED FOR HYBRID MODEL TESTING
-import { BuildManagerPanel } from './components/BuildManagerPanel';
 import { isExtendedGameState, ExtendedGameState } from './game/progressionTypes';
 import { useEnergyBooster as applyEnergyBooster } from './game/energyManagement';
 import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
-import {
-  saveBuild,
-  swapToBuild,
-  deleteBuild,
-  overwriteBuild,
-  updateBuildName,
-  importBuild,
-  loadStarterBuild,
-} from './game/buildManager';
 import { claimOfflineProgress } from './game/progressionIntegration';
 // import { checkMilestones } from './game/milestones'; // Disabled - redundant with Active Bonuses
 import { markMessagesAsRead } from './game/groupChat';
@@ -514,69 +504,6 @@ function App() {
   //   });
   // }, []);
 
-  const handleSaveBuild = useCallback((name: string, notes?: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      saveBuild(extendedState, name, notes);
-      return extendedState;
-    });
-  }, []);
-
-  const handleSwapBuild = useCallback((buildIndex: number) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      swapToBuild(extendedState, buildIndex);
-      return extendedState;
-    });
-  }, []);
-
-  const handleDeleteBuild = useCallback((buildId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      deleteBuild(extendedState, buildId);
-      return extendedState;
-    });
-  }, []);
-
-  const handleOverwriteBuild = useCallback((buildIndex: number) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      overwriteBuild(extendedState, buildIndex);
-      return extendedState;
-    });
-  }, []);
-
-  const handleUpdateBuildName = useCallback((buildId: string, newName: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      updateBuildName(extendedState, buildId, newName);
-      return extendedState;
-    });
-  }, []);
-
-  const handleImportBuild = useCallback((buildJson: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      importBuild(extendedState, buildJson);
-      return extendedState;
-    });
-  }, []);
-
-  const handleLoadStarterBuild = useCallback((presetId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      loadStarterBuild(extendedState, presetId);
-      return extendedState;
-    });
-  }, []);
-
   // Memoize vibes per second calculation for performance
   const vibesPerSecond = useMemo(() => {
     return Object.entries(state.substances).reduce((total: number, [id, count]: [string, number]) => {
@@ -585,7 +512,7 @@ function App() {
       const multiplier = calculateProductionMultiplier(state, id);
       return total + (substance.baseVibes * count * multiplier);
     }, 0);
-  }, [state.substances, state.upgrades, state.insightPoints]);
+  }, [state.substances, state.upgrades, state.insightPoints, state.energy, state.chaos]);
 
   return (
     <div className={`app font-${state.fontSize} ${state.reducedMotion ? 'reduced-motion' : ''} distortion-${state.distortionLevel}`}>
@@ -657,24 +584,23 @@ function App() {
           </div>
         </div>
 
-        {/* Right Panel - Now 3-Column Interactive Content */}
+        {/* Right Panel - Now 2-Column Interactive Content */}
         <div className="right-panel">
-          {/* Scrollable Content Area - 3 Columns */}
+          {/* Scrollable Content Area - 2 Columns */}
           <div className="scrollable-content">
-            {/* Column 1: Core Purchasing (Shops & Upgrades) */}
+            {/* Column 1: Core Purchasing (Acquisitions & Upgrades Side by Side) */}
             <div className="content-column column-purchasing">
-              <section className="shop-section">
-                <SubstanceShop state={state} onPurchase={handlePurchase} />
-              </section>
+              <div className="acquisitions-upgrades-container">
+                <section className="shop-section">
+                  <SubstanceShop state={state} onPurchase={handlePurchase} />
+                </section>
 
-              <section className="upgrade-section">
-                <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
-              </section>
-            </div>
+                <section className="upgrade-section">
+                  <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+                </section>
+              </div>
 
-            {/* Column 2: Core Actions (Energy, Chaos, Maintenance) */}
-            <div className="content-column column-actions">
-              {/* New Action Panels */}
+              {/* Energy Boosters & Chaos Actions in 2x Grid */}
               {isExtendedGameState(state) && (
                 <section className="action-panels-section">
                   <ActionPanels
@@ -690,35 +616,8 @@ function App() {
               </section>
             </div>
 
-            {/* Column 3: Strategy & Info */}
+            {/* Column 2: Social Feedback & Info */}
             <div className="content-column column-info">
-              {/* Strategy Selector - DISABLED FOR HYBRID MODEL TESTING */}
-              {/* {isExtendedGameState(state) && (
-                <section className="strategy-selector-section">
-                  <StrategySelector
-                    gameState={state as ExtendedGameState}
-                    onSwitchEnergyMode={handleSwitchEnergyMode}
-                    onSwitchChaosStrategy={handleSwitchChaosStrategy}
-                  />
-                </section>
-              )} */}
-
-              {/* Build Manager - Save/Load Configurations */}
-              {isExtendedGameState(state) && (
-                <section className="build-manager-section">
-                  <BuildManagerPanel
-                    gameState={state as ExtendedGameState}
-                    onSaveBuild={handleSaveBuild}
-                    onSwapBuild={handleSwapBuild}
-                    onDeleteBuild={handleDeleteBuild}
-                    onOverwriteBuild={handleOverwriteBuild}
-                    onUpdateBuildName={handleUpdateBuildName}
-                    onImportBuild={handleImportBuild}
-                    onLoadStarterBuild={handleLoadStarterBuild}
-                  />
-                </section>
-              )}
-
               {/* Group Chat & Organ Complaints - Social Feedback */}
               <section className="social-feedback-section">
                 <GroupChatPanel
@@ -735,6 +634,17 @@ function App() {
           </div>
         </div>
       </main>
+
+      <footer className="app-footer">
+        <div className="footer-content">
+          <span className="footer-stat">Nights Completed: {state.nightsCompleted || 0}</span>
+          <span className="footer-stat">Total Vibes Earned: {formatNumber(state.totalVibesEarned)}</span>
+          <span className="footer-stat">Total Clicks: {formatNumber(state.totalClicks)}</span>
+          {state.achievements && state.achievements.length > 0 && (
+            <span className="footer-stat">Achievements: {state.achievements.length}</span>
+          )}
+        </div>
+      </footer>
 
       {!state.muteNotifications && achievementQueue.length > 0 && (
         <div className="achievement-toast">
