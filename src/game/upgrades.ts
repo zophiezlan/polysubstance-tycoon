@@ -8,6 +8,7 @@ export const UPGRADES: Upgrade[] = [
     description: 'Learning to run the night more efficiently. +5 vibes per click.',
     cost: 400,
     tier: 1,
+    category: 'global',
     effects: {
       clickPower: 5,
     },
@@ -18,6 +19,7 @@ export const UPGRADES: Upgrade[] = [
     description: 'Muscle memory. Click power x2.',
     cost: 4000,
     tier: 2,
+    category: 'global',
     effects: {
       clickMultiplier: 2,
     },
@@ -31,6 +33,7 @@ export const UPGRADES: Upgrade[] = [
     description: 'Pacing yourself. Clicks cost 50% less energy.',
     cost: 40000,
     tier: 2,
+    category: 'global', // BROKEN: energyCostReduction incompatible with current energy system
     effects: {
       energyCostReduction: 0.5,
     },
@@ -41,6 +44,7 @@ export const UPGRADES: Upgrade[] = [
     description: 'Chaos generation reduced by 30%.',
     cost: 20000,
     tier: 3,
+    category: 'harm-reduction',
     effects: {
       chaosDampening: 0.3,
     },
@@ -53,6 +57,7 @@ export const UPGRADES: Upgrade[] = [
     description: 'Buying in bulk. Alcohol LLC twice as efficient.',
     cost: 400,
     tier: 1,
+    category: 'substance-specific',
     substanceId: 'alcohol',
     effects: {
       productionMultiplier: 2,
@@ -735,6 +740,8 @@ export const UPGRADES: Upgrade[] = [
     description: 'Mixing alcohol + empathogen is... strategic? Both +30%.',
     cost: 40000,
     tier: 3,
+    category: 'synergy',
+    synergySubstances: ['alcohol', 'empathogen'],
     effects: {
       productionMultiplier: 1.3,
     },
@@ -748,6 +755,8 @@ export const UPGRADES: Upgrade[] = [
     description: 'Stimulant + sedative creates... balance? Both +40%.',
     cost: 400000,
     tier: 3,
+    category: 'synergy',
+    synergySubstances: ['stimulant', 'sedative'],
     effects: {
       productionMultiplier: 1.4,
     },
@@ -761,6 +770,8 @@ export const UPGRADES: Upgrade[] = [
     description: 'Empathogen + psychedelic = transcendence. Both +50%.',
     cost: 400000,
     tier: 4,
+    category: 'synergy',
+    synergySubstances: ['empathogen', 'psychedelic'],
     effects: {
       productionMultiplier: 1.5,
     },
@@ -774,6 +785,8 @@ export const UPGRADES: Upgrade[] = [
     description: 'Three substances at once. You\'re a chemist now. +100% global.',
     cost: 3000000,
     tier: 5,
+    category: 'synergy',
+    synergySubstances: ['alcohol', 'empathogen', 'psychedelic'],
     effects: {
       globalProductionMultiplier: 2,
     },

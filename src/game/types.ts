@@ -160,13 +160,26 @@ export interface KnowledgeLevel {
   unlocks: string[];
 }
 
+// NEW: Upgrade categorization for better organization and pattern identification
+export type UpgradeCategory =
+  | 'global'              // Affects all production/clicking (e.g., Tolerance Management)
+  | 'substance-specific'  // Boosts single substance (e.g., Plastic Bottles for Alcohol)
+  | 'synergy'            // Boosts substance combinations (e.g., Cocktail Theory)
+  | 'automation'         // Auto-clickers, idle bonuses
+  | 'combo'              // Combo system enhancements
+  | 'harm-reduction'     // Chaos dampening, strain management
+  | 'progression-gate'   // Tier unlocks, required for progression
+  | 'special';           // Unique mechanics (memory suppression, reality distortion)
+
 export interface Upgrade {
   id: string;
   name: string;
   description: string;
   cost: number;
   tier: number; // For organizing in UI (1-5)
+  category: UpgradeCategory; // NEW: Categorize upgrades by type
   substanceId?: string; // If specific to a substance
+  synergySubstances?: string[]; // NEW: For synergy upgrades that boost multiple substances
   effects: {
     clickPower?: number; // Additive bonus to clicks (e.g., 5 = +5 vibes per click)
     clickMultiplier?: number; // Multiplicative bonus (e.g., 2 = double clicks)
