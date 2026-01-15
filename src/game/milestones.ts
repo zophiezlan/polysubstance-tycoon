@@ -73,9 +73,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_10k',
     name: '💎 Ten Thousand Strong',
-    description: 'Earned 10,000 total vibes. Your operation is growing!',
+    description: 'Earned 70,000 total vibes. Your operation is growing!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 10000,
+    checkCondition: (state) => state.totalVibesEarned >= 70000,
     reward: {
       permanentProductionBonus: 5, // +5% forever
       temporaryBonus: {
@@ -88,9 +88,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_100k',
     name: '⚡ Energy Master',
-    description: 'Earned 100,000 total vibes. Unlocked Energy Modes!',
+    description: 'Earned 700,000 total vibes. Unlocked Energy Modes!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 100000,
+    checkCondition: (state) => state.totalVibesEarned >= 700000,
     reward: {
       permanentProductionBonus: 10,
       unlockFeature: 'energy_modes',
@@ -100,9 +100,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_500k',
     name: '🎯 Chaos Controller',
-    description: 'Earned 500,000 total vibes. Unlocked Chaos Strategies!',
+    description: 'Earned 3,500,000 total vibes. Unlocked Chaos Strategies!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 500000,
+    checkCondition: (state) => state.totalVibesEarned >= 3500000,
     reward: {
       permanentProductionBonus: 15,
       unlockFeature: 'chaos_strategies',
@@ -112,9 +112,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_1m',
     name: '🚀 Million Club',
-    description: 'Earned 1,000,000 total vibes! Unlocked Chaos Actions!',
+    description: 'Earned 7,000,000 total vibes! Unlocked Chaos Actions!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 1000000,
+    checkCondition: (state) => state.totalVibesEarned >= 7000000,
     reward: {
       permanentProductionBonus: 25,
       permanentClickBonus: 10,
@@ -125,9 +125,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_10m',
     name: '💼 Corporate Tycoon',
-    description: 'Earned 10,000,000 total vibes! Unlocked Build Presets!',
+    description: 'Earned 70,000,000 total vibes! Unlocked Build Presets!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 10000000,
+    checkCondition: (state) => state.totalVibesEarned >= 70000000,
     reward: {
       permanentProductionBonus: 50,
       permanentClickBonus: 25,
@@ -138,9 +138,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_100m',
     name: '🌟 Prestige Plus',
-    description: 'Earned 100,000,000 total vibes! Unlocked Prestige+ features!',
+    description: 'Earned 700,000,000 total vibes! Unlocked Prestige+ features!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 100000000,
+    checkCondition: (state) => state.totalVibesEarned >= 700000000,
     reward: {
       permanentProductionBonus: 100,
       permanentClickBonus: 50,
@@ -152,9 +152,9 @@ export const VIBES_MILESTONES: Milestone[] = [
   {
     id: 'vibes_1b',
     name: '👑 Reality Breaker',
-    description: 'Earned 1,000,000,000 total vibes. You broke the game!',
+    description: 'Earned 7,000,000,000 total vibes. You broke the game!',
     category: 'vibes',
-    checkCondition: (state) => state.totalVibesEarned >= 1000000000,
+    checkCondition: (state) => state.totalVibesEarned >= 7000000000,
     reward: {
       permanentProductionBonus: 250,
       permanentClickBonus: 100,
