@@ -67,6 +67,9 @@ export interface GameState {
   compactLog: boolean;
   showLogTimestamps: boolean;
   disableLogCorruption: boolean;
+
+  // Random Events (Golden Cookie equivalent)
+  randomEventData?: any; // Serialized RandomEventManager state
 }
 
 export interface LogEntry {

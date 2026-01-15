@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { GameState } from './game/types';
 import { createInitialState, startNewNight } from './game/state';
 import { gameTick } from './game/tick';
@@ -38,6 +38,9 @@ import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
 import { claimOfflineProgress } from './game/progressionIntegration';
 // import { checkMilestones } from './game/milestones'; // Disabled - redundant with Active Bonuses
 import { markMessagesAsRead } from './game/groupChat';
+// Random Events (Golden Cookie equivalent)
+import { RandomEventManager } from './game/randomEvents';
+import { RandomEventPopup } from './components/RandomEventPopup';
 import './App.css';
 
 const STORAGE_KEY = 'polysubstance-tycoon-save';
@@ -86,6 +89,17 @@ function App() {
   const [floatingNumbers, setFloatingNumbers] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
   // const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]); // Disabled - redundant with Active Bonuses
 
+  // Random Event Manager (Golden Cookie equivalent)
+  const randomEventManager = useRef<RandomEventManager>(new RandomEventManager());
+  const [activeRandomEvent, setActiveRandomEvent] = useState<{ event: any; timeRemaining: number } | null>(null);
+
+  // Initialize RandomEventManager from saved state
+  useEffect(() => {
+    if (state.randomEventData) {
+      randomEventManager.current.deserialize(state.randomEventData);
+    }
+  }, []); // Only run on mount
+
   // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -132,6 +146,14 @@ function App() {
         const deltaTime = Math.min(safeDelta, TICK_INTERVAL);
         let newState = gameTick(prevState, deltaTime);
         newState.lastTickTime = now;
+
+        // Update random events
+        randomEventManager.current.update(newState, now / 1000); // Convert to seconds
+        const activeEvent = randomEventManager.current.getActiveEvent();
+        setActiveRandomEvent(activeEvent);
+
+        // Save random event state
+        newState.randomEventData = randomEventManager.current.serialize();
 
         // Check for new achievements
         const newAchievements = checkAchievements(newState, prevState.achievements);
@@ -485,6 +507,28 @@ function App() {
     });
   }, []);
 
+  const handleActivateRandomEvent = useCallback(() => {
+    setState(prevState => {
+      const result = randomEventManager.current.activateEvent(prevState);
+      if (result.success) {
+        // Clear the active event display
+        setActiveRandomEvent(null);
+
+        // Show success message in log
+        if (result.message) {
+          const newState = { ...prevState };
+          newState.log.push({
+            timestamp: 3600 - newState.timeRemaining,
+            message: result.message,
+            type: 'achievement',
+          });
+          return newState;
+        }
+      }
+      return prevState;
+    });
+  }, []);
+
   // DISABLED FOR HYBRID MODEL TESTING - Strategy selector is commented out
   // const handleSwitchEnergyMode = useCallback((modeId: string) => {
   //   setState(prevState => {
@@ -667,6 +711,15 @@ function App() {
           onComplete={handleFloatingNumberComplete}
         />
       ))}
+
+      {/* Random Event Popup (Golden Cookie equivalent) */}
+      {activeRandomEvent && (
+        <RandomEventPopup
+          event={activeRandomEvent.event}
+          timeRemaining={activeRandomEvent.timeRemaining}
+          onActivate={handleActivateRandomEvent}
+        />
+      )}
 
       {/* Milestone Notifications - Disabled (redundant with Active Bonuses section) */}
       {/* {!state.muteNotifications && (
