@@ -128,7 +128,7 @@
 /* Main Layout - 4 Column Layout */
 .app-main {
   display: grid;
-  grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   flex: 1;
   overflow: hidden;
   gap: 0.8rem;
@@ -148,6 +148,7 @@
   overflow-x: hidden;
   gap: 1rem;
   min-height: 0;
+  min-width: 0;
 }
 
 /* Column 1: Vibes */
@@ -169,6 +170,7 @@
   background: transparent;
   border: none;
   padding: 0;
+  grid-column: auto; /* Prevent spanning on desktop */
 }
 
 /* Section Cards for Everything Else column */
@@ -1171,24 +1173,16 @@
 }
 
 /* Responsive - 4 Column Layout */
-@media (max-width: 1400px) {
-  /* 3 columns for medium-large screens */
+@media (max-width: 900px) {
+  /* 2 columns for tablets */
   .app-main {
-    grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .column-everything-else {
+  .column-vibes {
     grid-column: 1 / -1;
   }
-}
 
-@media (max-width: 1100px) {
-  /* 2 columns for medium screens */
-  .app-main {
-    grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr);
-  }
-
-  .column-upgrades,
   .column-everything-else {
     grid-column: 1 / -1;
   }
