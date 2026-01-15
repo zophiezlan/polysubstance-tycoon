@@ -8,7 +8,7 @@ import {
   sanitizeGameState,
   createSaveData,
 } from './utils/saveValidation';
-import { getSubstance, getSubstanceCost } from './game/substances';
+import { getSubstance, getSubstanceCost, getSubstanceEnergyCost } from './game/substances';
 import { getAction } from './game/maintenance';
 import { checkAchievements, getAchievement } from './game/achievements';
 import { formatNumber, formatTime } from './utils/formatter';
@@ -31,11 +31,11 @@ import { OfflineProgressManager } from './components/OfflineProgress';
 import { ActionPanels } from './components/ActionPanels';
 import { GroupChatPanel } from './components/GroupChatPanel';
 import { OrganComplaintsPanel } from './components/OrganComplaintsPanel';
-import { StrategySelector } from './components/StrategySelector';
+// import { StrategySelector } from './components/StrategySelector'; // DISABLED FOR HYBRID MODEL TESTING
 import { BuildManagerPanel } from './components/BuildManagerPanel';
 import { isExtendedGameState, ExtendedGameState } from './game/progressionTypes';
-import { useEnergyBooster as applyEnergyBooster, switchEnergyMode } from './game/energyManagement';
-import { useChaosAction as applyChaosAction, switchChaosStrategy } from './game/chaosStrategy';
+import { useEnergyBooster as applyEnergyBooster } from './game/energyManagement';
+import { useChaosAction as applyChaosAction } from './game/chaosStrategy';
 import {
   saveBuild,
   swapToBuild,
@@ -209,16 +209,17 @@ function App() {
     setState(prevState => {
       let newState = { ...prevState };
 
+      // HYBRID MODEL: Clicking GENERATES energy (+0.5 per click)
+      newState.energy = Math.min(100, newState.energy + 0.5);
+
       // COOKIE CLICKER MODE: Update combo system
       newState = updateCombo(newState);
       const comboMultiplier = calculateComboMultiplier(newState.comboCount);
 
       const baseClickPower = calculateClickPower(prevState);
 
-      // COOKIE CLICKER MODE: Clicks NEVER cost energy!
-      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-1.2x)
-      // This makes energy a pure positive mechanic
-      const energyBonus = 1 + (newState.energy / 500); // 0 energy = 1x, 100 energy = 1.2x
+      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-2.0x)
+      const energyBonus = 1 + (newState.energy / 100); // 0 energy = 1x, 100 energy = 2x
 
       // Apply combo multiplier!
       let vibesGained = Math.floor(baseClickPower * energyBonus * comboMultiplier);
@@ -278,12 +279,15 @@ function App() {
       if (!substance) return prevState;
 
       const owned = prevState.substances[substanceId] || 0;
-      const cost = getSubstanceCost(substance, owned);
+      const vibesCost = getSubstanceCost(substance, owned);
+      const energyCost = getSubstanceEnergyCost(substance);
 
-      if (prevState.vibes < cost) return prevState;
+      // Check both vibes and energy
+      if (prevState.vibes < vibesCost || prevState.energy < energyCost) return prevState;
 
       const newState = { ...prevState };
-      newState.vibes -= cost;
+      newState.vibes -= vibesCost;
+      newState.energy = Math.max(0, newState.energy - energyCost);
       newState.substances[substanceId] = owned + 1;
 
       // Apply time extension immediately
@@ -293,7 +297,7 @@ function App() {
 
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: `Purchased ${substance.name} (x${owned + 1})`,
+        message: `Purchased ${substance.name} (x${owned + 1}) [-${energyCost} energy]`,
         type: 'info',
       });
 
@@ -491,23 +495,24 @@ function App() {
     });
   }, []);
 
-  const handleSwitchEnergyMode = useCallback((modeId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      switchEnergyMode(extendedState, modeId);
-      return extendedState;
-    });
-  }, []);
+  // DISABLED FOR HYBRID MODEL TESTING - Strategy selector is commented out
+  // const handleSwitchEnergyMode = useCallback((modeId: string) => {
+  //   setState(prevState => {
+  //     if (!isExtendedGameState(prevState)) return prevState;
+  //     const extendedState = { ...prevState } as ExtendedGameState;
+  //     switchEnergyMode(extendedState, modeId);
+  //     return extendedState;
+  //   });
+  // }, []);
 
-  const handleSwitchChaosStrategy = useCallback((strategyId: string) => {
-    setState(prevState => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      switchChaosStrategy(extendedState, strategyId);
-      return extendedState;
-    });
-  }, []);
+  // const handleSwitchChaosStrategy = useCallback((strategyId: string) => {
+  //   setState(prevState => {
+  //     if (!isExtendedGameState(prevState)) return prevState;
+  //     const extendedState = { ...prevState } as ExtendedGameState;
+  //     switchChaosStrategy(extendedState, strategyId);
+  //     return extendedState;
+  //   });
+  // }, []);
 
   const handleSaveBuild = useCallback((name: string, notes?: string) => {
     setState(prevState => {
@@ -687,8 +692,8 @@ function App() {
 
             {/* Column 3: Strategy & Info */}
             <div className="content-column column-info">
-              {/* Strategy Selector - Energy Modes & Chaos Strategies */}
-              {isExtendedGameState(state) && (
+              {/* Strategy Selector - DISABLED FOR HYBRID MODEL TESTING */}
+              {/* {isExtendedGameState(state) && (
                 <section className="strategy-selector-section">
                   <StrategySelector
                     gameState={state as ExtendedGameState}
@@ -696,7 +701,7 @@ function App() {
                     onSwitchChaosStrategy={handleSwitchChaosStrategy}
                   />
                 </section>
-              )}
+              )} */}
 
               {/* Build Manager - Save/Load Configurations */}
               {isExtendedGameState(state) && (

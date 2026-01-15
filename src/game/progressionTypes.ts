@@ -25,7 +25,8 @@ export interface EnergyBooster {
   id: string;
   name: string;
   description: string;
-  cooldown: number; // Seconds
+  cooldown: number; // Seconds (kept for compatibility, but boosters now use energy cost)
+  energyCost?: number; // HYBRID MODEL: Energy cost to use this booster
   unlockCondition: (state: GameState) => boolean;
   apply: (state: GameState) => void; // Modifies state directly
 }

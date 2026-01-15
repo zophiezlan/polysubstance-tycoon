@@ -5,7 +5,6 @@ import { GameState } from './types';
 import { ExtendedGameState, upgradeToExtendedGameState, isExtendedGameState } from './progressionTypes';
 import {
   calculateEnergyRegen,
-  calculateEnergyHarvest,
   getEnergyClickMultiplier,
   getEnergyProductionMultiplier,
   getActiveEnergyMode,
@@ -122,39 +121,20 @@ export function processAutoClicker(state: ExtendedGameState, deltaTime: number):
 export function processEnergySystem(state: ExtendedGameState, deltaTime: number): void {
   const dt = deltaTime / 1000;
 
-  // Calculate energy regeneration with new system
+  // Calculate energy regeneration with new system (includes drain)
   const energyRegen = calculateEnergyRegen(state);
   const permanentMultiplier = getPermanentEnergyMultiplier(state);
   const chaosMultipliers = getChaosThresholdMultipliers(state);
 
   const totalEnergyRegen = energyRegen * permanentMultiplier * chaosMultipliers.energyRegenMultiplier;
 
-  // Apply regen when below max
-  if (state.energy < 100) {
-    state.energy += totalEnergyRegen * dt;
-  }
+  // Apply regen/drain
+  state.energy += totalEnergyRegen * dt;
 
-  // Energy harvesting (if in Harvester mode)
-  const vibesPerSec = calculateVibesPerSecondQuick(state);
-  const harvestVibes = calculateEnergyHarvest(state, vibesPerSec);
-  if (harvestVibes > 0) {
-    // Consume energy above threshold
-    const mode = getActiveEnergyMode(state);
-    const threshold = mode.effects.energyHarvestThreshold || 80;
-
-    state.energyHarvestAccumulator += harvestVibes * dt;
-
-    // Process whole vibes
-    const wholeVibes = Math.floor(state.energyHarvestAccumulator);
-    if (wholeVibes > 0) {
-      state.vibes += wholeVibes;
-      state.totalVibesEarned += wholeVibes;
-      state.energyHarvestAccumulator -= wholeVibes;
-
-      // Consume energy
-      const energyConsumed = (wholeVibes / (mode.effects.energyHarvestRate || 10)) / vibesPerSec;
-      state.energy = Math.max(threshold, state.energy - energyConsumed);
-    }
+  // HYBRID MODEL: Auto-clicker energy cost (1 energy per second per auto-clicker level)
+  if (state.autoClickerActive && state.autoClickerLevel > 0) {
+    const autoClickerEnergyCost = state.autoClickerLevel * 1.0; // 1 energy/sec per level
+    state.energy -= autoClickerEnergyCost * dt;
   }
 
   // Clamp energy
@@ -165,7 +145,8 @@ export function processEnergySystem(state: ExtendedGameState, deltaTime: number)
     state.statistics.timeInLowEnergy += dt;
   }
 
-  // Tick down energy booster cooldowns
+  // Energy booster cooldowns no longer needed (energy costs instead)
+  // But keep for compatibility
   for (const boosterId in state.energyBoosterCooldowns) {
     state.energyBoosterCooldowns[boosterId] = Math.max(
       0,

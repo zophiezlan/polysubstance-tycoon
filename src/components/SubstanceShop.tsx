@@ -1,5 +1,5 @@
 import { GameState } from '../game/types';
-import { SUBSTANCES, getSubstanceCost } from '../game/substances';
+import { SUBSTANCES, getSubstanceCost, getSubstanceEnergyCost } from '../game/substances';
 import { formatNumber } from '../utils/formatter';
 import { hasUnlock } from '../game/prestige';
 
@@ -17,8 +17,9 @@ export function SubstanceShop({ state, onPurchase }: SubstanceShopProps) {
       <div className="substance-list">
         {SUBSTANCES.map(substance => {
           const owned = state.substances[substance.id] || 0;
-          const cost = getSubstanceCost(substance, owned);
-          const canAfford = state.vibes >= cost;
+          const vibesCost = getSubstanceCost(substance, owned);
+          const energyCost = getSubstanceEnergyCost(substance);
+          const canAfford = state.vibes >= vibesCost && state.energy >= energyCost;
 
           return (
             <div key={substance.id} className="substance-item">
@@ -31,8 +32,9 @@ export function SubstanceShop({ state, onPurchase }: SubstanceShopProps) {
                   className="buy-button"
                   onClick={() => onPurchase(substance.id)}
                   disabled={!canAfford}
+                  title={`Costs ${formatNumber(vibesCost)} vibes and ${energyCost} energy`}
                 >
-                  Buy ({formatNumber(cost)} V)
+                  Buy ({formatNumber(vibesCost)} V | {energyCost} E)
                 </button>
               </div>
               <div className="substance-tagline">{substance.tagline}</div>
