@@ -24,7 +24,12 @@ export function getUpgradeCategories(upgradeId: string): UpgradeCategory[] {
   const upgrade = getUpgrade(upgradeId);
   if (!upgrade) return [];
 
-  const categories: UpgradeCategory[] = [upgrade.category];
+  const categories: UpgradeCategory[] = [];
+
+  // Add primary category if it exists
+  if (upgrade.category) {
+    categories.push(upgrade.category);
+  }
 
   // Additional categorization based on properties
   if (upgrade.substanceId && upgrade.category !== 'substance-specific') {
@@ -150,7 +155,10 @@ export function getUpgradeStats(): {
   };
 
   for (const upgrade of UPGRADES) {
-    stats.byCategory[upgrade.category]++;
+    // Only count upgrades that have a category assigned
+    if (upgrade.category) {
+      stats.byCategory[upgrade.category]++;
+    }
 
     const validation = validateUpgrade(upgrade.id);
     if (validation) {

@@ -177,7 +177,7 @@ export interface Upgrade {
   description: string;
   cost: number;
   tier: number; // For organizing in UI (1-5)
-  category: UpgradeCategory; // NEW: Categorize upgrades by type
+  category?: UpgradeCategory; // NEW: Categorize upgrades by type (optional during migration)
   substanceId?: string; // If specific to a substance
   synergySubstances?: string[]; // NEW: For synergy upgrades that boost multiple substances
   effects: {

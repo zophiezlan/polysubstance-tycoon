@@ -169,7 +169,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.sleepDebt += totalSleepDebtMod * dt;
 
   // Exponential sleep debt after 10 stimulants (but less harsh)
-  const stimulantCount = newState.substances.stimulant || 0;
+  // stimulantCount already declared at line 44
   if (stimulantCount >= 10) {
     newState.sleepDebt += Math.pow(stimulantCount - 9, 1.5) * 0.05 * dt; // Reduced from 0.1
   }
