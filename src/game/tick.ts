@@ -40,7 +40,9 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   const alcoholAmp = getAlcoholAmplification(alcoholCount);
 
   // Track cumulative time extension for stimulant flip
-  let cumulativeTimeExtension = 3600 - newState.timeRemaining;
+  // Each stimulant provides +5 seconds, so total bonus time = count * 5
+  const stimulantCount = newState.substances.stimulant || 0;
+  const cumulativeTimeExtension = stimulantCount * 5;
 
   // 1. Passive vibe generation from substances
   let totalVibesPerSec = 0;
