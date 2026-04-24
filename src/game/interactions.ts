@@ -79,13 +79,15 @@ export function getActiveSubstanceTypes(
   return Object.keys(substances).filter((id) => substances[id] > 0);
 }
 
-export function calculateInteractionMultipliers(
-  substances: Record<string, number>,
-): {
+export interface InteractionMultipliers {
   strainMultiplier: number;
   vibesMultiplier: number;
   specialEffects: string[];
-} {
+}
+
+export function calculateInteractionMultipliers(
+  substances: Record<string, number>,
+): InteractionMultipliers {
   const activeTypes = getActiveSubstanceTypes(substances);
   let totalStrainMultiplier = 1.0;
   let totalVibesMultiplier = 1.0;
