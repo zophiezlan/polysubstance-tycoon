@@ -25,6 +25,7 @@ import { DisclaimerModal } from "./components/DisclaimerModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { FloatingNumber } from "./components/FloatingNumber";
 import { canPurchaseUpgrade, getUpgrade } from "./game/upgrades";
+import { canPrestige, getPrestigeInfo, performPrestige } from "./game/prestige";
 import {
   calculateClickPower,
   calculateChaosDampening,
@@ -622,6 +623,25 @@ function App() {
     }
   }, []);
 
+  const handlePrestige = useCallback(() => {
+    setState((prevState) => {
+      const info = getPrestigeInfo(prevState);
+      if (info.pointsToGain <= 0) return prevState;
+      const ok = confirm(
+        `Prestige now? You'll gain ${info.pointsToGain} Insight Point${info.pointsToGain === 1 ? "" : "s"} ` +
+          `(total ${info.potentialPoints}, +${Math.round((info.nextMultiplier - 1) * 100)}% to all production). ` +
+          `Your current run resets — vibes, substances, and meters wipe. Upgrades and achievements stay.`,
+      );
+      if (!ok) return prevState;
+      const next = performPrestige(prevState);
+      enqueueToast({
+        message: `✨ Prestiged for ${info.pointsToGain} Insight Point${info.pointsToGain === 1 ? "" : "s"}`,
+        variant: "success",
+      });
+      return next;
+    });
+  }, [enqueueToast]);
+
   const handleDismissSaveNotice = useCallback(() => {
     setSaveNotice(null);
   }, []);
@@ -883,6 +903,32 @@ function App() {
 
         {/* Column 4: Everything Else */}
         <div className="game-column column-everything-else">
+          {/* Prestige — only surfaces once eligible */}
+          {canPrestige(state) && (() => {
+            const info = getPrestigeInfo(state);
+            const gainPercent = Math.round((info.nextMultiplier - info.currentMultiplier) * 100);
+            return (
+              <section className="section-card prestige-card">
+                <h3>✨ ASCENSION AVAILABLE</h3>
+                <p className="prestige-blurb">
+                  You've earned enough vibes to transcend this run. Reset for{" "}
+                  <strong>{info.pointsToGain} Insight Point{info.pointsToGain === 1 ? "" : "s"}</strong>{" "}
+                  (+{gainPercent}% to all production, forever).
+                </p>
+                <p className="prestige-blurb prestige-warning">
+                  Wipes: vibes, substances, meters. Keeps: upgrades, achievements, knowledge.
+                </p>
+                <button
+                  className="prestige-button"
+                  onClick={handlePrestige}
+                  aria-label={`Prestige for ${info.pointsToGain} insight points`}
+                >
+                  Ascend ({info.pointsToGain} IP)
+                </button>
+              </section>
+            );
+          })()}
+
           {/* Maintenance Actions */}
           <section className="section-card">
             <MaintenancePanel state={state} onAction={handleMaintenance} />
