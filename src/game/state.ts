@@ -66,6 +66,12 @@ export function createInitialState(): GameState {
     lastActiveTime: Date.now(),
     offlineProgressPending: null,
 
+    // Random event buffs/debuffs — inactive at night start
+    productionBoostUntil: 0,
+    productionBoostMultiplier: 1,
+    flashSaleDiscountUntil: 0,
+    badBatchDebuffUntil: 0,
+
     // UI state
     distortionLevel: 0,
     log: [

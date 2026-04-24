@@ -3,10 +3,9 @@ import { GameState } from "./game/types";
 import { createInitialState, startNewNight } from "./game/state";
 import { gameTick } from "./game/tick";
 import {
-  validateSaveData,
-  migrateSaveData,
-  sanitizeGameState,
   createSaveData,
+  loadSaveData,
+  SaveLoadNotice,
 } from "./utils/saveValidation";
 import {
   getSubstance,
@@ -50,26 +49,13 @@ const STORAGE_KEY = "polysubstance-tycoon-save";
 const TICK_INTERVAL = 1000; // 1 second
 
 function App() {
+  const initialLoad = useRef<{ notice: SaveLoadNotice }>({ notice: null });
   const [state, setState] = useState<GameState>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    let baseState: GameState;
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const migrated = validateSaveData(parsed)
-          ? migrateSaveData(parsed)
-          : migrateSaveData(parsed);
-        baseState = sanitizeGameState(migrated);
-
-        if (baseState.isNightActive === false) {
-          baseState = startNewNight(baseState);
-        }
-      } catch (e) {
-        console.error("Failed to parse save, starting fresh:", e);
-        baseState = createInitialState();
-      }
-    } else {
-      baseState = createInitialState();
+    const outcome = loadSaveData(STORAGE_KEY);
+    initialLoad.current.notice = outcome.notice;
+    let baseState = outcome.state;
+    if (baseState.isNightActive === false) {
+      baseState = startNewNight(baseState);
     }
 
     // Compute offline progress before resetting timestamps (uses lastActiveTime)
@@ -79,6 +65,10 @@ function App() {
     withOffline.lastActiveTime = Date.now();
     return withOffline;
   });
+
+  const [saveNotice, setSaveNotice] = useState<SaveLoadNotice>(
+    initialLoad.current.notice,
+  );
 
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<
@@ -101,42 +91,24 @@ function App() {
     }
   }, []); // Only run on mount
 
+  const saveWriteCount = useRef(0);
+
   // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       try {
-        // Create versioned save data
         const saveData = createSaveData(state);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+        const serialized = JSON.stringify(saveData);
+        localStorage.setItem(STORAGE_KEY, serialized);
+
+        // Rotate backup slot every 10 writes so a very recent corruption
+        // doesn't clobber a known-good fallback.
+        saveWriteCount.current += 1;
+        if (saveWriteCount.current % 10 === 1) {
+          localStorage.setItem(STORAGE_KEY + "_backup", serialized);
+        }
       } catch (error) {
         console.error("Failed to save to localStorage:", error);
-        // If quota exceeded, try to save critical data only
-        if (
-          error instanceof DOMException &&
-          error.name === "QuotaExceededError"
-        ) {
-          try {
-            const criticalState = {
-              version: 1,
-              timestamp: Date.now(),
-              state: {
-                vibes: state.vibes,
-                experience: state.experience,
-                knowledgeLevel: state.knowledgeLevel,
-                substances: state.substances,
-                upgrades: state.upgrades,
-                achievements: state.achievements,
-              },
-            };
-            localStorage.setItem(
-              STORAGE_KEY + "_backup",
-              JSON.stringify(criticalState),
-            );
-            console.warn("Saved backup due to quota exceeded");
-          } catch (backupError) {
-            console.error("Failed to save backup:", backupError);
-          }
-        }
       }
     }, 1000); // Debounce: save 1 second after last state change
 
@@ -313,8 +285,14 @@ function App() {
       if (!substance) return prevState;
 
       const owned = prevState.substances[substanceId] || 0;
-      const vibesCost = getSubstanceCost(substance, owned);
+      const baseVibesCost = getSubstanceCost(substance, owned);
       const energyCost = getSubstanceEnergyCost(substance);
+
+      const now = Date.now();
+      const flashSaleActive = prevState.flashSaleDiscountUntil > now;
+      const vibesCost = flashSaleActive
+        ? Math.ceil(baseVibesCost * 0.5)
+        : baseVibesCost;
 
       // Check both vibes and energy
       if (prevState.vibes < vibesCost || prevState.energy < energyCost)
@@ -333,9 +311,28 @@ function App() {
         newState.timeRemaining += substance.timeExtension;
       }
 
+      // Flash sale is consumed on a single purchase
+      if (flashSaleActive) {
+        newState.flashSaleDiscountUntil = 0;
+      }
+
+      // Bad batch: next substance purchase applies chaos/strain spike, then clears
+      if (prevState.badBatchDebuffUntil > now) {
+        newState.chaos = Math.min(100, newState.chaos + 20);
+        newState.strain += 10;
+        newState.badBatchDebuffUntil = 0;
+        newState.log.push({
+          timestamp: 3600 - newState.timeRemaining,
+          message: `⚠️ Bad batch! Chaos +20, strain +10.`,
+          type: "warning",
+        });
+      }
+
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: `Purchased ${substance.name} (x${owned + 1}) [-${energyCost} energy]`,
+        message: flashSaleActive
+          ? `💸 Purchased ${substance.name} (x${owned + 1}) [50% off!]`
+          : `Purchased ${substance.name} (x${owned + 1}) [-${energyCost} energy]`,
         type: "info",
       });
 
@@ -348,18 +345,30 @@ function App() {
       const upgrade = getUpgrade(upgradeId);
       if (!upgrade) return prevState;
 
-      if (!canPurchaseUpgrade(upgrade, prevState)) return prevState;
+      const now = Date.now();
+      const flashSaleActive = prevState.flashSaleDiscountUntil > now;
+      const cost = flashSaleActive ? Math.ceil(upgrade.cost * 0.5) : upgrade.cost;
+
+      // canPurchaseUpgrade checks cost against upgrade.cost; re-check with discount.
+      if (prevState.vibes < cost) return prevState;
+      if (!canPurchaseUpgrade({ ...upgrade, cost }, prevState)) return prevState;
 
       const newState = { ...prevState };
-      newState.vibes -= upgrade.cost;
+      newState.vibes -= cost;
       newState.upgrades.push(upgradeId);
 
       // Track statistics
       newState.totalUpgradesPurchased += 1;
 
+      if (flashSaleActive) {
+        newState.flashSaleDiscountUntil = 0;
+      }
+
       newState.log.push({
         timestamp: 3600 - newState.timeRemaining,
-        message: `🔬 Unlocked: ${upgrade.name}`,
+        message: flashSaleActive
+          ? `🔬 Unlocked: ${upgrade.name} [50% off!]`
+          : `🔬 Unlocked: ${upgrade.name}`,
         type: "info",
       });
 
@@ -521,8 +530,13 @@ function App() {
       )
     ) {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY + "_backup");
       setState(createInitialState());
     }
+  }, []);
+
+  const handleDismissSaveNotice = useCallback(() => {
+    setSaveNotice(null);
   }, []);
 
   const handleClaimOfflineProgress = useCallback(() => {
@@ -563,21 +577,30 @@ function App() {
 
   // Memoize vibes per second calculation for performance
   const vibesPerSecond = useMemo(() => {
-    return Object.entries(state.substances).reduce(
-      (total: number, [id, count]: [string, number]) => {
+    let total = Object.entries(state.substances).reduce(
+      (acc: number, [id, count]: [string, number]) => {
         const substance = getSubstance(id);
-        if (!substance) return total;
+        if (!substance) return acc;
         const multiplier = calculateProductionMultiplier(state, id);
-        return total + substance.baseVibes * count * multiplier;
+        return acc + substance.baseVibes * count * multiplier;
       },
       0,
     );
+    if (
+      state.productionBoostUntil > Date.now() &&
+      state.productionBoostMultiplier > 1
+    ) {
+      total *= state.productionBoostMultiplier;
+    }
+    return total;
   }, [
     state.substances,
     state.upgrades,
     state.insightPoints,
     state.energy,
     state.chaos,
+    state.productionBoostUntil,
+    state.productionBoostMultiplier,
   ]);
 
   const autoClickerTier = getAutoClickerTier(state);
@@ -767,6 +790,25 @@ function App() {
         gameState={state}
         onClaimOfflineProgress={handleClaimOfflineProgress}
       />
+
+      {saveNotice && (
+        <div
+          className={`save-notice save-notice-${saveNotice}`}
+          role="status"
+        >
+          <span className="save-notice-text">
+            {saveNotice === "restored-from-backup"
+              ? "⚠️ Save file was unreadable. Restored from an earlier backup — you may have lost a few minutes of progress."
+              : "⚠️ Save file was unrecoverable. Starting fresh."}
+          </span>
+          <button
+            className="save-notice-dismiss"
+            onClick={handleDismissSaveNotice}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {!state.hasSeenDisclaimer && (
         <DisclaimerModal onAccept={handleDisclaimerAccept} />

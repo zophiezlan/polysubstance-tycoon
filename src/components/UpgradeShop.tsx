@@ -138,11 +138,6 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
                     x{upgrade.effects.globalProductionMultiplier} all production
                   </span>
                 )}
-                {upgrade.effects.energyCostReduction && (
-                  <span className="effect-info">
-                    -{upgrade.effects.energyCostReduction * 100}% energy cost
-                  </span>
-                )}
                 {upgrade.effects.chaosDampening && (
                   <span className="effect-positive">
                     -{upgrade.effects.chaosDampening * 100}% chaos

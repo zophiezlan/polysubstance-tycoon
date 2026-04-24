@@ -82,6 +82,23 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   // Apply vibe multiplier from interactions
   totalVibesPerSec *= interactions.vibesMultiplier;
 
+  // Apply temporary production boost from random events
+  const now = Date.now();
+  if (newState.productionBoostUntil > now && newState.productionBoostMultiplier > 1) {
+    totalVibesPerSec *= newState.productionBoostMultiplier;
+  } else if (newState.productionBoostUntil !== 0 && newState.productionBoostUntil <= now) {
+    newState.productionBoostUntil = 0;
+    newState.productionBoostMultiplier = 1;
+  }
+
+  // Clear expired temporary flags so downstream checks stay cheap
+  if (newState.flashSaleDiscountUntil !== 0 && newState.flashSaleDiscountUntil <= now) {
+    newState.flashSaleDiscountUntil = 0;
+  }
+  if (newState.badBatchDebuffUntil !== 0 && newState.badBatchDebuffUntil <= now) {
+    newState.badBatchDebuffUntil = 0;
+  }
+
   const vibesGained = totalVibesPerSec * dt;
   newState.vibes += vibesGained;
   newState.totalVibesEarned += vibesGained;

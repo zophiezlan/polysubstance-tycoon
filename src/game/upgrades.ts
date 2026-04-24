@@ -29,17 +29,6 @@ export const UPGRADES: Upgrade[] = [
     },
   },
   {
-    id: "efficient-energy",
-    name: "Efficient Energy Use",
-    description: "Pacing yourself. Clicks cost 50% less energy.",
-    cost: 40000,
-    tier: 2,
-    category: "global", // BROKEN: energyCostReduction incompatible with current energy system
-    effects: {
-      energyCostReduction: 0.5,
-    },
-  },
-  {
     id: "controlled-chaos",
     name: "Controlled Chaos",
     description: "Chaos generation reduced by 30%.",

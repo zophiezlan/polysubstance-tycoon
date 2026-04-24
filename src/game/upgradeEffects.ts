@@ -33,27 +33,6 @@ export function calculateClickPower(
 }
 
 /**
- * Calculate energy cost reduction for clicks
- */
-export function calculateEnergyCost(
-  state: GameState,
-  baseCost: number = 5,
-): number {
-  let reduction = 0;
-
-  for (const upgradeId of state.upgrades) {
-    const upgrade = getUpgrade(upgradeId);
-    if (!upgrade) continue;
-
-    if (upgrade.effects.energyCostReduction) {
-      reduction += upgrade.effects.energyCostReduction;
-    }
-  }
-
-  return Math.max(1, baseCost * (1 - reduction));
-}
-
-/**
  * Calculate production multiplier for a specific substance + prestige
  * Now includes synergy bonuses!
  */

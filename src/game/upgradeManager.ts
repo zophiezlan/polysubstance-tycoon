@@ -76,15 +76,6 @@ export function validateUpgrade(upgradeId: string): string | null {
       break;
   }
 
-  // Check for incompatible mechanics
-  if (
-    upgrade.effects.energyCostReduction &&
-    upgrade.effects.energyCostReduction > 0
-  ) {
-    // In hybrid model, clicks GENERATE energy, not cost it
-    return "BROKEN: energyCostReduction is incompatible with current energy system";
-  }
-
   return null;
 }
 

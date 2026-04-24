@@ -48,6 +48,32 @@ function stripOrphanFields(state: Record<string, unknown>): Record<string, unkno
   return cleaned;
 }
 
+// Upgrades removed post-release. Players who owned them get their vibes back
+// silently on load (no user notice).
+const REFUNDED_UPGRADES: Record<string, number> = {
+  "efficient-energy": 40000,
+};
+
+function refundRemovedUpgrades(state: Record<string, unknown>): Record<string, unknown> {
+  const upgrades = Array.isArray(state.upgrades) ? (state.upgrades as string[]) : [];
+  const currentVibes = typeof state.vibes === "number" ? state.vibes : 0;
+  let refund = 0;
+  const kept: string[] = [];
+  for (const id of upgrades) {
+    if (REFUNDED_UPGRADES[id] !== undefined) {
+      refund += REFUNDED_UPGRADES[id];
+    } else {
+      kept.push(id);
+    }
+  }
+  if (refund === 0) return state;
+  return {
+    ...state,
+    upgrades: kept,
+    vibes: currentVibes + refund,
+  };
+}
+
 /**
  * Validates that loaded save data has the shape we expect. Returns true for
  * any supported version (legacy, v1, v2) — migration fills in missing fields.
@@ -78,7 +104,7 @@ export function validateSaveData(data: any): data is SaveData {
 export function migrateSaveData(data: any): GameState {
   const rawState =
     typeof data?.version === "number" ? data.state : data;
-  const stripped = stripOrphanFields(rawState ?? {});
+  const stripped = refundRemovedUpgrades(stripOrphanFields(rawState ?? {}));
   const initialState = createInitialState();
 
   return {
@@ -104,6 +130,23 @@ export function migrateSaveData(data: any): GameState {
         : Date.now(),
     offlineProgressPending:
       stripped.offlineProgressPending ?? null,
+    // Random event buffs/debuffs — expire naturally, so default to 0/1.
+    productionBoostUntil:
+      typeof stripped.productionBoostUntil === "number"
+        ? stripped.productionBoostUntil
+        : 0,
+    productionBoostMultiplier:
+      typeof stripped.productionBoostMultiplier === "number"
+        ? stripped.productionBoostMultiplier
+        : 1,
+    flashSaleDiscountUntil:
+      typeof stripped.flashSaleDiscountUntil === "number"
+        ? stripped.flashSaleDiscountUntil
+        : 0,
+    badBatchDebuffUntil:
+      typeof stripped.badBatchDebuffUntil === "number"
+        ? stripped.badBatchDebuffUntil
+        : 0,
     // Reset runtime timestamps — tick.ts will manage these going forward.
     lastTickTime: Date.now(),
     nightStartTime: Date.now(),
@@ -119,6 +162,43 @@ export function createSaveData(state: GameState): SaveData {
     version: CURRENT_SAVE_VERSION,
     timestamp: Date.now(),
     state,
+  };
+}
+
+export type SaveLoadNotice = "restored-from-backup" | "corrupted-fresh" | null;
+
+export interface SaveLoadOutcome {
+  state: GameState;
+  notice: SaveLoadNotice;
+}
+
+function tryLoadSlot(key: string): GameState | null {
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return sanitizeGameState(migrateSaveData(parsed));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Load saved state, falling back through backup slot → fresh state.
+ * Returns a notice the UI should surface when a fallback occurred.
+ */
+export function loadSaveData(primaryKey: string): SaveLoadOutcome {
+  const primary = tryLoadSlot(primaryKey);
+  if (primary) return { state: primary, notice: null };
+
+  const primaryExisted = localStorage.getItem(primaryKey) !== null;
+
+  const backup = tryLoadSlot(primaryKey + "_backup");
+  if (backup) return { state: backup, notice: "restored-from-backup" };
+
+  return {
+    state: createInitialState(),
+    notice: primaryExisted ? "corrupted-fresh" : null,
   };
 }
 

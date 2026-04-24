@@ -86,6 +86,13 @@ export interface GameState {
 
   // Random Events (Golden Cookie equivalent)
   randomEventData?: any; // Serialized RandomEventManager state
+
+  // Temporary buffs/debuffs from random events. 0 = inactive; otherwise a
+  // Date.now() timestamp the effect is valid until.
+  productionBoostUntil: number;
+  productionBoostMultiplier: number; // Defaults to 1 (no-op)
+  flashSaleDiscountUntil: number; // Applies 50% off next substance/upgrade
+  badBatchDebuffUntil: number; // Next substance purchase doubles chaos/strain
 }
 
 export interface LogEntry {
@@ -204,7 +211,6 @@ export interface Upgrade {
     clickMultiplier?: number; // Multiplicative bonus (e.g., 2 = double clicks)
     productionMultiplier?: number; // Multiplier for specific substance
     globalProductionMultiplier?: number; // Multiplier for all substances
-    energyCostReduction?: number; // Reduce click energy cost (e.g., 0.5 = half cost)
     chaosDampening?: number; // Reduce chaos generation (e.g., 0.5 = half chaos)
   };
   requirement?: {

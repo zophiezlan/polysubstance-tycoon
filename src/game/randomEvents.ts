@@ -34,7 +34,15 @@ export interface RandomEvent {
     strainReduction?: number;
     hydrationReduction?: number;
     freeSubstance?: string;
-    productionBoost?: { multiplier: number; duration: number }; // Temporary boost
+    productionBoost?: { multiplier: number; duration: number }; // Temporary vibes/sec boost
+    flashSaleDuration?: number; // Seconds 50% discount stays active on next purchase
+    message: string;
+  };
+
+  // Optional: effect applied if the event expires without being clicked.
+  // Used for "click to avoid" events.
+  expireEffect?: (state: GameState) => {
+    badBatchDebuffDuration?: number; // Seconds the next-purchase debuff lasts
     message: string;
   };
 }
@@ -50,8 +58,8 @@ export const RANDOM_EVENTS: RandomEvent[] = [
     duration: 15,
     cooldown: 180,
     effect: (_state) => ({
-      message: "💸 Flash Sale! Next purchase 50% off!",
-      // TODO: Implement temporary discount flag
+      flashSaleDuration: 60,
+      message: "💸 Flash Sale! 50% off purchases for 60s!",
     }),
   },
 
@@ -257,19 +265,21 @@ export const RANDOM_EVENTS: RandomEvent[] = [
   {
     id: "bad-batch-warning",
     name: "Bad Batch Warning",
-    description: "Dealer warns about sketchy product",
+    description: "Click fast to dodge a sketchy batch!",
     icon: "⚠️",
     rarity: "rare",
-    duration: 25,
+    duration: 12,
     cooldown: 600,
     unlockCondition: {
       minKnowledgeLevel: 2,
     },
-    effect: (_state) => ({
-      // This is actually a warning - player SHOULD click to avoid it
-      message:
-        "⚠️ Bad Batch Warning! Click to avoid - next purchase will have 2x chaos/strain if ignored!",
-      // TODO: Implement temporary debuff flag
+    effect: (state) => ({
+      vibesBonus: Math.max(100, Math.floor(state.vibes * 0.02)),
+      message: "⚠️ Bad Batch Dodged! Nice reflexes.",
+    }),
+    expireEffect: (_state) => ({
+      badBatchDebuffDuration: 30,
+      message: "⚠️ You missed the warning. Next purchase: 2x chaos/strain!",
     }),
   },
 ];
@@ -301,7 +311,25 @@ export class RandomEventManager {
     if (this.activeEvent) {
       const elapsed = currentTime - this.activeEvent.spawnTime;
       if (elapsed > this.activeEvent.event.duration * 1000) {
-        // Event expired without being clicked
+        // Event expired without being clicked — run expireEffect if defined.
+        const expired = this.activeEvent.event;
+        if (expired.expireEffect) {
+          const result = expired.expireEffect(state);
+          if (result.badBatchDebuffDuration) {
+            state.badBatchDebuffUntil =
+              Date.now() + result.badBatchDebuffDuration * 1000;
+          }
+          state.log.push({
+            timestamp: 3600 - state.timeRemaining,
+            message: result.message,
+            type: "warning",
+          });
+        }
+        // Set cooldown so the event doesn't immediately respawn.
+        this.eventCooldowns.set(
+          expired.id,
+          Date.now() + expired.cooldown * 1000,
+        );
         this.activeEvent = null;
       }
     }
@@ -410,7 +438,16 @@ export class RandomEventManager {
         (state.substances[result.freeSubstance] || 0) + 1;
     }
 
-    // TODO: Handle productionBoost (requires new state field)
+    if (result.productionBoost) {
+      state.productionBoostMultiplier = result.productionBoost.multiplier;
+      state.productionBoostUntil =
+        Date.now() + result.productionBoost.duration * 1000;
+    }
+
+    if (result.flashSaleDuration) {
+      state.flashSaleDiscountUntil =
+        Date.now() + result.flashSaleDuration * 1000;
+    }
 
     // Add to log
     state.log.push({
