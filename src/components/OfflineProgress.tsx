@@ -1,4 +1,4 @@
-import { ExtendedGameState } from "../game/progressionTypes";
+import { GameState } from "../game/types";
 import "./OfflineProgress.css";
 
 interface OfflineProgressProps {
@@ -53,8 +53,7 @@ export function OfflineProgress({
 
           <div className="offline-footer">
             <p className="offline-tip">
-              💡 Upgrade "Enhanced Offline Progress" to earn even more while
-              away!
+              💡 Offline earnings are capped at 4 hours and pay 50% of live rate.
             </p>
           </div>
         </div>
@@ -68,7 +67,7 @@ export function OfflineProgress({
 }
 
 interface OfflineProgressManagerProps {
-  gameState: ExtendedGameState;
+  gameState: GameState;
   onClaimOfflineProgress: () => void;
 }
 

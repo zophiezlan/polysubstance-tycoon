@@ -58,9 +58,15 @@ export interface GameState {
   organComplaints: OrganComplaint[]; // Body parts complaining
   ritualProgress: Record<string, number>; // Secret pattern detection
 
-  // Automation/Idle features
-  autoClickerLevel: number; // 0 = none, 1+ = tiers of automation
+  // Automation/Idle features (auto-clicker tier is derived from upgrades; see getAutoClickerTier)
+  autoClickerAccumulator: number; // Fractional auto-clicks carried between ticks
   idleMultiplier: number; // Bonus for time away
+  lastActiveTime: number; // timestamp, used to compute offline progress on return
+  offlineProgressPending: {
+    vibesGained: number;
+    timeAway: number; // seconds
+    claimed: boolean;
+  } | null;
 
   // UI state
   distortionLevel: number;

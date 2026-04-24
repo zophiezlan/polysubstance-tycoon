@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs wc *)",
+      "Bash(find \"/c/Users/AV/SlashDot/polysubstance-tycoon/src/game\" -name \"*.ts\" -exec wc -l {} +)",
+      "Bash(awk '{sum+=$1} END {print \"Total lines in game/:\", sum}')",
+      "Bash(find \"/c/Users/AV/SlashDot/polysubstance-tycoon/src/components\" -name \"*.tsx\" -exec wc -l {} +)",
+      "Bash(awk '{sum+=$1} END {print \"Total lines in components/:\", sum}')",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

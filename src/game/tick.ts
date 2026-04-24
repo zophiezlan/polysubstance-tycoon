@@ -6,16 +6,15 @@ import {
   getAlcoholAmplification,
   getStimulantEnergyMod,
 } from "./interactions";
-import { calculateProductionMultiplier } from "./upgradeEffects";
+import {
+  calculateAutoClickerRate,
+  calculateChaosDampening,
+  calculateClickPower,
+  calculateProductionMultiplier,
+} from "./upgradeEffects";
 import { tickCombo } from "./combos";
 import { checkGroupChatTriggers } from "./groupChat";
 import { checkOrganComplaints } from "./organCommentary";
-import {
-  processProgressionSystems,
-  getTotalProductionMultiplier,
-  checkOfflineProgress,
-} from "./progressionIntegration";
-import { isExtendedGameState } from "./progressionTypes";
 
 export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!state.isNightActive) {
@@ -25,14 +24,8 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   const newState = { ...state };
   const dt = deltaTime / 1000; // Convert to seconds
 
-  // Check for offline progress on first tick back
-  if (isExtendedGameState(newState)) {
-    checkOfflineProgress(newState);
-  }
-
-  // Process all new progression systems (auto-clicker, energy modes, chaos strategies, milestones)
-  const stateAfterProgression = processProgressionSystems(newState, deltaTime);
-  Object.assign(newState, stateAfterProgression);
+  // Keep lastActiveTime fresh so offline-progress detection on next mount is accurate
+  newState.lastActiveTime = Date.now();
 
   // Calculate interaction effects
   const interactions = calculateInteractionMultipliers(newState.substances);
@@ -89,12 +82,6 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   // Apply vibe multiplier from interactions
   totalVibesPerSec *= interactions.vibesMultiplier;
 
-  // Apply new progression system multipliers (energy modes, chaos thresholds, permanent unlocks, milestones)
-  if (isExtendedGameState(newState)) {
-    const progressionMultiplier = getTotalProductionMultiplier(newState);
-    totalVibesPerSec *= progressionMultiplier;
-  }
-
   const vibesGained = totalVibesPerSec * dt;
   newState.vibes += vibesGained;
   newState.totalVibesEarned += vibesGained;
@@ -104,36 +91,42 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     totalVibesPerSec,
   );
 
-  // 2. Apply energy changes - ENERGY IS ALWAYS POSITIVE!
-  // NOTE: Energy regeneration is now handled by progressionIntegration.ts
-  // This section only applies substance modifiers
-  newState.energy += totalEnergyMod * dt;
+  // 1b. Auto-clicker production (tier driven by owned upgrades)
+  const autoClickerRate = calculateAutoClickerRate(newState);
+  if (autoClickerRate > 0) {
+    newState.autoClickerAccumulator += autoClickerRate * dt;
+    const wholeClicks = Math.floor(newState.autoClickerAccumulator);
+    newState.autoClickerAccumulator -= wholeClicks;
+    if (wholeClicks > 0) {
+      const clickPower = calculateClickPower(newState);
+      const autoVibes = clickPower * wholeClicks;
+      newState.vibes += autoVibes;
+      newState.totalVibesEarned += autoVibes;
+      newState.totalClicks += wholeClicks;
+      // Auto-clicks generate chaos at half the rate of manual clicks
+      const chaosPerClick = 0.5 * (1 - calculateChaosDampening(newState));
+      newState.chaos = Math.min(100, newState.chaos + wholeClicks * chaosPerClick);
+    }
+  }
 
-  // Hydration debt SLIGHTLY reduces energy gain (if not using new system)
-  if (!isExtendedGameState(newState) && newState.hydrationDebt > 70) {
-    const baseRegen = 1.0 + newState.knowledgeLevel * 0.2; // Buffed for better energy management
-    const energyRegen = baseRegen * dt;
+  // 2. Apply energy changes — substance modifiers plus passive regen.
+  newState.energy += totalEnergyMod * dt;
+  const energyRegen = 1.0 + newState.knowledgeLevel * 0.2;
+  newState.energy += energyRegen * dt;
+  if (newState.hydrationDebt > 70) {
     const penalty = Math.min(
-      energyRegen * 0.3,
+      energyRegen * dt * 0.3,
       (newState.hydrationDebt - 70) * 0.005 * dt,
     );
     newState.energy -= penalty;
   }
-
-  // Energy is always 0-100, but 0 energy just means no bonus (not a penalty)
+  // Energy is always 0-100; 0 means no bonus, not a penalty
   newState.energy = Math.max(0, Math.min(100, newState.energy));
 
-  // 3. Apply chaos changes - EASY MODE
-  // NOTE: Chaos decay and strategy effects are now handled by progressionIntegration.ts
-  // This section only applies substance modifiers and special interactions
+  // 3. Apply chaos changes — substance modifiers plus passive decay above baseline.
   newState.chaos += totalChaosMod * dt;
-
-  // Legacy chaos decay (only if not using new system)
-  if (!isExtendedGameState(newState)) {
-    const chaosDecay = 0.3 * dt;
-    if (newState.chaos > 30) {
-      newState.chaos -= chaosDecay;
-    }
+  if (newState.chaos > 30) {
+    newState.chaos -= 0.3 * dt;
   }
 
   // Empathogen special: pulls chaos toward 50 (more strongly now)

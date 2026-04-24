@@ -3,7 +3,7 @@
 import { GameState } from "../game/types";
 import { createInitialState } from "../game/state";
 
-export const CURRENT_SAVE_VERSION = 1;
+export const CURRENT_SAVE_VERSION = 2;
 
 export interface SaveData {
   version: number;
@@ -11,74 +11,104 @@ export interface SaveData {
   state: GameState;
 }
 
+// Fields from systems that were cut in v2 (energy modes, chaos strategies,
+// build manager, strategic upgrades, milestones, permanent unlocks).
+// Stripped silently during migration.
+const ORPHAN_FIELDS = [
+  "autoClickerLevel",
+  "autoClickerActive",
+  "activeEnergyMode",
+  "unlockedEnergyModes",
+  "energyBoosterCooldowns",
+  "energyHarvestAccumulator",
+  "activeChaosStrategy",
+  "unlockedChaosStrategies",
+  "chaosActionCooldowns",
+  "chaosActionCharges",
+  "completedMilestones",
+  "lastMilestoneVibes",
+  "lastMilestoneClicks",
+  "activeBonuses",
+  "savedBuilds",
+  "activeBuildIndex",
+  "buildSwapCooldown",
+  "maxBuildSlots",
+  "activeSpecialization",
+  "prestigeTier",
+  "canRespecialization",
+  "permanentUnlocks",
+  "statistics",
+];
+
+function stripOrphanFields(state: Record<string, unknown>): Record<string, unknown> {
+  const cleaned = { ...state };
+  for (const field of ORPHAN_FIELDS) {
+    delete cleaned[field];
+  }
+  return cleaned;
+}
+
 /**
- * Validates that loaded save data has all required fields
+ * Validates that loaded save data has the shape we expect. Returns true for
+ * any supported version (legacy, v1, v2) — migration fills in missing fields.
  */
 export function validateSaveData(data: any): data is SaveData {
   if (!data || typeof data !== "object") {
     return false;
   }
 
-  // Check for version field
   if (typeof data.version !== "number") {
-    console.warn("Save data missing version field, assuming legacy save");
-    return typeof data.vibes === "number"; // Legacy format check
+    // Legacy format: state fields live directly on the root object.
+    return typeof data.vibes === "number";
   }
 
-  // Version-specific validation
-  if (data.version === 1) {
-    return (
-      typeof data.timestamp === "number" &&
-      data.state &&
-      typeof data.state.vibes === "number" &&
-      typeof data.state.energy === "number"
-    );
-  }
-
-  return false;
+  // v1 and v2 share the same wrapper shape; the migration step reconciles fields.
+  return (
+    typeof data.timestamp === "number" &&
+    data.state &&
+    typeof data.state.vibes === "number" &&
+    typeof data.state.energy === "number"
+  );
 }
 
 /**
- * Migrates save data from older versions to current version
+ * Migrates save data from older versions to current version. Unknown fields
+ * from cut systems are silently dropped.
  */
 export function migrateSaveData(data: any): GameState {
-  // Legacy format (no version field) - treat as version 0
-  if (!data.version) {
-    console.log("Migrating legacy save data to version 1");
-    return migrateLegacyToV1(data);
-  }
-
-  // Future migrations would go here
-  // if (data.version === 1) return migrateV1ToV2(data.state);
-
-  return data.state;
-}
-
-/**
- * Migrate legacy save format (direct GameState) to version 1
- */
-function migrateLegacyToV1(legacyData: any): GameState {
+  const rawState =
+    typeof data?.version === "number" ? data.state : data;
+  const stripped = stripOrphanFields(rawState ?? {});
   const initialState = createInitialState();
 
-  // Merge legacy data with initial state, preserving new fields
   return {
     ...initialState,
-    ...legacyData,
-    // Ensure critical arrays exist
-    substances: legacyData.substances || {},
-    upgrades: legacyData.upgrades || [],
-    achievements: legacyData.achievements || [],
-    actionCooldowns: legacyData.actionCooldowns || {},
-    log: legacyData.log || initialState.log,
-    unlockedFeatures: legacyData.unlockedFeatures || [],
-    groupChatMessages: legacyData.groupChatMessages || [],
-    organComplaints: legacyData.organComplaints || [],
-    ritualProgress: legacyData.ritualProgress || {},
-    // Reset timestamps to current time
+    ...stripped,
+    substances: stripped.substances || {},
+    upgrades: stripped.upgrades || [],
+    achievements: stripped.achievements || [],
+    actionCooldowns: stripped.actionCooldowns || {},
+    log: stripped.log || initialState.log,
+    unlockedFeatures: stripped.unlockedFeatures || [],
+    groupChatMessages: stripped.groupChatMessages || [],
+    organComplaints: stripped.organComplaints || [],
+    ritualProgress: stripped.ritualProgress || {},
+    // New fields added in v2 — default for any save that predates them.
+    autoClickerAccumulator:
+      typeof stripped.autoClickerAccumulator === "number"
+        ? stripped.autoClickerAccumulator
+        : 0,
+    lastActiveTime:
+      typeof stripped.lastActiveTime === "number"
+        ? stripped.lastActiveTime
+        : Date.now(),
+    offlineProgressPending:
+      stripped.offlineProgressPending ?? null,
+    // Reset runtime timestamps — tick.ts will manage these going forward.
     lastTickTime: Date.now(),
     nightStartTime: Date.now(),
     lastClickTime: Date.now(),
-  };
+  } as GameState;
 }
 
 /**

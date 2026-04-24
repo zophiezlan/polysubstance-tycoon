@@ -30,24 +30,16 @@ import {
   calculateClickPower,
   calculateChaosDampening,
   calculateProductionMultiplier,
+  getAutoClickerTier,
 } from "./game/upgradeEffects";
 import { updateCombo, calculateComboMultiplier } from "./game/combos";
-// New progression system components
-import { ProgressionStatus } from "./components/ProgressionStatus";
-// import { MilestoneManager } from './components/MilestoneNotification'; // Disabled - redundant with Active Bonuses
 import { OfflineProgressManager } from "./components/OfflineProgress";
-import { ActionPanels } from "./components/ActionPanels";
 import { GroupChatPanel } from "./components/GroupChatPanel";
 import { OrganComplaintsPanel } from "./components/OrganComplaintsPanel";
-// import { StrategySelector } from './components/StrategySelector'; // DISABLED FOR HYBRID MODEL TESTING
 import {
-  isExtendedGameState,
-  ExtendedGameState,
-} from "./game/progressionTypes";
-import { useEnergyBooster as applyEnergyBooster } from "./game/energyManagement";
-import { useChaosAction as applyChaosAction } from "./game/chaosStrategy";
-import { claimOfflineProgress } from "./game/progressionIntegration";
-// import { checkMilestones } from './game/milestones'; // Disabled - redundant with Active Bonuses
+  checkOfflineProgress,
+  claimOfflineProgress,
+} from "./game/offlineProgress";
 import { markMessagesAsRead } from "./game/groupChat";
 // Random Events (Golden Cookie equivalent)
 import { RandomEventManager } from "./game/randomEvents";
@@ -59,48 +51,39 @@ const TICK_INTERVAL = 1000; // 1 second
 
 function App() {
   const [state, setState] = useState<GameState>(() => {
-    // Try to load from localStorage with validation and migration
     const saved = localStorage.getItem(STORAGE_KEY);
+    let baseState: GameState;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        const migrated = validateSaveData(parsed)
+          ? migrateSaveData(parsed)
+          : migrateSaveData(parsed);
+        baseState = sanitizeGameState(migrated);
 
-        // Validate and migrate save data
-        if (validateSaveData(parsed)) {
-          const migratedState = migrateSaveData(parsed);
-          const sanitizedState = sanitizeGameState(migratedState);
-
-          // If there's a saved active night, create new night with persistent data
-          if (sanitizedState.isNightActive === false) {
-            return startNewNight(sanitizedState);
-          }
-
-          // Reset runtime timestamps
-          sanitizedState.lastTickTime = Date.now();
-          sanitizedState.nightStartTime = Date.now();
-
-          console.log("Successfully loaded save data");
-          return sanitizedState;
-        } else {
-          console.warn("Save data validation failed, attempting migration");
-          // Try to migrate legacy format
-          const migratedState = migrateSaveData(parsed);
-          const sanitizedState = sanitizeGameState(migratedState);
-          return sanitizedState;
+        if (baseState.isNightActive === false) {
+          baseState = startNewNight(baseState);
         }
       } catch (e) {
-        console.error("Failed to parse save:", e);
-        console.log("Starting fresh game");
+        console.error("Failed to parse save, starting fresh:", e);
+        baseState = createInitialState();
       }
+    } else {
+      baseState = createInitialState();
     }
-    return createInitialState();
+
+    // Compute offline progress before resetting timestamps (uses lastActiveTime)
+    const withOffline = checkOfflineProgress(baseState);
+    withOffline.lastTickTime = Date.now();
+    withOffline.nightStartTime = Date.now();
+    withOffline.lastActiveTime = Date.now();
+    return withOffline;
   });
 
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<
     Array<{ id: string; value: number; x: number; y: number }>
   >([]);
-  // const [milestoneQueue, setMilestoneQueue] = useState<Milestone[]>([]); // Disabled - redundant with Active Bonuses
 
   // Random Event Manager (Golden Cookie equivalent)
   const randomEventManager = useRef<RandomEventManager>(
@@ -219,15 +202,6 @@ function App() {
             });
           }
         }
-
-        // Check for new milestones (if using extended state)
-        // Milestone notifications disabled - redundant with Active Bonuses section
-        // if (isExtendedGameState(newState)) {
-        //   const completedMilestones = checkMilestones(newState as ExtendedGameState);
-        //   if (completedMilestones.length > 0 && !newState.muteNotifications) {
-        //     setMilestoneQueue(prev => [...prev, ...completedMilestones]);
-        //   }
-        // }
 
         return newState;
       });
@@ -494,7 +468,6 @@ function App() {
       const nextMute = !prevState.muteNotifications;
       if (nextMute) {
         setAchievementQueue([]);
-        // setMilestoneQueue([]); // Disabled - redundant with Active Bonuses
       }
       return {
         ...prevState,
@@ -552,38 +525,9 @@ function App() {
     }
   }, []);
 
-  // New progression system handlers
-  const handleUseEnergyBooster = useCallback((boosterId: string) => {
-    setState((prevState) => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      applyEnergyBooster(extendedState, boosterId);
-      return extendedState;
-    });
-  }, []);
-
-  const handleUseChaosAction = useCallback((actionId: string) => {
-    setState((prevState) => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = { ...prevState } as ExtendedGameState;
-      applyChaosAction(extendedState, actionId);
-      return extendedState;
-    });
-  }, []);
-
   const handleClaimOfflineProgress = useCallback(() => {
-    setState((prevState) => {
-      if (!isExtendedGameState(prevState)) return prevState;
-      const extendedState = prevState as ExtendedGameState;
-      claimOfflineProgress(extendedState);
-      return { ...extendedState };
-    });
+    setState((prevState) => claimOfflineProgress(prevState));
   }, []);
-
-  // Disabled - redundant with Active Bonuses section
-  // const handleClearMilestones = useCallback(() => {
-  //   setMilestoneQueue([]);
-  // }, []);
 
   const handleMarkMessagesAsRead = useCallback(() => {
     setState((prevState) => {
@@ -617,25 +561,6 @@ function App() {
     });
   }, []);
 
-  // DISABLED FOR HYBRID MODEL TESTING - Strategy selector is commented out
-  // const handleSwitchEnergyMode = useCallback((modeId: string) => {
-  //   setState(prevState => {
-  //     if (!isExtendedGameState(prevState)) return prevState;
-  //     const extendedState = { ...prevState } as ExtendedGameState;
-  //     switchEnergyMode(extendedState, modeId);
-  //     return extendedState;
-  //   });
-  // }, []);
-
-  // const handleSwitchChaosStrategy = useCallback((strategyId: string) => {
-  //   setState(prevState => {
-  //     if (!isExtendedGameState(prevState)) return prevState;
-  //     const extendedState = { ...prevState } as ExtendedGameState;
-  //     switchChaosStrategy(extendedState, strategyId);
-  //     return extendedState;
-  //   });
-  // }, []);
-
   // Memoize vibes per second calculation for performance
   const vibesPerSecond = useMemo(() => {
     return Object.entries(state.substances).reduce(
@@ -654,6 +579,8 @@ function App() {
     state.energy,
     state.chaos,
   ]);
+
+  const autoClickerTier = getAutoClickerTier(state);
 
   return (
     <div
@@ -716,10 +643,10 @@ function App() {
             <div className="vibes-value">{formatNumber(state.vibes)}</div>
             <div className="vibes-per-second">
               per second: {formatNumber(vibesPerSecond, 1)}
-              {state.autoClickerLevel > 0 && (
+              {autoClickerTier > 0 && (
                 <span
                   className="auto-clicker-badge"
-                  title={`Auto-clicker active (Tier ${state.autoClickerLevel})`}
+                  title={`Auto-clicker active (Tier ${autoClickerTier})`}
                 >
                   🤖 AUTO
                 </span>
@@ -738,9 +665,6 @@ function App() {
           {/* Hidden Meters */}
           <div className="left-panel-meters">
             <HiddenMeters state={state} />
-            {isExtendedGameState(state) && (
-              <ProgressionStatus gameState={state} />
-            )}
           </div>
         </div>
 
@@ -756,17 +680,6 @@ function App() {
 
         {/* Column 4: Everything Else */}
         <div className="game-column column-everything-else">
-          {/* Energy Boosters & Chaos Actions */}
-          {isExtendedGameState(state) && (
-            <section className="section-card">
-              <ActionPanels
-                gameState={state as ExtendedGameState}
-                onUseEnergyBooster={handleUseEnergyBooster}
-                onUseChaosAction={handleUseChaosAction}
-              />
-            </section>
-          )}
-
           {/* Maintenance Actions */}
           <section className="section-card">
             <MaintenancePanel state={state} onAction={handleMaintenance} />
@@ -849,21 +762,11 @@ function App() {
         />
       )}
 
-      {/* Milestone Notifications - Disabled (redundant with Active Bonuses section) */}
-      {/* {!state.muteNotifications && (
-        <MilestoneManager
-          milestones={milestoneQueue}
-          onClearMilestones={handleClearMilestones}
-        />
-      )} */}
-
       {/* Offline Progress Welcome */}
-      {isExtendedGameState(state) && (
-        <OfflineProgressManager
-          gameState={state as ExtendedGameState}
-          onClaimOfflineProgress={handleClaimOfflineProgress}
-        />
-      )}
+      <OfflineProgressManager
+        gameState={state}
+        onClaimOfflineProgress={handleClaimOfflineProgress}
+      />
 
       {!state.hasSeenDisclaimer && (
         <DisclaimerModal onAccept={handleDisclaimerAccept} />

@@ -1,4 +1,5 @@
 import { Achievement, GameState } from "./types";
+import { getAutoClickerTier } from "./upgradeEffects";
 
 export const ACHIEVEMENTS: Achievement[] = [
   // Early Game
@@ -388,13 +389,13 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "firstBot",
     name: "First Bot",
     description: "Purchase your first auto-clicker",
-    checkCondition: (state) => state.autoClickerLevel >= 1,
+    checkCondition: (state) => getAutoClickerTier(state) >= 1,
   },
   {
     id: "fullyAutomated",
     name: "Fully Automated",
     description: "Reach max auto-clicker tier",
-    checkCondition: (state) => state.autoClickerLevel >= 4,
+    checkCondition: (state) => getAutoClickerTier(state) >= 4,
   },
   {
     id: "idleTycoon",

@@ -123,12 +123,24 @@ export function calculateChaosDampening(state: GameState): number {
 }
 
 /**
- * Calculate autoclicker rate (clicks per second)
+ * Calculate autoclicker rate (clicks per second) based on owned upgrades.
  */
 export function calculateAutoClickerRate(state: GameState): number {
   if (state.upgrades.includes("auto-clicker-4")) return 100;
   if (state.upgrades.includes("auto-clicker-3")) return 20;
   if (state.upgrades.includes("auto-clicker-2")) return 5;
+  if (state.upgrades.includes("auto-clicker-1")) return 1;
+  return 0;
+}
+
+/**
+ * Derived auto-clicker tier (0 = none, 1-4 = owned tiers). Used for UI badges
+ * and achievement checks so callers don't need to re-implement the ID lookup.
+ */
+export function getAutoClickerTier(state: GameState): number {
+  if (state.upgrades.includes("auto-clicker-4")) return 4;
+  if (state.upgrades.includes("auto-clicker-3")) return 3;
+  if (state.upgrades.includes("auto-clicker-2")) return 2;
   if (state.upgrades.includes("auto-clicker-1")) return 1;
   return 0;
 }

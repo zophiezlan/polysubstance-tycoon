@@ -61,8 +61,10 @@ export function createInitialState(): GameState {
     ritualProgress: {},
 
     // Automation/Idle features
-    autoClickerLevel: 0,
+    autoClickerAccumulator: 0,
     idleMultiplier: 1,
+    lastActiveTime: Date.now(),
+    offlineProgressPending: null,
 
     // UI state
     distortionLevel: 0,
@@ -136,7 +138,9 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.groupChatMessages = persistentState.groupChatMessages || [];
   newState.organComplaints = persistentState.organComplaints || [];
   newState.ritualProgress = persistentState.ritualProgress || {};
-  newState.autoClickerLevel = persistentState.autoClickerLevel || 0;
+  newState.autoClickerAccumulator = persistentState.autoClickerAccumulator || 0;
+  newState.lastActiveTime = persistentState.lastActiveTime || Date.now();
+  newState.offlineProgressPending = persistentState.offlineProgressPending ?? null;
 
   // Apply sleep debt penalty from previous night
   if (persistentState.sleepDebt && persistentState.sleepDebt > 0) {
