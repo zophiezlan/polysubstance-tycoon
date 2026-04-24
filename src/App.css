@@ -26,7 +26,7 @@
   font-size: 1.1rem;
   color: var(--text-cyan);
   text-shadow: 0 0 10px var(--text-cyan);
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   margin: 0;
 }
 
@@ -51,7 +51,7 @@
 }
 
 .header-stat-value {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 0.95rem;
   font-weight: bold;
 }
@@ -87,7 +87,9 @@
 
 .header-bar-fill {
   height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .header-bar-fill.normal {
@@ -209,7 +211,7 @@
   font-size: 1rem;
   color: var(--text-cyan);
   text-shadow: 0 0 10px var(--text-cyan);
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   margin-bottom: 0.3rem;
 }
 
@@ -218,7 +220,7 @@
   font-weight: bold;
   color: var(--success);
   text-shadow: 0 0 20px var(--success);
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   line-height: 1;
 }
 
@@ -248,7 +250,8 @@
 }
 
 @keyframes autoClickerPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   }
@@ -316,7 +319,7 @@
 }
 
 .stat-value {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 0.9rem;
   font-weight: bold;
 }
@@ -353,7 +356,9 @@
 
 .stat-bar-fill {
   height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .stat-bar-fill.normal {
@@ -396,7 +401,9 @@
   border: 3px solid var(--text-cyan);
   border-radius: 50%;
   text-shadow: 0 0 10px var(--text-cyan);
-  box-shadow: 0 0 30px var(--purple), inset 0 0 30px rgba(107, 76, 154, 0.3);
+  box-shadow:
+    0 0 30px var(--purple),
+    inset 0 0 30px rgba(107, 76, 154, 0.3);
   transition: all 0.15s;
   cursor: pointer;
   position: relative;
@@ -410,13 +417,17 @@
 
 .main-button:hover:not(:disabled) {
   transform: scale(1.08);
-  box-shadow: 0 0 60px var(--text-cyan), inset 0 0 60px rgba(0, 255, 255, 0.2);
+  box-shadow:
+    0 0 60px var(--text-cyan),
+    inset 0 0 60px rgba(0, 255, 255, 0.2);
   border-color: var(--success);
 }
 
 .main-button:active:not(:disabled) {
   transform: scale(0.95);
-  box-shadow: 0 0 30px var(--purple), inset 0 0 30px rgba(107, 76, 154, 0.5);
+  box-shadow:
+    0 0 30px var(--purple),
+    inset 0 0 30px rgba(107, 76, 154, 0.5);
 }
 
 .main-button:disabled {
@@ -437,16 +448,32 @@
 }
 
 @keyframes subtle-wobble {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(0.5deg); }
-  75% { transform: rotate(-0.5deg); }
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.5deg);
+  }
+  75% {
+    transform: rotate(-0.5deg);
+  }
 }
 
 @keyframes intense-wobble {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(1deg) scale(1.02); }
-  50% { transform: rotate(-1deg) scale(0.98); }
-  75% { transform: rotate(0.5deg) scale(1.01); }
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(1deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(-1deg) scale(0.98);
+  }
+  75% {
+    transform: rotate(0.5deg) scale(1.01);
+  }
 }
 
 /* Substance Shop and Upgrade Shop */
@@ -632,7 +659,8 @@
 }
 
 @keyframes synergy-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
   }
   50% {
@@ -738,7 +766,11 @@
 }
 
 .maintenance-button {
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.3),
+    rgba(138, 43, 226, 0.2)
+  );
   color: var(--text-white);
   padding: 12px;
   border-radius: 6px;
@@ -752,7 +784,11 @@
 }
 
 .maintenance-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.5), rgba(138, 43, 226, 0.3));
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.5),
+    rgba(138, 43, 226, 0.3)
+  );
   border-color: var(--text-cyan);
   transform: translateY(-1px);
 }
@@ -777,7 +813,7 @@
 .button-cost {
   color: var(--success);
   font-size: 0.9em;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .cooldown-bar-container {
@@ -861,7 +897,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 0.7rem;
 }
 
@@ -1090,7 +1126,7 @@
 }
 
 .xp-progress {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   margin-top: 0.5rem;
 }
 
@@ -1222,23 +1258,54 @@
 }
 
 @keyframes text-shimmer {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.9; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
 }
 
 @keyframes text-glitch {
-  0%, 90%, 100% { transform: translate(0); }
-  92% { transform: translate(-2px, 1px); }
-  94% { transform: translate(2px, -1px); }
-  96% { transform: translate(-1px, 2px); }
-  98% { transform: translate(1px, -2px); }
+  0%,
+  90%,
+  100% {
+    transform: translate(0);
+  }
+  92% {
+    transform: translate(-2px, 1px);
+  }
+  94% {
+    transform: translate(2px, -1px);
+  }
+  96% {
+    transform: translate(-1px, 2px);
+  }
+  98% {
+    transform: translate(1px, -2px);
+  }
 }
 
 @keyframes text-chaos {
-  0%, 80%, 100% { transform: translate(0); filter: blur(0); }
-  85% { transform: translate(-3px, 2px); filter: blur(0.5px); }
-  90% { transform: translate(3px, -2px); filter: blur(0.5px); }
-  95% { transform: translate(-2px, 3px); filter: blur(0.5px); }
+  0%,
+  80%,
+  100% {
+    transform: translate(0);
+    filter: blur(0);
+  }
+  85% {
+    transform: translate(-3px, 2px);
+    filter: blur(0.5px);
+  }
+  90% {
+    transform: translate(3px, -2px);
+    filter: blur(0.5px);
+  }
+  95% {
+    transform: translate(-2px, 3px);
+    filter: blur(0.5px);
+  }
 }
 
 /* Responsive - 4 Column Layout */
@@ -1351,10 +1418,9 @@
 .footer-stat {
   color: var(--text-cyan);
   font-size: 0.8rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   white-space: nowrap;
 }
-
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {

@@ -1,8 +1,14 @@
-import { GameState } from '../game/types';
-import { ExtendedGameState, isExtendedGameState } from '../game/progressionTypes';
-import { getActiveEnergyMode } from '../game/energyManagement';
-import { getCurrentChaosThreshold, getActiveChaosStrategy } from '../game/chaosStrategy';
-import './ProgressionStatus.css';
+import { GameState } from "../game/types";
+import {
+  ExtendedGameState,
+  isExtendedGameState,
+} from "../game/progressionTypes";
+import { getActiveEnergyMode } from "../game/energyManagement";
+import {
+  getCurrentChaosThreshold,
+  getActiveChaosStrategy,
+} from "../game/chaosStrategy";
+import "./ProgressionStatus.css";
 
 interface ProgressionStatusProps {
   gameState: GameState;
@@ -20,7 +26,7 @@ export function ProgressionStatus({ gameState }: ProgressionStatusProps) {
 
   // Calculate active bonuses summary
   const activeBonuses = extendedState.activeBonuses.filter(
-    (bonus) => bonus.expiresAt > Date.now()
+    (bonus) => bonus.expiresAt > Date.now(),
   );
 
   return (
@@ -39,18 +45,27 @@ export function ProgressionStatus({ gameState }: ProgressionStatusProps) {
         <div className="status-description">{chaosThreshold.description}</div>
         <div className="status-effects">
           <span className="effect-item">
-            Prod: {((chaosThreshold.effects.productionMultiplier - 1) * 100).toFixed(0)}%
+            Prod:{" "}
+            {((chaosThreshold.effects.productionMultiplier - 1) * 100).toFixed(
+              0,
+            )}
+            %
           </span>
           {chaosThreshold.effects.clickPowerMultiplier !== 1 && (
             <span className="effect-item">
-              Click: {((chaosThreshold.effects.clickPowerMultiplier - 1) * 100).toFixed(0)}%
+              Click:{" "}
+              {(
+                (chaosThreshold.effects.clickPowerMultiplier - 1) *
+                100
+              ).toFixed(0)}
+              %
             </span>
           )}
         </div>
       </div>
 
       {/* Chaos Strategy Display */}
-      {chaosStrategy.id !== 'none' && (
+      {chaosStrategy.id !== "none" && (
         <div className="status-section chaos-strategy">
           <div className="status-label">🎯 Strategy</div>
           <div className="status-value">{chaosStrategy.name}</div>
@@ -66,11 +81,12 @@ export function ProgressionStatus({ gameState }: ProgressionStatusProps) {
             return (
               <div key={bonus.id} className="bonus-item">
                 <span className="bonus-name">{bonus.name}</span>
-                {bonus.productionMultiplier && bonus.productionMultiplier !== 1 && (
-                  <span className="bonus-effect">
-                    {bonus.productionMultiplier.toFixed(1)}x prod
-                  </span>
-                )}
+                {bonus.productionMultiplier &&
+                  bonus.productionMultiplier !== 1 && (
+                    <span className="bonus-effect">
+                      {bonus.productionMultiplier.toFixed(1)}x prod
+                    </span>
+                  )}
                 {bonus.clickMultiplier && bonus.clickMultiplier !== 1 && (
                   <span className="bonus-effect">
                     {bonus.clickMultiplier.toFixed(1)}x click
@@ -114,7 +130,7 @@ function getNextMilestoneDisplay(state: ExtendedGameState): string {
     return `${nextThreshold.toLocaleString()} vibes (${progress.toFixed(1)}%)`;
   }
 
-  return 'All milestones complete!';
+  return "All milestones complete!";
 }
 
 function getNextRepeatThreshold(current: number): number {

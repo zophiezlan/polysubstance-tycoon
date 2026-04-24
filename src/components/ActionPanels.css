@@ -34,7 +34,11 @@
 }
 
 .action-button {
-  background: linear-gradient(135deg, rgba(100, 200, 255, 0.15), rgba(100, 150, 255, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(100, 200, 255, 0.15),
+    rgba(100, 150, 255, 0.1)
+  );
   border: 2px solid rgba(100, 200, 255, 0.3);
   border-radius: 8px;
   padding: 12px;
@@ -46,7 +50,11 @@
 }
 
 .action-button:hover:not(.disabled) {
-  background: linear-gradient(135deg, rgba(100, 200, 255, 0.25), rgba(100, 150, 255, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(100, 200, 255, 0.25),
+    rgba(100, 150, 255, 0.2)
+  );
   border-color: rgba(100, 200, 255, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(100, 200, 255, 0.3);
@@ -65,12 +73,20 @@
 
 /* Chaos Actions Styling */
 .chaos-action {
-  background: linear-gradient(135deg, rgba(255, 100, 255, 0.15), rgba(200, 100, 255, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 100, 255, 0.15),
+    rgba(200, 100, 255, 0.1)
+  );
   border-color: rgba(255, 100, 255, 0.3);
 }
 
 .chaos-action:hover:not(.disabled) {
-  background: linear-gradient(135deg, rgba(255, 100, 255, 0.25), rgba(200, 100, 255, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 100, 255, 0.25),
+    rgba(200, 100, 255, 0.2)
+  );
   border-color: rgba(255, 100, 255, 0.5);
   box-shadow: 0 4px 12px rgba(255, 100, 255, 0.3);
 }
@@ -128,7 +144,7 @@
 
 /* Glow effect for available actions */
 .action-button:not(.disabled)::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -148,7 +164,8 @@
   0% {
     left: -100%;
   }
-  50%, 100% {
+  50%,
+  100% {
     left: 200%;
   }
 }

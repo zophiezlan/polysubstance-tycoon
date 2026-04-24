@@ -1,6 +1,6 @@
 // Extended types for new progression systems
 
-import { GameState } from './types';
+import { GameState } from "./types";
 
 // ============================================================================
 // ENERGY MANAGEMENT SYSTEM
@@ -81,7 +81,7 @@ export interface Milestone {
   id: string;
   name: string;
   description: string;
-  category: 'vibes' | 'clicks' | 'substance' | 'collection' | 'special';
+  category: "vibes" | "clicks" | "substance" | "collection" | "special";
   checkCondition: (state: GameState) => boolean;
   reward: {
     permanentProductionBonus?: number; // Percentage
@@ -150,7 +150,7 @@ export interface PermanentUnlock {
   name: string;
   description: string;
   insightCost: number; // Cost in prestige currency
-  category: 'automation' | 'quality-of-life' | 'build' | 'special';
+  category: "automation" | "quality-of-life" | "build" | "special";
   unlockCondition?: (state: GameState) => boolean;
   maxPurchases?: number; // For stackable unlocks (default 1)
 }
@@ -220,23 +220,27 @@ export interface ExtendedGameState extends GameState {
 // HELPER FUNCTIONS
 // ============================================================================
 
-export function isExtendedGameState(state: GameState): state is ExtendedGameState {
-  return 'activeEnergyMode' in state;
+export function isExtendedGameState(
+  state: GameState,
+): state is ExtendedGameState {
+  return "activeEnergyMode" in state;
 }
 
-export function upgradeToExtendedGameState(state: GameState): ExtendedGameState {
+export function upgradeToExtendedGameState(
+  state: GameState,
+): ExtendedGameState {
   if (isExtendedGameState(state)) {
     return state;
   }
 
   return {
     ...state,
-    activeEnergyMode: 'balanced',
-    unlockedEnergyModes: ['balanced'],
+    activeEnergyMode: "balanced",
+    unlockedEnergyModes: ["balanced"],
     energyBoosterCooldowns: {},
     energyHarvestAccumulator: 0,
-    activeChaosStrategy: 'none',
-    unlockedChaosStrategies: ['none'],
+    activeChaosStrategy: "none",
+    unlockedChaosStrategies: ["none"],
     chaosActionCooldowns: {},
     chaosActionCharges: {},
     completedMilestones: [],

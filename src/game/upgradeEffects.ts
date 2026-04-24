@@ -1,11 +1,14 @@
-import { GameState } from './types';
-import { getUpgrade } from './upgrades';
-import { calculateInsightMultiplier } from './prestige';
+import { GameState } from "./types";
+import { getUpgrade } from "./upgrades";
+import { calculateInsightMultiplier } from "./prestige";
 
 /**
  * Calculate total click power based on upgrades + prestige
  */
-export function calculateClickPower(state: GameState, baseClickPower: number = 1): number {
+export function calculateClickPower(
+  state: GameState,
+  baseClickPower: number = 1,
+): number {
   let power = baseClickPower;
   let multiplier = 1;
 
@@ -32,7 +35,10 @@ export function calculateClickPower(state: GameState, baseClickPower: number = 1
 /**
  * Calculate energy cost reduction for clicks
  */
-export function calculateEnergyCost(state: GameState, baseCost: number = 5): number {
+export function calculateEnergyCost(
+  state: GameState,
+  baseCost: number = 5,
+): number {
   let reduction = 0;
 
   for (const upgradeId of state.upgrades) {
@@ -51,7 +57,10 @@ export function calculateEnergyCost(state: GameState, baseCost: number = 5): num
  * Calculate production multiplier for a specific substance + prestige
  * Now includes synergy bonuses!
  */
-export function calculateProductionMultiplier(state: GameState, substanceId: string): number {
+export function calculateProductionMultiplier(
+  state: GameState,
+  substanceId: string,
+): number {
   let multiplier = 1;
 
   for (const upgradeId of state.upgrades) {
@@ -59,16 +68,22 @@ export function calculateProductionMultiplier(state: GameState, substanceId: str
     if (!upgrade) continue;
 
     // Substance-specific multiplier
-    if (upgrade.substanceId === substanceId && upgrade.effects.productionMultiplier) {
+    if (
+      upgrade.substanceId === substanceId &&
+      upgrade.effects.productionMultiplier
+    ) {
       multiplier *= upgrade.effects.productionMultiplier;
     }
 
     // Synergy multiplier - applies if this substance is in the synergy list
     // AND player owns ALL substances in the synergy
-    if (upgrade.synergySubstances?.includes(substanceId) && upgrade.effects.productionMultiplier) {
+    if (
+      upgrade.synergySubstances?.includes(substanceId) &&
+      upgrade.effects.productionMultiplier
+    ) {
       // Check if player owns all substances in the synergy
       const ownsAllSynergySubstances = upgrade.synergySubstances.every(
-        sId => (state.substances[sId] || 0) > 0
+        (sId) => (state.substances[sId] || 0) > 0,
       );
 
       if (ownsAllSynergySubstances) {
@@ -111,10 +126,10 @@ export function calculateChaosDampening(state: GameState): number {
  * Calculate autoclicker rate (clicks per second)
  */
 export function calculateAutoClickerRate(state: GameState): number {
-  if (state.upgrades.includes('auto-clicker-4')) return 100;
-  if (state.upgrades.includes('auto-clicker-3')) return 20;
-  if (state.upgrades.includes('auto-clicker-2')) return 5;
-  if (state.upgrades.includes('auto-clicker-1')) return 1;
+  if (state.upgrades.includes("auto-clicker-4")) return 100;
+  if (state.upgrades.includes("auto-clicker-3")) return 20;
+  if (state.upgrades.includes("auto-clicker-2")) return 5;
+  if (state.upgrades.includes("auto-clicker-1")) return 1;
   return 0;
 }
 
@@ -124,9 +139,9 @@ export function calculateAutoClickerRate(state: GameState): number {
 export function calculateComboTimerExtension(state: GameState): number {
   let extension = 0;
 
-  if (state.upgrades.includes('eternal-combo')) extension += 5;
-  else if (state.upgrades.includes('combo-god')) extension += 2;
-  else if (state.upgrades.includes('combo-master')) extension += 1;
+  if (state.upgrades.includes("eternal-combo")) extension += 5;
+  else if (state.upgrades.includes("combo-god")) extension += 2;
+  else if (state.upgrades.includes("combo-master")) extension += 1;
 
   return extension;
 }

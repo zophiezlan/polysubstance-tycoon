@@ -1,5 +1,5 @@
-import { ExtendedGameState } from '../game/progressionTypes';
-import './OfflineProgress.css';
+import { ExtendedGameState } from "../game/progressionTypes";
+import "./OfflineProgress.css";
 
 interface OfflineProgressProps {
   offlineData: {
@@ -9,14 +9,17 @@ interface OfflineProgressProps {
   onClaim: () => void;
 }
 
-export function OfflineProgress({ offlineData, onClaim }: OfflineProgressProps) {
+export function OfflineProgress({
+  offlineData,
+  onClaim,
+}: OfflineProgressProps) {
   const { vibesGained, timeAway } = offlineData;
 
   // Format time away
   const hours = Math.floor(timeAway / 3600);
   const minutes = Math.floor((timeAway % 3600) / 60);
 
-  let timeAwayText = '';
+  let timeAwayText = "";
   if (hours > 0) {
     timeAwayText = `${hours}h ${minutes}m`;
   } else {
@@ -25,7 +28,10 @@ export function OfflineProgress({ offlineData, onClaim }: OfflineProgressProps) 
 
   return (
     <div className="offline-progress-overlay" onClick={onClaim}>
-      <div className="offline-progress-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="offline-progress-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="offline-header">
           <div className="offline-icon">💤</div>
           <h2>Welcome Back!</h2>
@@ -47,7 +53,8 @@ export function OfflineProgress({ offlineData, onClaim }: OfflineProgressProps) 
 
           <div className="offline-footer">
             <p className="offline-tip">
-              💡 Upgrade "Enhanced Offline Progress" to earn even more while away!
+              💡 Upgrade "Enhanced Offline Progress" to earn even more while
+              away!
             </p>
           </div>
         </div>
@@ -69,7 +76,10 @@ export function OfflineProgressManager({
   gameState,
   onClaimOfflineProgress,
 }: OfflineProgressManagerProps) {
-  if (!gameState.offlineProgressPending || gameState.offlineProgressPending.claimed) {
+  if (
+    !gameState.offlineProgressPending ||
+    gameState.offlineProgressPending.claimed
+  ) {
     return null;
   }
 

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import '../styles/FloatingNumber.css';
+import { useEffect, useState } from "react";
+import "../styles/FloatingNumber.css";
 
 interface FloatingNumberProps {
   value: number;
@@ -9,7 +9,13 @@ interface FloatingNumberProps {
   onComplete: (id: string) => void;
 }
 
-export function FloatingNumber({ value, x, y, id, onComplete }: FloatingNumberProps) {
+export function FloatingNumber({
+  value,
+  x,
+  y,
+  id,
+  onComplete,
+}: FloatingNumberProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {

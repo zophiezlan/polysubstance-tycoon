@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Milestone } from '../game/progressionTypes';
-import './MilestoneNotification.css';
+import { useState, useEffect } from "react";
+import { Milestone } from "../game/progressionTypes";
+import "./MilestoneNotification.css";
 
 interface MilestoneNotificationProps {
   milestone: Milestone;
   onDismiss: () => void;
 }
 
-export function MilestoneNotification({ milestone, onDismiss }: MilestoneNotificationProps) {
+export function MilestoneNotification({
+  milestone,
+  onDismiss,
+}: MilestoneNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -30,7 +33,7 @@ export function MilestoneNotification({ milestone, onDismiss }: MilestoneNotific
 
   return (
     <div
-      className={`milestone-notification ${isVisible ? 'visible' : ''}`}
+      className={`milestone-notification ${isVisible ? "visible" : ""}`}
       onClick={handleClick}
     >
       <div className="milestone-content">
@@ -42,7 +45,8 @@ export function MilestoneNotification({ milestone, onDismiss }: MilestoneNotific
             <div className="milestone-rewards">
               {milestone.reward.permanentProductionBonus && (
                 <span className="reward-item">
-                  +{milestone.reward.permanentProductionBonus}% production forever!
+                  +{milestone.reward.permanentProductionBonus}% production
+                  forever!
                 </span>
               )}
               {milestone.reward.permanentClickBonus && (
@@ -55,8 +59,8 @@ export function MilestoneNotification({ milestone, onDismiss }: MilestoneNotific
                   {milestone.reward.temporaryBonus.productionMultiplier &&
                     `${milestone.reward.temporaryBonus.productionMultiplier}x production`}
                   {milestone.reward.temporaryBonus.clickMultiplier &&
-                    `${milestone.reward.temporaryBonus.clickMultiplier}x clicks`}
-                  {' '}for {milestone.reward.temporaryBonus.duration}s
+                    `${milestone.reward.temporaryBonus.clickMultiplier}x clicks`}{" "}
+                  for {milestone.reward.temporaryBonus.duration}s
                 </span>
               )}
               {milestone.reward.insightPoints && (
@@ -66,7 +70,7 @@ export function MilestoneNotification({ milestone, onDismiss }: MilestoneNotific
               )}
               {milestone.reward.unlockFeature && (
                 <span className="reward-item unlock">
-                  Unlocked: {milestone.reward.unlockFeature.replace(/_/g, ' ')}!
+                  Unlocked: {milestone.reward.unlockFeature.replace(/_/g, " ")}!
                 </span>
               )}
             </div>
@@ -83,7 +87,10 @@ interface MilestoneManagerProps {
   onClearMilestones: () => void;
 }
 
-export function MilestoneManager({ milestones, onClearMilestones }: MilestoneManagerProps) {
+export function MilestoneManager({
+  milestones,
+  onClearMilestones,
+}: MilestoneManagerProps) {
   const [visibleMilestones, setVisibleMilestones] = useState<Milestone[]>([]);
 
   useEffect(() => {

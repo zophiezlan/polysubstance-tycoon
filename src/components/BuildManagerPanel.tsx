@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ExtendedGameState, SavedBuild } from '../game/progressionTypes';
+import { useState } from "react";
+import { ExtendedGameState, SavedBuild } from "../game/progressionTypes";
 import {
   canSaveBuild,
   canSwapToBuild,
@@ -7,9 +7,9 @@ import {
   compareBuildToCurrentState,
   exportBuild,
   STARTER_BUILDS,
-} from '../game/buildManager';
-import { getSubstance } from '../game/substances';
-import '../styles/BuildManagerPanel.css';
+} from "../game/buildManager";
+import { getSubstance } from "../game/substances";
+import "../styles/BuildManagerPanel.css";
 
 interface BuildManagerPanelProps {
   gameState: ExtendedGameState;
@@ -36,11 +36,11 @@ export function BuildManagerPanel({
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showStarterBuilds, setShowStarterBuilds] = useState(false);
-  const [newBuildName, setNewBuildName] = useState('');
-  const [newBuildNotes, setNewBuildNotes] = useState('');
-  const [importJson, setImportJson] = useState('');
+  const [newBuildName, setNewBuildName] = useState("");
+  const [newBuildNotes, setNewBuildNotes] = useState("");
+  const [importJson, setImportJson] = useState("");
   const [editingBuildId, setEditingBuildId] = useState<string | null>(null);
-  const [editedName, setEditedName] = useState('');
+  const [editedName, setEditedName] = useState("");
 
   const activeBuild = getActiveBuild(gameState);
   const canSave = canSaveBuild(gameState);
@@ -48,8 +48,8 @@ export function BuildManagerPanel({
   const handleSave = () => {
     if (newBuildName.trim()) {
       onSaveBuild(newBuildName.trim(), newBuildNotes.trim() || undefined);
-      setNewBuildName('');
-      setNewBuildNotes('');
+      setNewBuildName("");
+      setNewBuildNotes("");
       setShowSaveDialog(false);
     }
   };
@@ -57,7 +57,7 @@ export function BuildManagerPanel({
   const handleImport = () => {
     if (importJson.trim()) {
       onImportBuild(importJson.trim());
-      setImportJson('');
+      setImportJson("");
       setShowImportDialog(false);
     }
   };
@@ -66,14 +66,14 @@ export function BuildManagerPanel({
     const json = exportBuild(build);
     navigator.clipboard.writeText(json);
     // Could show a toast notification here
-    alert('Build exported to clipboard!');
+    alert("Build exported to clipboard!");
   };
 
   const handleRename = (buildId: string) => {
     if (editedName.trim()) {
       onUpdateBuildName(buildId, editedName.trim());
       setEditingBuildId(null);
-      setEditedName('');
+      setEditedName("");
     }
   };
 
@@ -88,18 +88,22 @@ export function BuildManagerPanel({
   }
 
   return (
-    <div className={`build-manager-panel ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <div
+      className={`build-manager-panel ${isExpanded ? "expanded" : "collapsed"}`}
+    >
       <div className="build-header" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="header-content">
           <span className="build-icon">💾</span>
           <div className="build-info">
             <div className="build-label">Build Manager</div>
             <div className="build-status">
-              {activeBuild ? `Active: ${activeBuild.name}` : `${gameState.savedBuilds.length}/${gameState.maxBuildSlots} builds saved`}
+              {activeBuild
+                ? `Active: ${activeBuild.name}`
+                : `${gameState.savedBuilds.length}/${gameState.maxBuildSlots} builds saved`}
             </div>
           </div>
         </div>
-        <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
+        <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
       </div>
 
       {isExpanded && (
@@ -110,7 +114,11 @@ export function BuildManagerPanel({
               className="action-btn save-btn"
               onClick={() => setShowSaveDialog(true)}
               disabled={!canSave}
-              title={!canSave ? `Build slots full (${gameState.maxBuildSlots} max)` : 'Save current configuration'}
+              title={
+                !canSave
+                  ? `Build slots full (${gameState.maxBuildSlots} max)`
+                  : "Save current configuration"
+              }
             >
               💾 Save Current
             </button>
@@ -142,7 +150,7 @@ export function BuildManagerPanel({
           {showStarterBuilds && (
             <div className="starter-builds-section">
               <h4>📦 Starter Build Templates</h4>
-              {STARTER_BUILDS.map(preset => (
+              {STARTER_BUILDS.map((preset) => (
                 <div key={preset.id} className="starter-build-card">
                   <div className="build-card-header">
                     <span className="build-name">{preset.name}</span>
@@ -184,7 +192,7 @@ export function BuildManagerPanel({
                 return (
                   <div
                     key={build.id}
-                    className={`build-card ${isActive ? 'active-build' : ''}`}
+                    className={`build-card ${isActive ? "active-build" : ""}`}
                   >
                     <div className="build-card-header">
                       {editingBuildId === build.id ? (
@@ -196,14 +204,29 @@ export function BuildManagerPanel({
                             className="name-edit-input"
                             autoFocus
                           />
-                          <button onClick={() => handleRename(build.id)} className="save-name-btn">✓</button>
-                          <button onClick={() => setEditingBuildId(null)} className="cancel-name-btn">✗</button>
+                          <button
+                            onClick={() => handleRename(build.id)}
+                            className="save-name-btn"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => setEditingBuildId(null)}
+                            className="cancel-name-btn"
+                          >
+                            ✗
+                          </button>
                         </div>
                       ) : (
                         <>
-                          <span className="build-name" onClick={() => startEdit(build)}>
+                          <span
+                            className="build-name"
+                            onClick={() => startEdit(build)}
+                          >
                             {build.name}
-                            {isActive && <span className="active-badge">ACTIVE</span>}
+                            {isActive && (
+                              <span className="active-badge">ACTIVE</span>
+                            )}
                           </span>
                           <span className="build-timestamp">
                             {new Date(build.timestamp).toLocaleDateString()}
@@ -212,7 +235,9 @@ export function BuildManagerPanel({
                       )}
                     </div>
 
-                    {build.notes && <div className="build-notes">{build.notes}</div>}
+                    {build.notes && (
+                      <div className="build-notes">{build.notes}</div>
+                    )}
 
                     {/* Strategy Info */}
                     <div className="build-strategy">
@@ -233,24 +258,37 @@ export function BuildManagerPanel({
                     </div>
 
                     {/* Differences from current */}
-                    {comparison.substanceDifferences.length > 0 && !isActive && (
-                      <details className="build-diff">
-                        <summary>Changes from current ({comparison.substanceDifferences.length})</summary>
-                        <div className="diff-list">
-                          {comparison.substanceDifferences.map(diff => {
-                            const substance = getSubstance(diff.substanceId);
-                            return substance ? (
-                              <div key={diff.substanceId} className="diff-item">
-                                <span>{substance.name}:</span>
-                                <span className={diff.diff > 0 ? 'positive' : 'negative'}>
-                                  {diff.current} → {diff.target} ({diff.diff > 0 ? '+' : ''}{diff.diff})
-                                </span>
-                              </div>
-                            ) : null;
-                          })}
-                        </div>
-                      </details>
-                    )}
+                    {comparison.substanceDifferences.length > 0 &&
+                      !isActive && (
+                        <details className="build-diff">
+                          <summary>
+                            Changes from current (
+                            {comparison.substanceDifferences.length})
+                          </summary>
+                          <div className="diff-list">
+                            {comparison.substanceDifferences.map((diff) => {
+                              const substance = getSubstance(diff.substanceId);
+                              return substance ? (
+                                <div
+                                  key={diff.substanceId}
+                                  className="diff-item"
+                                >
+                                  <span>{substance.name}:</span>
+                                  <span
+                                    className={
+                                      diff.diff > 0 ? "positive" : "negative"
+                                    }
+                                  >
+                                    {diff.current} → {diff.target} (
+                                    {diff.diff > 0 ? "+" : ""}
+                                    {diff.diff})
+                                  </span>
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        </details>
+                      )}
 
                     {/* Actions */}
                     <div className="build-card-actions">
@@ -258,14 +296,22 @@ export function BuildManagerPanel({
                         className="swap-btn"
                         onClick={() => onSwapBuild(index)}
                         disabled={!canSwap || isActive}
-                        title={!canSwap && gameState.buildSwapCooldown > 0 ? 'Swap on cooldown' : 'Switch to this build'}
+                        title={
+                          !canSwap && gameState.buildSwapCooldown > 0
+                            ? "Swap on cooldown"
+                            : "Switch to this build"
+                        }
                       >
-                        {isActive ? '✓ Active' : '🔄 Load'}
+                        {isActive ? "✓ Active" : "🔄 Load"}
                       </button>
                       <button
                         className="overwrite-btn"
                         onClick={() => {
-                          if (confirm(`Overwrite "${build.name}" with current configuration?`)) {
+                          if (
+                            confirm(
+                              `Overwrite "${build.name}" with current configuration?`,
+                            )
+                          ) {
                             onOverwriteBuild(index);
                           }
                         }}
@@ -299,14 +345,23 @@ export function BuildManagerPanel({
           ) : (
             <div className="no-builds">
               <p>No builds saved yet.</p>
-              <p>Save your current substance configuration to quickly switch between strategies!</p>
+              <p>
+                Save your current substance configuration to quickly switch
+                between strategies!
+              </p>
             </div>
           )}
 
           {/* Save Dialog */}
           {showSaveDialog && (
-            <div className="modal-overlay" onClick={() => setShowSaveDialog(false)}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="modal-overlay"
+              onClick={() => setShowSaveDialog(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <h3>💾 Save Current Build</h3>
                 <input
                   type="text"
@@ -325,25 +380,39 @@ export function BuildManagerPanel({
                   maxLength={200}
                 />
                 <div className="build-preview">
-                  <div><strong>Substances:</strong></div>
-                  {Object.entries(gameState.substances).filter(([_, count]) => count > 0).map(([id, count]) => {
-                    const substance = getSubstance(id);
-                    return substance ? (
-                      <div key={id}>• {substance.name}: {count}</div>
-                    ) : null;
-                  })}
-                  <div style={{ marginTop: '0.5rem' }}>
+                  <div>
+                    <strong>Substances:</strong>
+                  </div>
+                  {Object.entries(gameState.substances)
+                    .filter(([_, count]) => count > 0)
+                    .map(([id, count]) => {
+                      const substance = getSubstance(id);
+                      return substance ? (
+                        <div key={id}>
+                          • {substance.name}: {count}
+                        </div>
+                      ) : null;
+                    })}
+                  <div style={{ marginTop: "0.5rem" }}>
                     <strong>Energy Mode:</strong> {gameState.activeEnergyMode}
                   </div>
                   <div>
-                    <strong>Chaos Strategy:</strong> {gameState.activeChaosStrategy}
+                    <strong>Chaos Strategy:</strong>{" "}
+                    {gameState.activeChaosStrategy}
                   </div>
                 </div>
                 <div className="modal-actions">
-                  <button onClick={handleSave} className="confirm-btn" disabled={!newBuildName.trim()}>
+                  <button
+                    onClick={handleSave}
+                    className="confirm-btn"
+                    disabled={!newBuildName.trim()}
+                  >
                     💾 Save
                   </button>
-                  <button onClick={() => setShowSaveDialog(false)} className="cancel-btn">
+                  <button
+                    onClick={() => setShowSaveDialog(false)}
+                    className="cancel-btn"
+                  >
                     Cancel
                   </button>
                 </div>
@@ -353,8 +422,14 @@ export function BuildManagerPanel({
 
           {/* Import Dialog */}
           {showImportDialog && (
-            <div className="modal-overlay" onClick={() => setShowImportDialog(false)}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="modal-overlay"
+              onClick={() => setShowImportDialog(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <h3>📥 Import Build</h3>
                 <p>Paste build JSON from clipboard:</p>
                 <textarea
@@ -365,10 +440,17 @@ export function BuildManagerPanel({
                   rows={10}
                 />
                 <div className="modal-actions">
-                  <button onClick={handleImport} className="confirm-btn" disabled={!importJson.trim()}>
+                  <button
+                    onClick={handleImport}
+                    className="confirm-btn"
+                    disabled={!importJson.trim()}
+                  >
                     📥 Import
                   </button>
-                  <button onClick={() => setShowImportDialog(false)} className="cancel-btn">
+                  <button
+                    onClick={() => setShowImportDialog(false)}
+                    className="cancel-btn"
+                  >
                     Cancel
                   </button>
                 </div>

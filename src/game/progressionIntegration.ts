@@ -1,42 +1,52 @@
 // Integration file for all progression systems into game tick
 // This file handles auto-clicker, energy modes, chaos strategies, milestones, etc.
 
-import { GameState } from './types';
-import { ExtendedGameState, upgradeToExtendedGameState, isExtendedGameState } from './progressionTypes';
+import { GameState } from "./types";
+import {
+  ExtendedGameState,
+  upgradeToExtendedGameState,
+  isExtendedGameState,
+} from "./progressionTypes";
 import {
   calculateEnergyRegen,
   getEnergyClickMultiplier,
   getEnergyProductionMultiplier,
   getActiveEnergyMode,
-} from './energyManagement';
+} from "./energyManagement";
 import {
   getChaosThresholdMultipliers,
   getActiveChaosStrategy,
   isChaosFrozen,
   applyChaosStrategy,
-} from './chaosStrategy';
+} from "./chaosStrategy";
 import {
   processMilestones,
   cleanupExpiredBonuses,
   getActiveBonusMultipliers,
   getPermanentBonusesFromMilestones,
-} from './milestones';
+} from "./milestones";
 import {
   getPermanentProductionMultiplier,
   getPermanentClickMultiplier,
   getPermanentEnergyMultiplier,
   getAutoClickerSpeedMultiplier,
   getChaosActionCooldownMultiplier,
-} from './permanentUnlocks';
-import { calculateClickPower, calculateProductionMultiplier } from './upgradeEffects';
-import { getSubstance } from './substances';
-import { calculateInteractionMultipliers } from './interactions';
+} from "./permanentUnlocks";
+import {
+  calculateClickPower,
+  calculateProductionMultiplier,
+} from "./upgradeEffects";
+import { getSubstance } from "./substances";
+import { calculateInteractionMultipliers } from "./interactions";
 
 // ============================================================================
 // AUTO-CLICKER IMPLEMENTATION
 // ============================================================================
 
-export function processAutoClicker(state: ExtendedGameState, deltaTime: number): number {
+export function processAutoClicker(
+  state: ExtendedGameState,
+  deltaTime: number,
+): number {
   if (!state.autoClickerActive || state.autoClickerLevel === 0) {
     return 0;
   }
@@ -86,11 +96,17 @@ export function processAutoClicker(state: ExtendedGameState, deltaTime: number):
     const clickPower = calculateClickPower(state);
     const energyMultiplier = getEnergyClickMultiplier(state);
     const permanentMultiplier = getPermanentClickMultiplier(state);
-    const { clickMultiplier: bonusMultiplier } = getActiveBonusMultipliers(state);
-    const { clickBonus: milestoneBonus } = getPermanentBonusesFromMilestones(state);
+    const { clickMultiplier: bonusMultiplier } =
+      getActiveBonusMultipliers(state);
+    const { clickBonus: milestoneBonus } =
+      getPermanentBonusesFromMilestones(state);
 
     const totalClickPower =
-      clickPower * energyMultiplier * permanentMultiplier * bonusMultiplier * (1 + milestoneBonus / 100);
+      clickPower *
+      energyMultiplier *
+      permanentMultiplier *
+      bonusMultiplier *
+      (1 + milestoneBonus / 100);
 
     const vibesGained = totalClickPower * wholeClicks;
     state.vibes += vibesGained;
@@ -118,7 +134,10 @@ export function processAutoClicker(state: ExtendedGameState, deltaTime: number):
 // ENERGY SYSTEM INTEGRATION
 // ============================================================================
 
-export function processEnergySystem(state: ExtendedGameState, deltaTime: number): void {
+export function processEnergySystem(
+  state: ExtendedGameState,
+  deltaTime: number,
+): void {
   const dt = deltaTime / 1000;
 
   // Calculate energy regeneration with new system (includes drain)
@@ -126,7 +145,8 @@ export function processEnergySystem(state: ExtendedGameState, deltaTime: number)
   const permanentMultiplier = getPermanentEnergyMultiplier(state);
   const chaosMultipliers = getChaosThresholdMultipliers(state);
 
-  const totalEnergyRegen = energyRegen * permanentMultiplier * chaosMultipliers.energyRegenMultiplier;
+  const totalEnergyRegen =
+    energyRegen * permanentMultiplier * chaosMultipliers.energyRegenMultiplier;
 
   // Apply regen/drain
   state.energy += totalEnergyRegen * dt;
@@ -150,7 +170,7 @@ export function processEnergySystem(state: ExtendedGameState, deltaTime: number)
   for (const boosterId in state.energyBoosterCooldowns) {
     state.energyBoosterCooldowns[boosterId] = Math.max(
       0,
-      state.energyBoosterCooldowns[boosterId] - dt
+      state.energyBoosterCooldowns[boosterId] - dt,
     );
   }
 }
@@ -159,7 +179,10 @@ export function processEnergySystem(state: ExtendedGameState, deltaTime: number)
 // CHAOS SYSTEM INTEGRATION
 // ============================================================================
 
-export function processChaosSystem(state: ExtendedGameState, deltaTime: number): void {
+export function processChaosSystem(
+  state: ExtendedGameState,
+  deltaTime: number,
+): void {
   const dt = deltaTime / 1000;
 
   // Apply chaos strategy effects
@@ -188,7 +211,7 @@ export function processChaosSystem(state: ExtendedGameState, deltaTime: number):
   for (const actionId in state.chaosActionCooldowns) {
     state.chaosActionCooldowns[actionId] = Math.max(
       0,
-      state.chaosActionCooldowns[actionId] - dt * cooldownMultiplier
+      state.chaosActionCooldowns[actionId] - dt * cooldownMultiplier,
     );
   }
 }
@@ -208,10 +231,12 @@ export function getTotalProductionMultiplier(state: ExtendedGameState): number {
   const permanentMultiplier = getPermanentProductionMultiplier(state);
 
   // Active bonus multiplier (from milestones, boosters, etc.)
-  const { productionMultiplier: bonusMultiplier } = getActiveBonusMultipliers(state);
+  const { productionMultiplier: bonusMultiplier } =
+    getActiveBonusMultipliers(state);
 
   // Milestone permanent bonus
-  const { productionBonus: milestoneBonus } = getPermanentBonusesFromMilestones(state);
+  const { productionBonus: milestoneBonus } =
+    getPermanentBonusesFromMilestones(state);
 
   return (
     energyModeMultiplier *
@@ -228,7 +253,7 @@ export function getTotalProductionMultiplier(state: ExtendedGameState): number {
 
 export function calculateOfflineProgress(
   state: ExtendedGameState,
-  timeAway: number
+  timeAway: number,
 ): {
   vibesGained: number;
   timeProcessed: number;
@@ -268,7 +293,7 @@ export function claimOfflineProgress(state: ExtendedGameState): void {
   state.log.push({
     timestamp: state.timeRemaining,
     message: `💤 Welcome back! Earned ${Math.floor(vibesGained).toLocaleString()} vibes while away`,
-    type: 'achievement',
+    type: "achievement",
   });
 
   state.offlineProgressPending.claimed = true;
@@ -278,7 +303,10 @@ export function claimOfflineProgress(state: ExtendedGameState): void {
 // MAIN INTEGRATION FUNCTION
 // ============================================================================
 
-export function processProgressionSystems(state: GameState, deltaTime: number): GameState {
+export function processProgressionSystems(
+  state: GameState,
+  deltaTime: number,
+): GameState {
   // Upgrade to extended state if needed
   const extendedState = isExtendedGameState(state)
     ? state
@@ -306,14 +334,14 @@ export function processProgressionSystems(state: GameState, deltaTime: number): 
   if (extendedState.buildSwapCooldown > 0) {
     extendedState.buildSwapCooldown = Math.max(
       0,
-      extendedState.buildSwapCooldown - deltaTime / 1000
+      extendedState.buildSwapCooldown - deltaTime / 1000,
     );
   }
 
   // Update max combo statistic
   extendedState.statistics.highestCombo = Math.max(
     extendedState.statistics.highestCombo,
-    extendedState.maxCombo
+    extendedState.maxCombo,
   );
 
   return extendedState;
@@ -336,7 +364,10 @@ function calculateVibesPerSecondQuick(state: GameState): number {
     if (!substance) continue;
 
     // Apply per-substance multipliers (upgrades + prestige)
-    const productionMultiplier = calculateProductionMultiplier(state, substanceId);
+    const productionMultiplier = calculateProductionMultiplier(
+      state,
+      substanceId,
+    );
     totalVibesPerSec += substance.baseVibes * count * productionMultiplier;
   }
 
@@ -346,7 +377,9 @@ function calculateVibesPerSecondQuick(state: GameState): number {
 
   // Apply progression system multipliers if extended state
   if (isExtendedGameState(state)) {
-    const progressionMultiplier = getTotalProductionMultiplier(state as ExtendedGameState);
+    const progressionMultiplier = getTotalProductionMultiplier(
+      state as ExtendedGameState,
+    );
     totalVibesPerSec *= progressionMultiplier;
   }
 
@@ -363,7 +396,10 @@ export function checkOfflineProgress(state: ExtendedGameState): void {
 
   // Only calculate offline progress if away for more than 5 minutes
   if (timeSinceLastActive > 300 && !state.offlineProgressPending) {
-    const offlineProgress = calculateOfflineProgress(state, timeSinceLastActive);
+    const offlineProgress = calculateOfflineProgress(
+      state,
+      timeSinceLastActive,
+    );
 
     state.offlineProgressPending = {
       vibesGained: offlineProgress.vibesGained,
@@ -377,9 +413,15 @@ export function checkOfflineProgress(state: ExtendedGameState): void {
 // BUILD/LOADOUT SYSTEM
 // ============================================================================
 
-export function tickBuildSwapCooldown(state: ExtendedGameState, deltaTime: number): void {
+export function tickBuildSwapCooldown(
+  state: ExtendedGameState,
+  deltaTime: number,
+): void {
   if (state.buildSwapCooldown > 0) {
-    state.buildSwapCooldown = Math.max(0, state.buildSwapCooldown - deltaTime / 1000);
+    state.buildSwapCooldown = Math.max(
+      0,
+      state.buildSwapCooldown - deltaTime / 1000,
+    );
   }
 }
 
@@ -389,9 +431,11 @@ export function tickBuildSwapCooldown(state: ExtendedGameState, deltaTime: numbe
 
 export function updateStatistics(state: ExtendedGameState): void {
   // Count unique substances
-  const uniqueSubstances = Object.values(state.substances).filter((count) => count > 0).length;
+  const uniqueSubstances = Object.values(state.substances).filter(
+    (count) => count > 0,
+  ).length;
   state.statistics.maxSimultaneousSubstances = Math.max(
     state.statistics.maxSimultaneousSubstances,
-    uniqueSubstances
+    uniqueSubstances,
   );
 }

@@ -1,6 +1,10 @@
-import { GameState } from '../game/types';
-import { formatNumber } from '../utils/formatter';
-import { calculateExperience, getKnowledgeLevel, getNextLevelInfo } from '../game/prestige';
+import { GameState } from "../game/types";
+import { formatNumber } from "../utils/formatter";
+import {
+  calculateExperience,
+  getKnowledgeLevel,
+  getNextLevelInfo,
+} from "../game/prestige";
 
 interface NightEndModalProps {
   state: GameState;
@@ -21,16 +25,17 @@ export function NightEndModal({ state, onNewNight }: NightEndModalProps) {
   return (
     <div className="modal-overlay">
       <div className="modal night-end-modal">
-        <h2>{state.hasCollapsed ? '💀 COLLAPSE' : '🌙 NIGHT COMPLETE'}</h2>
+        <h2>{state.hasCollapsed ? "💀 COLLAPSE" : "🌙 NIGHT COMPLETE"}</h2>
 
         {canRemember ? (
           <div className="modal-content">
             <div className="day-transition">
               <h3>☀️ Day {nextDay} Begins</h3>
               <p className="day-message">
-                {nextDay === 1 && 'The night is over. The cycle continues.'}
-                {nextDay === 2 && 'Night 2 awaits. You know what you\'re doing now.'}
-                {nextDay === 3 && 'Third night. The vibes are accumulating.'}
+                {nextDay === 1 && "The night is over. The cycle continues."}
+                {nextDay === 2 &&
+                  "Night 2 awaits. You know what you're doing now."}
+                {nextDay === 3 && "Third night. The vibes are accumulating."}
                 {nextDay >= 4 && `Night ${nextDay}. How far can you push it?`}
               </p>
             </div>
@@ -42,7 +47,9 @@ export function NightEndModal({ state, onNewNight }: NightEndModalProps) {
 
             <div className="summary-stat">
               <span>Lifetime Vibes Earned:</span>
-              <span className="stat-value">{formatNumber(state.totalVibesEarned)}</span>
+              <span className="stat-value">
+                {formatNumber(state.totalVibesEarned)}
+              </span>
             </div>
 
             {state.hasCollapsed && (
@@ -94,7 +101,9 @@ export function NightEndModal({ state, onNewNight }: NightEndModalProps) {
             </div>
             <div className="summary-stat">
               <span>Experience Gained:</span>
-              <span className="stat-value">+{Math.floor(xpGained * 0.5)} XP (reduced due to memory loss)</span>
+              <span className="stat-value">
+                +{Math.floor(xpGained * 0.5)} XP (reduced due to memory loss)
+              </span>
             </div>
           </div>
         )}

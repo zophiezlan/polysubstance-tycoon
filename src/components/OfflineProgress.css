@@ -26,7 +26,7 @@
 }
 
 .offline-progress-modal::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -165,7 +165,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -174,11 +175,14 @@
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
   }
   50% {
-    text-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4);
+    text-shadow:
+      0 0 30px rgba(0, 255, 136, 0.8),
+      0 0 40px rgba(0, 255, 136, 0.4);
   }
 }
 

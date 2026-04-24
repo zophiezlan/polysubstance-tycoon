@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { ExtendedGameState } from '../game/progressionTypes';
+import { useState } from "react";
+import { ExtendedGameState } from "../game/progressionTypes";
 import {
   getAvailableEnergyModes,
   getActiveEnergyMode,
-} from '../game/energyManagement';
+} from "../game/energyManagement";
 import {
   getAvailableChaosStrategies,
   getActiveChaosStrategy,
   getCurrentChaosThreshold,
-} from '../game/chaosStrategy';
-import '../styles/StrategySelector.css';
+} from "../game/chaosStrategy";
+import "../styles/StrategySelector.css";
 
 interface StrategySelectorProps {
   gameState: ExtendedGameState;
@@ -32,7 +32,10 @@ export function StrategySelector({
   const currentChaosThreshold = getCurrentChaosThreshold(gameState.chaos);
 
   // Don't show if only default options available
-  if (availableEnergyModes.length <= 1 && availableChaosStrategies.length <= 1) {
+  if (
+    availableEnergyModes.length <= 1 &&
+    availableChaosStrategies.length <= 1
+  ) {
     return null;
   }
 
@@ -52,52 +55,88 @@ export function StrategySelector({
                 <div className="strategy-current">{activeEnergyMode.name}</div>
               </div>
             </div>
-            <span className="expand-icon">{showEnergyModes ? '▼' : '▶'}</span>
+            <span className="expand-icon">{showEnergyModes ? "▼" : "▶"}</span>
           </div>
 
           {showEnergyModes && (
             <div className="strategy-options">
-              {availableEnergyModes.map(mode => {
+              {availableEnergyModes.map((mode) => {
                 const isActive = mode.id === gameState.activeEnergyMode;
                 const isLocked = !mode.unlockCondition(gameState);
 
                 return (
                   <button
                     key={mode.id}
-                    className={`strategy-option ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
+                    className={`strategy-option ${isActive ? "active" : ""} ${isLocked ? "locked" : ""}`}
                     onClick={() => !isLocked && onSwitchEnergyMode(mode.id)}
                     disabled={isActive || isLocked}
                   >
                     <div className="option-header">
                       <span className="option-name">{mode.name}</span>
                       {isActive && <span className="active-badge">ACTIVE</span>}
-                      {isLocked && <span className="locked-badge">🔒 LOCKED</span>}
+                      {isLocked && (
+                        <span className="locked-badge">🔒 LOCKED</span>
+                      )}
                     </div>
                     <div className="option-description">{mode.description}</div>
                     <div className="option-effects">
                       {mode.effects.energyRegenMultiplier !== 1.0 && (
-                        <span className={mode.effects.energyRegenMultiplier > 1 ? 'positive' : 'negative'}>
-                          Energy Regen: {(mode.effects.energyRegenMultiplier * 100).toFixed(0)}%
+                        <span
+                          className={
+                            mode.effects.energyRegenMultiplier > 1
+                              ? "positive"
+                              : "negative"
+                          }
+                        >
+                          Energy Regen:{" "}
+                          {(mode.effects.energyRegenMultiplier * 100).toFixed(
+                            0,
+                          )}
+                          %
                         </span>
                       )}
                       {mode.effects.clickPowerMultiplier !== 1.0 && (
-                        <span className={mode.effects.clickPowerMultiplier > 1 ? 'positive' : 'negative'}>
-                          Click Power: {(mode.effects.clickPowerMultiplier * 100).toFixed(0)}%
+                        <span
+                          className={
+                            mode.effects.clickPowerMultiplier > 1
+                              ? "positive"
+                              : "negative"
+                          }
+                        >
+                          Click Power:{" "}
+                          {(mode.effects.clickPowerMultiplier * 100).toFixed(0)}
+                          %
                         </span>
                       )}
-                      {mode.effects.productionMultiplier && mode.effects.productionMultiplier !== 1.0 && (
-                        <span className={mode.effects.productionMultiplier > 1 ? 'positive' : 'negative'}>
-                          Production: {(mode.effects.productionMultiplier * 100).toFixed(0)}%
-                        </span>
-                      )}
+                      {mode.effects.productionMultiplier &&
+                        mode.effects.productionMultiplier !== 1.0 && (
+                          <span
+                            className={
+                              mode.effects.productionMultiplier > 1
+                                ? "positive"
+                                : "negative"
+                            }
+                          >
+                            Production:{" "}
+                            {(mode.effects.productionMultiplier * 100).toFixed(
+                              0,
+                            )}
+                            %
+                          </span>
+                        )}
                       {mode.effects.autoClickerSpeedMultiplier && (
                         <span className="positive">
-                          Auto-Clicker: {(mode.effects.autoClickerSpeedMultiplier * 100).toFixed(0)}%
+                          Auto-Clicker:{" "}
+                          {(
+                            mode.effects.autoClickerSpeedMultiplier * 100
+                          ).toFixed(0)}
+                          %
                         </span>
                       )}
                       {mode.effects.energyHarvestRate && (
                         <span className="special">
-                          Energy Harvest: {mode.effects.energyHarvestRate}× at {mode.effects.energyHarvestThreshold}+ energy
+                          Energy Harvest: {mode.effects.energyHarvestRate}× at{" "}
+                          {mode.effects.energyHarvestThreshold}+ energy
                         </span>
                       )}
                     </div>
@@ -125,47 +164,89 @@ export function StrategySelector({
                 </div>
               </div>
             </div>
-            <span className="expand-icon">{showChaosStrategies ? '▼' : '▶'}</span>
+            <span className="expand-icon">
+              {showChaosStrategies ? "▼" : "▶"}
+            </span>
           </div>
 
           {showChaosStrategies && (
             <div className="strategy-options">
               <div className="chaos-threshold-info">
-                <div className="threshold-name">{currentChaosThreshold.name}</div>
-                <div className="threshold-description">{currentChaosThreshold.description}</div>
+                <div className="threshold-name">
+                  {currentChaosThreshold.name}
+                </div>
+                <div className="threshold-description">
+                  {currentChaosThreshold.description}
+                </div>
               </div>
 
-              {availableChaosStrategies.map(strategy => {
+              {availableChaosStrategies.map((strategy) => {
                 const isActive = strategy.id === gameState.activeChaosStrategy;
                 const isLocked = !strategy.unlockCondition(gameState);
 
                 return (
                   <button
                     key={strategy.id}
-                    className={`strategy-option ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
-                    onClick={() => !isLocked && onSwitchChaosStrategy(strategy.id)}
+                    className={`strategy-option ${isActive ? "active" : ""} ${isLocked ? "locked" : ""}`}
+                    onClick={() =>
+                      !isLocked && onSwitchChaosStrategy(strategy.id)
+                    }
                     disabled={isActive || isLocked}
                   >
                     <div className="option-header">
                       <span className="option-name">{strategy.name}</span>
                       {isActive && <span className="active-badge">ACTIVE</span>}
-                      {isLocked && <span className="locked-badge">🔒 LOCKED</span>}
+                      {isLocked && (
+                        <span className="locked-badge">🔒 LOCKED</span>
+                      )}
                     </div>
-                    <div className="option-description">{strategy.description}</div>
+                    <div className="option-description">
+                      {strategy.description}
+                    </div>
                     <div className="option-effects">
                       {strategy.effects.chaosThresholdMultiplier !== 1.0 && (
-                        <span className={strategy.effects.chaosThresholdMultiplier > 1 ? 'positive' : 'negative'}>
-                          Threshold Bonus: {(strategy.effects.chaosThresholdMultiplier * 100).toFixed(0)}%
+                        <span
+                          className={
+                            strategy.effects.chaosThresholdMultiplier > 1
+                              ? "positive"
+                              : "negative"
+                          }
+                        >
+                          Threshold Bonus:{" "}
+                          {(
+                            strategy.effects.chaosThresholdMultiplier * 100
+                          ).toFixed(0)}
+                          %
                         </span>
                       )}
                       {strategy.effects.chaosDecayMultiplier !== 1.0 && (
-                        <span className={strategy.effects.chaosDecayMultiplier < 1 ? 'positive' : 'negative'}>
-                          Decay Rate: {(strategy.effects.chaosDecayMultiplier * 100).toFixed(0)}%
+                        <span
+                          className={
+                            strategy.effects.chaosDecayMultiplier < 1
+                              ? "positive"
+                              : "negative"
+                          }
+                        >
+                          Decay Rate:{" "}
+                          {(
+                            strategy.effects.chaosDecayMultiplier * 100
+                          ).toFixed(0)}
+                          %
                         </span>
                       )}
                       {strategy.effects.chaosGenerationMultiplier !== 1.0 && (
-                        <span className={strategy.effects.chaosGenerationMultiplier > 1 ? 'warning' : 'positive'}>
-                          Generation: {(strategy.effects.chaosGenerationMultiplier * 100).toFixed(0)}%
+                        <span
+                          className={
+                            strategy.effects.chaosGenerationMultiplier > 1
+                              ? "warning"
+                              : "positive"
+                          }
+                        >
+                          Generation:{" "}
+                          {(
+                            strategy.effects.chaosGenerationMultiplier * 100
+                          ).toFixed(0)}
+                          %
                         </span>
                       )}
                       {strategy.effects.chaosCapOverride && (

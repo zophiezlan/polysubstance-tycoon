@@ -3,6 +3,7 @@
 ## Overview
 
 This update adds **massive depth** to the game with multiple interconnected progression systems designed for:
+
 - ✅ **Constant dopamine hits** - Always something to work towards
 - ✅ **Player control** - Make meaningful choices about how to play
 - ✅ **Mathematical soundness** - All systems are balanced and tested
@@ -18,6 +19,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Energy is always auto-gaining, but players can optimize the rate and benefits.
 
 **Energy Modes** (unlocked at 100K vibes):
+
 - **Balanced** - Default, normal bonuses
 - **Conservation** - +50% regen, -25% click power (idle play)
 - **Overdrive** - +100% click, +50% production, -50% regen (active play)
@@ -26,6 +28,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - **Unstable Flux** - 2x everything, but energy swings wildly (Prestige 3+)
 
 **Energy Boosters** (consumable actions):
+
 - ☕ **Espresso Shot** - Instant +30 energy (60s cooldown)
 - 🥤 **Energy Drink** - +3 energy/sec for 20s (120s cooldown)
 - 😴 **Power Nap** - Restore to 100, -10 sleep debt (180s cooldown)
@@ -33,6 +36,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - 🧘 **Zen State** - Balance energy/chaos, +2x production for 30s (240s cooldown)
 
 **Key Features:**
+
 - Energy now affects both click power AND passive production
 - Clear UI showing "+2.3 energy/sec"
 - Always positive, never blocks progress
@@ -44,6 +48,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Chaos is a resource you can strategically manage for benefits.
 
 **Chaos Thresholds** (passive bonuses):
+
 - 0-20: Stable (normal)
 - 21-40: Energized (+15% production)
 - 41-60: Intense (+35% production, +20% click)
@@ -51,6 +56,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - 81-100: Transcendent (+100% production, +75% click, -30% energy, random events!)
 
 **Chaos Actions** (unlockable):
+
 - 💥 **Chaos Release** - Spend 30 chaos for +3x production for 15s
 - 🛡️ **Chaos Shield** - Lock chaos for 60s (no generation or decay)
 - 💰 **Chaos Conversion** - Spend 50 chaos for 100× current vibes/sec
@@ -59,6 +65,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - ☯️ **Perfect Balance** - Set chaos to 50, +10x production for 5s
 
 **Chaos Strategies** (passive modifiers):
+
 - **Stabilizer** - +100% decay, -50% generation (safe play)
 - **Amplifier** - +50% threshold bonuses (maximize gains)
 - **Safe Zone** - Cap chaos at 60 (never volatile)
@@ -72,10 +79,12 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Constant stream of achievements at multiple scales.
 
 **Repeatable Micro-Milestones** (frequent dopamine):
+
 - Every 1K→10K→100K→1M vibes: +5% production for 60s
 - Every 100→1K→10K clicks: +50% click power for 30s
 
 **Major Vibes Milestones** (permanent bonuses):
+
 - 10K: +5% production forever
 - 100K: Unlock Energy Modes (+10% production)
 - 500K: Unlock Chaos Strategies (+15% production)
@@ -85,12 +94,14 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - 1B: Reality Breaker (+250% production, +100% click, +25 insight)
 
 **Collection Milestones:**
+
 - Own 1 of each substance: +10% production
 - Own 10 of each: +25% production, +15% click
 - Max one substance (100): +20% production, unlock specialist upgrades
 - Max all substances: +100% production/click, +10 insight, Singularity Mode
 
 **Special Achievements:**
+
 - 100x combo: +25% click, +1 insight
 - 10 min at 80+ chaos: +15% production
 - 5 prestiges: +30% production, +20% click
@@ -102,6 +113,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Actually works now! Fully integrated into game loop.
 
 **Auto-Clicker Tiers:**
+
 - Level 1: 1 click/sec
 - Level 2: 5 clicks/sec
 - Level 3: 20 clicks/sec
@@ -109,6 +121,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - Level 5: 1000 clicks/sec ("Singularity Clicker")
 
 **Features:**
+
 - Auto-clicks generate combo progress (at 50% rate)
 - Auto-clicks generate chaos (at 50% rate)
 - Affected by energy modes (Automation mode: +100% speed)
@@ -122,30 +135,36 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Spend Insight Points (prestige currency) for permanent benefits.
 
 **Quality of Life:**
+
 - Faster auto-save, quiet mode, hotkey controls, advanced stats
 
 **Build System:**
+
 - Extra build slots (4th, 5th, 6th) - 2/3/5 points
 - Instant build swap (no cooldown) - 5 points
 
 **Automation:**
+
 - Auto-purchase substances - 5 points
 - Auto-maintenance (use actions when critical) - 7 points
 - Enhanced offline progress (50%→75%→100%) - 3 points each
 - Auto-clicker boost (+50%, stackable 5x) - 3 points each
 
 **Starting Bonuses:**
+
 - Fresh start (keep 25%→50%→75%→100% substances) - 5 points each
 - Knowledge retention (+1 starting knowledge, stackable 3x) - 10 points
 - Insight multiplier (+10% insight gain, stackable 5x) - 8 points
 
 **Permanent Boosts:**
+
 - +10% production (stackable 10x) - 5 points
 - +15% click (stackable 10x) - 4 points
 - +20% energy regen (stackable 10x) - 3 points
 - -25% chaos action cooldowns (stackable 4x) - 6 points
 
 **Special Unlocks:**
+
 - Forbidden substances (Prestige 2+) - 15/25 points
 - Transcendence Mode (Prestige 5+)
 
@@ -156,6 +175,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Save and swap substance configurations for different strategies.
 
 **Features:**
+
 - Save current substance counts + energy mode + chaos strategy
 - 3 build slots (unlock more with insight points)
 - Name and annotate builds
@@ -164,6 +184,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - Import/export builds (share with friends!)
 
 **Starter Presets:**
+
 - ⚖️ **Balanced Starter** - Safe and steady
 - 👆 **Active Clicker** - Maximize click power
 - 💤 **Idle Production** - Passive income
@@ -176,12 +197,14 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Reward players who come back.
 
 **Features:**
+
 - Track time away (when tab closed or inactive)
 - Gain up to 4 hours of offline progress (capped)
 - Offline production at 50% efficiency (upgradeable to 100%)
 - "Welcome Back Bonus": +10% production for 10min per hour away (max 60min)
 
 **Achievement:**
+
 - Stay away 8+ hours: +20% production forever, unlock "Idle Master"
 
 ---
@@ -191,6 +214,7 @@ This update adds **massive depth** to the game with multiple interconnected prog
 **Core Principle:** Meaningful decisions that change playstyle, not just "more numbers."
 
 **Specializations:**
+
 - **Active Master** - +200% click, -50% production
 - **Idle Master** - +200% production, -50% click
 - **High/Low Energy Protocol** - Bonuses at specific energy levels
@@ -199,21 +223,25 @@ This update adds **massive depth** to the game with multiple interconnected prog
 - **Full Automation** - Disable manual clicks for +300% auto-clicker
 
 **Substance Specialists:**
+
 - +200% to one substance type, -30% to all others
 - One for each substance category
 
 **Synergies:**
+
 - Stimulant + Research: Both produce +100%
 - Alcohol + Empathogen: Reduce memory crash, +50% both
 - Dissociative + Sedative: Reduce blackout, +50% both
 - Stimulant + Sedative: Convert paradox anxiety into production
 
 **Risk/Reward:**
+
 - **All Or Nothing** - Production swings 50%-300% every 10s (avg +175%)
 - **Burnout Mode** - Lose 5 energy/sec, gain +500% production
 - **Chaos Cascade** - Gain 10 chaos/sec, +20% production per chaos point
 
 **Scaling:**
+
 - **Combo Momentum** - +1% production per combo point
 - **Knowledge is Power** - +20% production per knowledge level
 - **Diversity Bonus** - +15% per substance type owned (max +150%)
@@ -223,14 +251,16 @@ This update adds **massive depth** to the game with multiple interconnected prog
 
 ## 📊 Mathematical Soundness
 
-### Production Multiplier Stack:
+### Production Multiplier Stack
+
 ```
 Total Production = Base × Substance Multipliers × Interaction Multipliers
                    × Energy Mode × Chaos Threshold × Permanent Unlocks
                    × Active Bonuses × Milestone Bonuses
 ```
 
-### Example Calculation (Late Game):
+### Example Calculation (Late Game)
+
 - Base: 100 vibes/sec (from substances)
 - Substance multipliers: 2x (upgrades)
 - Interaction multipliers: 1.5x (combos)
@@ -248,30 +278,35 @@ That's a **43.2x multiplier** from strategic play!
 
 ## 🎯 Player Engagement
 
-### Micro Loop (seconds):
+### Micro Loop (seconds)
+
 - Click for combo build-up
 - Watch energy/chaos meters
 - Use energy boosters or chaos actions
 
-### Short Loop (minutes):
+### Short Loop (minutes)
+
 - Buy substances
 - Purchase upgrades
 - Adjust energy mode or chaos strategy
 - Maintain meters with actions
 
-### Medium Loop (hours):
+### Medium Loop (hours)
+
 - Hit vibe milestones (constant dopamine)
 - Unlock new features (100K, 500K, 1M, 10M)
 - Complete achievements
 - Experiment with different builds
 
-### Long Loop (days):
+### Long Loop (days)
+
 - Max out substances for collection bonuses
 - Complete all upgrades
 - Prestige for insight points
 - Purchase permanent unlocks
 
-### Meta Loop (weeks):
+### Meta Loop (weeks)
+
 - Multiple prestige runs
 - Unlock all specializations
 - Max out permanent boosts
@@ -281,11 +316,13 @@ That's a **43.2x multiplier** from strategic play!
 
 ## 🔧 Integration Points
 
-### Files Modified:
+### Files Modified
+
 - `tick.ts` - Added progression system calls
 - `types.ts` - Extended with `ExtendedGameState`
 
-### Files Created:
+### Files Created
+
 - `progressionTypes.ts` - Type definitions
 - `energyManagement.ts` - Energy modes and boosters
 - `chaosStrategy.ts` - Chaos thresholds and actions
@@ -295,7 +332,8 @@ That's a **43.2x multiplier** from strategic play!
 - `strategicUpgrades.ts` - Special upgrade tiers
 - `progressionIntegration.ts` - Main integration layer
 
-### Next Steps (for UI):
+### Next Steps (for UI)
+
 1. Add Energy Mode selector panel
 2. Add Chaos Strategy selector panel
 3. Add Energy Booster buttons (with cooldown timers)
@@ -333,7 +371,8 @@ That's a **43.2x multiplier** from strategic play!
 
 ## 🎓 For Future Developers
 
-### Adding a New Energy Mode:
+### Adding a New Energy Mode
+
 ```typescript
 // In energyManagement.ts
 newMode: {
@@ -349,7 +388,8 @@ newMode: {
 }
 ```
 
-### Adding a New Milestone:
+### Adding a New Milestone
+
 ```typescript
 // In milestones.ts
 {
@@ -365,7 +405,8 @@ newMode: {
 }
 ```
 
-### Adding a New Chaos Action:
+### Adding a New Chaos Action
+
 ```typescript
 // In chaosStrategy.ts
 newAction: {

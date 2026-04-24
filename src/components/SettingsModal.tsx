@@ -1,5 +1,5 @@
-import { GameState } from '../game/types';
-import { formatNumber, formatTime } from '../utils/formatter';
+import { GameState } from "../game/types";
+import { formatNumber, formatTime } from "../utils/formatter";
 
 interface SettingsModalProps {
   state: GameState;
@@ -11,7 +11,7 @@ interface SettingsModalProps {
   onToggleCompactLog: () => void;
   onToggleLogTimestamps: () => void;
   onToggleLogCorruption: () => void;
-  onChangeFontSize: (size: 'small' | 'default' | 'large') => void;
+  onChangeFontSize: (size: "small" | "default" | "large") => void;
   onReset: () => void;
 }
 
@@ -59,20 +59,20 @@ export function SettingsModal({
               <span>Font Size:</span>
               <div className="font-size-buttons">
                 <button
-                  className={state.fontSize === 'small' ? 'active' : ''}
-                  onClick={() => onChangeFontSize('small')}
+                  className={state.fontSize === "small" ? "active" : ""}
+                  onClick={() => onChangeFontSize("small")}
                 >
                   Small
                 </button>
                 <button
-                  className={state.fontSize === 'default' ? 'active' : ''}
-                  onClick={() => onChangeFontSize('default')}
+                  className={state.fontSize === "default" ? "active" : ""}
+                  onClick={() => onChangeFontSize("default")}
                 >
                   Default
                 </button>
                 <button
-                  className={state.fontSize === 'large' ? 'active' : ''}
-                  onClick={() => onChangeFontSize('large')}
+                  className={state.fontSize === "large" ? "active" : ""}
+                  onClick={() => onChangeFontSize("large")}
                 >
                   Large
                 </button>
@@ -160,9 +160,12 @@ export function SettingsModal({
           <div className="settings-section">
             <h3>Progress</h3>
             <p>
-              Level: {state.knowledgeLevel}<br />
-              Total XP: {state.experience}<br />
-              Nights: {state.nightsCompleted}<br />
+              Level: {state.knowledgeLevel}
+              <br />
+              Total XP: {state.experience}
+              <br />
+              Nights: {state.nightsCompleted}
+              <br />
               Achievements: {state.achievements.length}
             </p>
             <button className="danger-button" onClick={onReset}>
@@ -173,10 +176,14 @@ export function SettingsModal({
           <div className="settings-section">
             <h3>Statistics</h3>
             <p>
-              Total Clicks: {formatNumber(state.totalClicks)}<br />
-              Total Vibes Earned: {formatNumber(state.totalVibesEarned)}<br />
-              Time Played: {formatTime(state.timePlayed)}<br />
-              Highest Vibes/Second: {formatNumber(state.highestVibesPerSecond, 2)}
+              Total Clicks: {formatNumber(state.totalClicks)}
+              <br />
+              Total Vibes Earned: {formatNumber(state.totalVibesEarned)}
+              <br />
+              Time Played: {formatTime(state.timePlayed)}
+              <br />
+              Highest Vibes/Second:{" "}
+              {formatNumber(state.highestVibesPerSecond, 2)}
             </p>
           </div>
         </div>

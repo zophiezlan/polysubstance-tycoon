@@ -1,7 +1,7 @@
 // Milestone System - Constant progression feedback with micro and macro milestones
 
-import { GameState } from './types';
-import { Milestone, ExtendedGameState } from './progressionTypes';
+import { GameState } from "./types";
+import { Milestone, ExtendedGameState } from "./progressionTypes";
 
 // ============================================================================
 // REPEATABLE MICRO-MILESTONES - Frequent dopamine hits
@@ -9,10 +9,10 @@ import { Milestone, ExtendedGameState } from './progressionTypes';
 
 export const REPEATABLE_MILESTONES: Milestone[] = [
   {
-    id: 'vibes_1k',
-    name: '🎉 Thousand Club',
-    description: 'Earned 1,000 vibes milestone!',
-    category: 'vibes',
+    id: "vibes_1k",
+    name: "🎉 Thousand Club",
+    description: "Earned 1,000 vibes milestone!",
+    category: "vibes",
     checkCondition: (state: GameState) => {
       const extended = state as ExtendedGameState;
       const threshold = getNextVibesThreshold(extended.lastMilestoneVibes);
@@ -39,10 +39,10 @@ export const REPEATABLE_MILESTONES: Milestone[] = [
   },
 
   {
-    id: 'clicks_100',
-    name: '👆 Click Master',
-    description: 'Reached 100 clicks milestone!',
-    category: 'clicks',
+    id: "clicks_100",
+    name: "👆 Click Master",
+    description: "Reached 100 clicks milestone!",
+    category: "clicks",
     checkCondition: (state: GameState) => {
       const extended = state as ExtendedGameState;
       const threshold = getNextClickThreshold(extended.lastMilestoneClicks);
@@ -71,10 +71,10 @@ export const REPEATABLE_MILESTONES: Milestone[] = [
 
 export const VIBES_MILESTONES: Milestone[] = [
   {
-    id: 'vibes_10k',
-    name: '💎 Ten Thousand Strong',
-    description: 'Earned 70,000 total vibes. Your operation is growing!',
-    category: 'vibes',
+    id: "vibes_10k",
+    name: "💎 Ten Thousand Strong",
+    description: "Earned 70,000 total vibes. Your operation is growing!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 70000,
     reward: {
       permanentProductionBonus: 5, // +5% forever
@@ -86,79 +86,79 @@ export const VIBES_MILESTONES: Milestone[] = [
   },
 
   {
-    id: 'vibes_100k',
-    name: '⚡ Energy Master',
-    description: 'Earned 700,000 total vibes. Unlocked Energy Modes!',
-    category: 'vibes',
+    id: "vibes_100k",
+    name: "⚡ Energy Master",
+    description: "Earned 700,000 total vibes. Unlocked Energy Modes!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 700000,
     reward: {
       permanentProductionBonus: 10,
-      unlockFeature: 'energy_modes',
+      unlockFeature: "energy_modes",
     },
   },
 
   {
-    id: 'vibes_500k',
-    name: '🎯 Chaos Controller',
-    description: 'Earned 3,500,000 total vibes. Unlocked Chaos Strategies!',
-    category: 'vibes',
+    id: "vibes_500k",
+    name: "🎯 Chaos Controller",
+    description: "Earned 3,500,000 total vibes. Unlocked Chaos Strategies!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 3500000,
     reward: {
       permanentProductionBonus: 15,
-      unlockFeature: 'chaos_strategies',
+      unlockFeature: "chaos_strategies",
     },
   },
 
   {
-    id: 'vibes_1m',
-    name: '🚀 Million Club',
-    description: 'Earned 7,000,000 total vibes! Unlocked Chaos Actions!',
-    category: 'vibes',
+    id: "vibes_1m",
+    name: "🚀 Million Club",
+    description: "Earned 7,000,000 total vibes! Unlocked Chaos Actions!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 7000000,
     reward: {
       permanentProductionBonus: 25,
       permanentClickBonus: 10,
-      unlockFeature: 'chaos_actions',
+      unlockFeature: "chaos_actions",
     },
   },
 
   {
-    id: 'vibes_10m',
-    name: '💼 Corporate Tycoon',
-    description: 'Earned 70,000,000 total vibes! Unlocked Build Presets!',
-    category: 'vibes',
+    id: "vibes_10m",
+    name: "💼 Corporate Tycoon",
+    description: "Earned 70,000,000 total vibes! Unlocked Build Presets!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 70000000,
     reward: {
       permanentProductionBonus: 50,
       permanentClickBonus: 25,
-      unlockFeature: 'build_presets',
+      unlockFeature: "build_presets",
     },
   },
 
   {
-    id: 'vibes_100m',
-    name: '🌟 Prestige Plus',
-    description: 'Earned 700,000,000 total vibes! Unlocked Prestige+ features!',
-    category: 'vibes',
+    id: "vibes_100m",
+    name: "🌟 Prestige Plus",
+    description: "Earned 700,000,000 total vibes! Unlocked Prestige+ features!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 700000000,
     reward: {
       permanentProductionBonus: 100,
       permanentClickBonus: 50,
-      unlockFeature: 'prestige_plus',
+      unlockFeature: "prestige_plus",
       insightPoints: 5,
     },
   },
 
   {
-    id: 'vibes_1b',
-    name: '👑 Reality Breaker',
-    description: 'Earned 7,000,000,000 total vibes. You broke the game!',
-    category: 'vibes',
+    id: "vibes_1b",
+    name: "👑 Reality Breaker",
+    description: "Earned 7,000,000,000 total vibes. You broke the game!",
+    category: "vibes",
     checkCondition: (state) => state.totalVibesEarned >= 7000000000,
     reward: {
       permanentProductionBonus: 250,
       permanentClickBonus: 100,
-      unlockFeature: 'singularity_mode',
+      unlockFeature: "singularity_mode",
       insightPoints: 25,
     },
   },
@@ -170,13 +170,13 @@ export const VIBES_MILESTONES: Milestone[] = [
 
 export const COLLECTION_MILESTONES: Milestone[] = [
   {
-    id: 'own_all_substances',
-    name: '📦 Full Inventory',
-    description: 'Own at least 1 of every substance type.',
-    category: 'collection',
+    id: "own_all_substances",
+    name: "📦 Full Inventory",
+    description: "Own at least 1 of every substance type.",
+    category: "collection",
     checkCondition: (state) => {
       const uniqueSubstances = Object.keys(state.substances).filter(
-        (id) => state.substances[id] > 0
+        (id) => state.substances[id] > 0,
       ).length;
       // Game has 15 total substances (alcohol through void)
       return uniqueSubstances >= 15;
@@ -187,10 +187,10 @@ export const COLLECTION_MILESTONES: Milestone[] = [
   },
 
   {
-    id: 'ten_of_each',
-    name: '📊 Diversified Portfolio',
-    description: 'Own at least 10 of every substance type.',
-    category: 'collection',
+    id: "ten_of_each",
+    name: "📊 Diversified Portfolio",
+    description: "Own at least 10 of every substance type.",
+    category: "collection",
     checkCondition: (state) => {
       const substances = Object.values(state.substances);
       // Must have all 15 substances with at least 10 each
@@ -204,24 +204,24 @@ export const COLLECTION_MILESTONES: Milestone[] = [
   },
 
   {
-    id: 'max_one_substance',
-    name: '🎖️ Specialist',
-    description: 'Max out one substance to 100 units.',
-    category: 'collection',
+    id: "max_one_substance",
+    name: "🎖️ Specialist",
+    description: "Max out one substance to 100 units.",
+    category: "collection",
     checkCondition: (state) => {
       return Object.values(state.substances).some((count) => count >= 100);
     },
     reward: {
       permanentProductionBonus: 20,
-      unlockFeature: 'specialist_upgrades',
+      unlockFeature: "specialist_upgrades",
     },
   },
 
   {
-    id: 'max_all_substances',
-    name: '♾️ Singularity',
-    description: 'Max out ALL substances to 100 units. You are unstoppable!',
-    category: 'collection',
+    id: "max_all_substances",
+    name: "♾️ Singularity",
+    description: "Max out ALL substances to 100 units. You are unstoppable!",
+    category: "collection",
     checkCondition: (state) => {
       const substances = Object.values(state.substances);
       // Must have all 15 substances with at least 100 each
@@ -231,7 +231,7 @@ export const COLLECTION_MILESTONES: Milestone[] = [
     reward: {
       permanentProductionBonus: 100,
       permanentClickBonus: 100,
-      unlockFeature: 'singularity_mode',
+      unlockFeature: "singularity_mode",
       insightPoints: 10,
     },
   },
@@ -243,10 +243,10 @@ export const COLLECTION_MILESTONES: Milestone[] = [
 
 export const SPECIAL_MILESTONES: Milestone[] = [
   {
-    id: 'combo_100',
-    name: '🔥 Combo God',
-    description: 'Achieved a 100x combo streak!',
-    category: 'special',
+    id: "combo_100",
+    name: "🔥 Combo God",
+    description: "Achieved a 100x combo streak!",
+    category: "special",
     checkCondition: (state) => state.maxCombo >= 100,
     reward: {
       permanentClickBonus: 25,
@@ -255,40 +255,40 @@ export const SPECIAL_MILESTONES: Milestone[] = [
   },
 
   {
-    id: 'high_chaos_survivor',
-    name: '💀 Chaos Survivor',
-    description: 'Spent 10 minutes at 80+ chaos without collapsing.',
-    category: 'special',
+    id: "high_chaos_survivor",
+    name: "💀 Chaos Survivor",
+    description: "Spent 10 minutes at 80+ chaos without collapsing.",
+    category: "special",
     checkCondition: (state) => {
       const extended = state as ExtendedGameState;
       return extended.statistics.timeInHighChaos >= 600; // 10 minutes
     },
     reward: {
       permanentProductionBonus: 15,
-      unlockFeature: 'chaos_mastery',
+      unlockFeature: "chaos_mastery",
     },
   },
 
   {
-    id: 'low_energy_grinder',
-    name: '😴 Sleep Fighter',
-    description: 'Spent 10 minutes at 20- energy. You need a break!',
-    category: 'special',
+    id: "low_energy_grinder",
+    name: "😴 Sleep Fighter",
+    description: "Spent 10 minutes at 20- energy. You need a break!",
+    category: "special",
     checkCondition: (state) => {
       const extended = state as ExtendedGameState;
       return extended.statistics.timeInLowEnergy >= 600;
     },
     reward: {
       permanentProductionBonus: 10,
-      unlockFeature: 'energy_mastery',
+      unlockFeature: "energy_mastery",
     },
   },
 
   {
-    id: 'prestige_5',
-    name: '🔄 Veteran Resetter',
-    description: 'Performed 5 prestiges. You know the game well!',
-    category: 'special',
+    id: "prestige_5",
+    name: "🔄 Veteran Resetter",
+    description: "Performed 5 prestiges. You know the game well!",
+    category: "special",
     checkCondition: (state) => {
       const extended = state as ExtendedGameState;
       return extended.prestigeTier >= 5;
@@ -296,15 +296,15 @@ export const SPECIAL_MILESTONES: Milestone[] = [
     reward: {
       permanentProductionBonus: 30,
       permanentClickBonus: 20,
-      unlockFeature: 'veteran_perks',
+      unlockFeature: "veteran_perks",
     },
   },
 
   {
-    id: 'all_upgrades',
-    name: '🛒 Shopaholic',
-    description: 'Purchased every available upgrade. Nothing left to buy!',
-    category: 'special',
+    id: "all_upgrades",
+    name: "🛒 Shopaholic",
+    description: "Purchased every available upgrade. Nothing left to buy!",
+    category: "special",
     checkCondition: (state) => {
       // This needs to check against total upgrades available
       const extended = state as ExtendedGameState;
@@ -318,27 +318,28 @@ export const SPECIAL_MILESTONES: Milestone[] = [
   },
 
   {
-    id: 'perfect_balance',
-    name: '☯️ Zen Master',
-    description: 'Maintained exactly 50 energy and 50 chaos simultaneously for 60 seconds.',
-    category: 'special',
+    id: "perfect_balance",
+    name: "☯️ Zen Master",
+    description:
+      "Maintained exactly 50 energy and 50 chaos simultaneously for 60 seconds.",
+    category: "special",
     checkCondition: (_state) => {
       // This will need special tracking in future update
       return false; // Placeholder
     },
     reward: {
       permanentProductionBonus: 25,
-      unlockFeature: 'zen_perks',
+      unlockFeature: "zen_perks",
       insightPoints: 2,
     },
     hidden: true,
   },
 
   {
-    id: 'idle_overnight',
-    name: '💤 Overnight Success',
-    description: 'Left the game idle for 8+ hours and came back to rewards.',
-    category: 'special',
+    id: "idle_overnight",
+    name: "💤 Overnight Success",
+    description: "Left the game idle for 8+ hours and came back to rewards.",
+    category: "special",
     checkCondition: (state) => {
       const extended = state as ExtendedGameState;
       return (
@@ -349,7 +350,7 @@ export const SPECIAL_MILESTONES: Milestone[] = [
     },
     reward: {
       permanentProductionBonus: 20,
-      unlockFeature: 'idle_master',
+      unlockFeature: "idle_master",
     },
   },
 ];
@@ -374,7 +375,10 @@ export function checkMilestones(state: ExtendedGameState): Milestone[] {
 
   for (const milestone of ALL_MILESTONES) {
     // Skip if already completed (unless repeatable)
-    if (!milestone.repeatable && state.completedMilestones.includes(milestone.id)) {
+    if (
+      !milestone.repeatable &&
+      state.completedMilestones.includes(milestone.id)
+    ) {
       continue;
     }
 
@@ -392,9 +396,15 @@ export function checkMilestones(state: ExtendedGameState): Milestone[] {
   return newlyCompleted;
 }
 
-export function awardMilestone(state: ExtendedGameState, milestone: Milestone): void {
+export function awardMilestone(
+  state: ExtendedGameState,
+  milestone: Milestone,
+): void {
   // Add to completed list (unless repeatable)
-  if (!milestone.repeatable && !state.completedMilestones.includes(milestone.id)) {
+  if (
+    !milestone.repeatable &&
+    !state.completedMilestones.includes(milestone.id)
+  ) {
     state.completedMilestones.push(milestone.id);
   }
 
@@ -429,10 +439,14 @@ export function awardMilestone(state: ExtendedGameState, milestone: Milestone): 
 
   // Update repeatable thresholds
   if (milestone.repeatable) {
-    if (milestone.category === 'vibes' && milestone.nextThreshold) {
-      state.lastMilestoneVibes = milestone.nextThreshold(state.lastMilestoneVibes);
-    } else if (milestone.category === 'clicks' && milestone.nextThreshold) {
-      state.lastMilestoneClicks = milestone.nextThreshold(state.lastMilestoneClicks);
+    if (milestone.category === "vibes" && milestone.nextThreshold) {
+      state.lastMilestoneVibes = milestone.nextThreshold(
+        state.lastMilestoneVibes,
+      );
+    } else if (milestone.category === "clicks" && milestone.nextThreshold) {
+      state.lastMilestoneClicks = milestone.nextThreshold(
+        state.lastMilestoneClicks,
+      );
     }
   }
 
@@ -440,7 +454,7 @@ export function awardMilestone(state: ExtendedGameState, milestone: Milestone): 
   state.log.push({
     timestamp: state.timeRemaining,
     message: `🏆 MILESTONE: ${milestone.name}!`,
-    type: 'achievement',
+    type: "achievement",
   });
 }
 
@@ -458,7 +472,9 @@ export function processMilestones(state: ExtendedGameState): void {
   const timeSinceLastMilestone = now - (state as any).lastMilestoneTime;
   const canAwardRepeatable = timeSinceLastMilestone >= MILESTONE_COOLDOWN;
 
-  const repeatableMilestones = ALL_MILESTONES.filter((milestone) => milestone.repeatable);
+  const repeatableMilestones = ALL_MILESTONES.filter(
+    (milestone) => milestone.repeatable,
+  );
   let totalAwardsThisTick = 0;
 
   for (const milestone of repeatableMilestones) {
@@ -466,7 +482,10 @@ export function processMilestones(state: ExtendedGameState): void {
     if (totalAwardsThisTick >= MAX_BATCH_AWARDS) break; // Prevent floods
 
     let safetyCounter = 0;
-    while (milestone.checkCondition(state) && totalAwardsThisTick < MAX_BATCH_AWARDS) {
+    while (
+      milestone.checkCondition(state) &&
+      totalAwardsThisTick < MAX_BATCH_AWARDS
+    ) {
       awardMilestone(state, milestone);
       (state as any).lastMilestoneTime = now;
       totalAwardsThisTick += 1;
@@ -480,7 +499,8 @@ export function processMilestones(state: ExtendedGameState): void {
   const completed = ALL_MILESTONES.filter((milestone) => {
     if (milestone.repeatable) return false;
     if (state.completedMilestones.includes(milestone.id)) return false;
-    if (milestone.hidden && !state.completedMilestones.includes(milestone.id)) return false;
+    if (milestone.hidden && !state.completedMilestones.includes(milestone.id))
+      return false;
     return milestone.checkCondition(state);
   });
 
@@ -534,20 +554,22 @@ export function getPermanentBonusesFromMilestones(state: ExtendedGameState): {
 // ============================================================================
 
 function getNextVibesThreshold(current: number): number {
-  const milestone = REPEATABLE_MILESTONES.find((m) => m.id === 'vibes_1k');
+  const milestone = REPEATABLE_MILESTONES.find((m) => m.id === "vibes_1k");
   if (!milestone || !milestone.nextThreshold) return current + 1000;
   return milestone.nextThreshold(current);
 }
 
 function getNextClickThreshold(current: number): number {
-  const milestone = REPEATABLE_MILESTONES.find((m) => m.id === 'clicks_100');
+  const milestone = REPEATABLE_MILESTONES.find((m) => m.id === "clicks_100");
   if (!milestone || !milestone.nextThreshold) return current + 100;
   return milestone.nextThreshold(current);
 }
 
 export function cleanupExpiredBonuses(state: ExtendedGameState): void {
   const now = Date.now();
-  state.activeBonuses = state.activeBonuses.filter((bonus) => bonus.expiresAt > now);
+  state.activeBonuses = state.activeBonuses.filter(
+    (bonus) => bonus.expiresAt > now,
+  );
 }
 
 export function getActiveBonusMultipliers(state: ExtendedGameState): {

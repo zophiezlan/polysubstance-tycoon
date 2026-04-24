@@ -35,6 +35,7 @@ npm run build   # Build for production
 ## Features
 
 ### Core Loop
+
 - Click "RUN THE NIGHT" to generate Vibes
 - Purchase substances that passively generate Vibes
 - Balance Energy, Chaos, and hidden Strain meters
@@ -42,6 +43,7 @@ npm run build   # Build for production
 - Complete nights to gain Experience and unlock Knowledge
 
 ### Systems
+
 - **5 substance archetypes** with realistic interaction mechanics
 - **Hidden meters** that unlock as you gain Knowledge
 - **Polysubstance interactions** that multiply risk
@@ -50,6 +52,7 @@ npm run build   # Build for production
 - **Achievement tracking** with satirical feedback
 
 ### Safety Framework
+
 - No dosage amounts, timing schedules, or combination advice
 - Abstracted mechanics (Strain, Collapse) instead of graphic depictions
 - Disclaimer on first load with actual resources
@@ -73,4 +76,4 @@ MIT - Do whatever you want with this, just keep the harm reduction principles in
 
 ---
 
-*"Knowledge is a curse. You understand The Night. It doesn't care."*
+_"Knowledge is a curse. You understand The Night. It doesn't care."_

@@ -1,7 +1,7 @@
 // Save data versioning and validation utilities
 
-import { GameState } from '../game/types';
-import { createInitialState } from '../game/state';
+import { GameState } from "../game/types";
+import { createInitialState } from "../game/state";
 
 export const CURRENT_SAVE_VERSION = 1;
 
@@ -15,23 +15,23 @@ export interface SaveData {
  * Validates that loaded save data has all required fields
  */
 export function validateSaveData(data: any): data is SaveData {
-  if (!data || typeof data !== 'object') {
+  if (!data || typeof data !== "object") {
     return false;
   }
 
   // Check for version field
-  if (typeof data.version !== 'number') {
-    console.warn('Save data missing version field, assuming legacy save');
-    return typeof data.vibes === 'number'; // Legacy format check
+  if (typeof data.version !== "number") {
+    console.warn("Save data missing version field, assuming legacy save");
+    return typeof data.vibes === "number"; // Legacy format check
   }
 
   // Version-specific validation
   if (data.version === 1) {
     return (
-      typeof data.timestamp === 'number' &&
+      typeof data.timestamp === "number" &&
       data.state &&
-      typeof data.state.vibes === 'number' &&
-      typeof data.state.energy === 'number'
+      typeof data.state.vibes === "number" &&
+      typeof data.state.energy === "number"
     );
   }
 
@@ -44,7 +44,7 @@ export function validateSaveData(data: any): data is SaveData {
 export function migrateSaveData(data: any): GameState {
   // Legacy format (no version field) - treat as version 0
   if (!data.version) {
-    console.log('Migrating legacy save data to version 1');
+    console.log("Migrating legacy save data to version 1");
     return migrateLegacyToV1(data);
   }
 
@@ -100,24 +100,57 @@ export function sanitizeGameState(state: GameState): GameState {
     ...state,
     // Clamp numeric values to valid ranges
     vibes: Math.max(0, isFinite(state.vibes) ? state.vibes : 0),
-    energy: Math.max(0, Math.min(100, isFinite(state.energy) ? state.energy : 100)),
+    energy: Math.max(
+      0,
+      Math.min(100, isFinite(state.energy) ? state.energy : 100),
+    ),
     chaos: Math.max(0, Math.min(100, isFinite(state.chaos) ? state.chaos : 30)),
-    confidence: Math.max(0, Math.min(100, isFinite(state.confidence) ? state.confidence : 0)),
-    timeRemaining: Math.max(0, isFinite(state.timeRemaining) ? state.timeRemaining : 3600),
+    confidence: Math.max(
+      0,
+      Math.min(100, isFinite(state.confidence) ? state.confidence : 0),
+    ),
+    timeRemaining: Math.max(
+      0,
+      isFinite(state.timeRemaining) ? state.timeRemaining : 3600,
+    ),
     strain: Math.max(0, isFinite(state.strain) ? state.strain : 0),
-    hydrationDebt: Math.max(0, isFinite(state.hydrationDebt) ? state.hydrationDebt : 0),
+    hydrationDebt: Math.max(
+      0,
+      isFinite(state.hydrationDebt) ? state.hydrationDebt : 0,
+    ),
     sleepDebt: Math.max(0, isFinite(state.sleepDebt) ? state.sleepDebt : 0),
-    memoryIntegrity: Math.max(0, Math.min(100, isFinite(state.memoryIntegrity) ? state.memoryIntegrity : 100)),
+    memoryIntegrity: Math.max(
+      0,
+      Math.min(
+        100,
+        isFinite(state.memoryIntegrity) ? state.memoryIntegrity : 100,
+      ),
+    ),
     // Ensure arrays are arrays
     upgrades: Array.isArray(state.upgrades) ? state.upgrades : [],
     achievements: Array.isArray(state.achievements) ? state.achievements : [],
-    unlockedFeatures: Array.isArray(state.unlockedFeatures) ? state.unlockedFeatures : [],
-    groupChatMessages: Array.isArray(state.groupChatMessages) ? state.groupChatMessages : [],
-    organComplaints: Array.isArray(state.organComplaints) ? state.organComplaints : [],
+    unlockedFeatures: Array.isArray(state.unlockedFeatures)
+      ? state.unlockedFeatures
+      : [],
+    groupChatMessages: Array.isArray(state.groupChatMessages)
+      ? state.groupChatMessages
+      : [],
+    organComplaints: Array.isArray(state.organComplaints)
+      ? state.organComplaints
+      : [],
     log: Array.isArray(state.log) ? state.log : [],
     // Ensure objects are objects
-    substances: typeof state.substances === 'object' && state.substances ? state.substances : {},
-    actionCooldowns: typeof state.actionCooldowns === 'object' && state.actionCooldowns ? state.actionCooldowns : {},
-    ritualProgress: typeof state.ritualProgress === 'object' && state.ritualProgress ? state.ritualProgress : {},
+    substances:
+      typeof state.substances === "object" && state.substances
+        ? state.substances
+        : {},
+    actionCooldowns:
+      typeof state.actionCooldowns === "object" && state.actionCooldowns
+        ? state.actionCooldowns
+        : {},
+    ritualProgress:
+      typeof state.ritualProgress === "object" && state.ritualProgress
+        ? state.ritualProgress
+        : {},
   };
 }

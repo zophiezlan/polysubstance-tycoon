@@ -1,7 +1,12 @@
 // Chaos Strategy System - Risk/reward mechanics with player control
 
-import { GameState } from './types';
-import { ChaosThreshold, ChaosAction, ChaosStrategy, ExtendedGameState } from './progressionTypes';
+import { GameState } from "./types";
+import {
+  ChaosThreshold,
+  ChaosAction,
+  ChaosStrategy,
+  ExtendedGameState,
+} from "./progressionTypes";
 
 // ============================================================================
 // CHAOS THRESHOLDS - Passive bonuses based on current chaos level
@@ -11,8 +16,8 @@ export const CHAOS_THRESHOLDS: ChaosThreshold[] = [
   {
     min: 0,
     max: 20,
-    name: '😌 Stable',
-    description: 'Low chaos, stable operation. Normal gameplay.',
+    name: "😌 Stable",
+    description: "Low chaos, stable operation. Normal gameplay.",
     effects: {
       productionMultiplier: 1.0,
       clickPowerMultiplier: 1.0,
@@ -22,8 +27,8 @@ export const CHAOS_THRESHOLDS: ChaosThreshold[] = [
   {
     min: 21,
     max: 40,
-    name: '⚡ Energized',
-    description: 'Moderate chaos brings focus. +15% production.',
+    name: "⚡ Energized",
+    description: "Moderate chaos brings focus. +15% production.",
     effects: {
       productionMultiplier: 1.15,
       clickPowerMultiplier: 1.0,
@@ -33,8 +38,8 @@ export const CHAOS_THRESHOLDS: ChaosThreshold[] = [
   {
     min: 41,
     max: 60,
-    name: '🔥 Intense',
-    description: 'High chaos, high output! +35% production, +20% click power.',
+    name: "🔥 Intense",
+    description: "High chaos, high output! +35% production, +20% click power.",
     effects: {
       productionMultiplier: 1.35,
       clickPowerMultiplier: 1.2,
@@ -44,8 +49,9 @@ export const CHAOS_THRESHOLDS: ChaosThreshold[] = [
   {
     min: 61,
     max: 80,
-    name: '⚠️ Volatile',
-    description: 'Dangerous levels! +60% production, +40% click power, -15% energy regen.',
+    name: "⚠️ Volatile",
+    description:
+      "Dangerous levels! +60% production, +40% click power, -15% energy regen.",
     effects: {
       productionMultiplier: 1.6,
       clickPowerMultiplier: 1.4,
@@ -55,13 +61,14 @@ export const CHAOS_THRESHOLDS: ChaosThreshold[] = [
   {
     min: 81,
     max: 100,
-    name: '💀 Transcendent',
-    description: 'Reality bends! +100% production, +75% click power, -30% energy regen. Random events!',
+    name: "💀 Transcendent",
+    description:
+      "Reality bends! +100% production, +75% click power, -30% energy regen. Random events!",
     effects: {
       productionMultiplier: 2.0,
       clickPowerMultiplier: 1.75,
       energyRegenMultiplier: 0.7,
-      specialEffect: 'random_events',
+      specialEffect: "random_events",
     },
   },
 ];
@@ -72,9 +79,10 @@ export const CHAOS_THRESHOLDS: ChaosThreshold[] = [
 
 export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
   chaosRelease: {
-    id: 'chaosRelease',
-    name: '💥 Chaos Release',
-    description: 'Spend 30 chaos for +3x production for 15 seconds. (30s cooldown)',
+    id: "chaosRelease",
+    name: "💥 Chaos Release",
+    description:
+      "Spend 30 chaos for +3x production for 15 seconds. (30s cooldown)",
     cooldown: 30,
     chaosCost: 30,
     unlockCondition: (state: GameState) => state.totalVibesEarned >= 1000000,
@@ -84,44 +92,46 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
       state.chaos = Math.max(0, state.chaos - 30);
       const extended = state as ExtendedGameState;
       extended.activeBonuses.push({
-        id: 'chaos_release_' + Date.now(),
-        name: 'Chaos Release',
+        id: "chaos_release_" + Date.now(),
+        name: "Chaos Release",
         productionMultiplier: 3.0,
         expiresAt: Date.now() + 15000, // 15 seconds
       });
       state.log.push({
         timestamp: state.timeRemaining,
-        message: '💥 Chaos Released! -30 chaos, +3x production for 15s',
-        type: 'info',
+        message: "💥 Chaos Released! -30 chaos, +3x production for 15s",
+        type: "info",
       });
     },
   },
 
   chaosShield: {
-    id: 'chaosShield',
-    name: '🛡️ Chaos Shield',
-    description: 'Lock chaos at current level for 60 seconds. No generation or decay. (120s cooldown)',
+    id: "chaosShield",
+    name: "🛡️ Chaos Shield",
+    description:
+      "Lock chaos at current level for 60 seconds. No generation or decay. (120s cooldown)",
     cooldown: 120,
     unlockCondition: (state: GameState) => state.totalVibesEarned >= 500000,
     apply: (state: GameState) => {
       const extended = state as ExtendedGameState;
       extended.activeBonuses.push({
-        id: 'chaos_shield_' + Date.now(),
-        name: 'Chaos Shield',
+        id: "chaos_shield_" + Date.now(),
+        name: "Chaos Shield",
         expiresAt: Date.now() + 60000, // 60 seconds
       });
       state.log.push({
         timestamp: state.timeRemaining,
-        message: '🛡️ Chaos Shield active! Chaos locked for 60s',
-        type: 'info',
+        message: "🛡️ Chaos Shield active! Chaos locked for 60s",
+        type: "info",
       });
     },
   },
 
   chaosConversion: {
-    id: 'chaosConversion',
-    name: '💰 Chaos Conversion',
-    description: 'Spend 50 chaos to gain vibes equal to 100× your current vibes/sec. (90s cooldown)',
+    id: "chaosConversion",
+    name: "💰 Chaos Conversion",
+    description:
+      "Spend 50 chaos to gain vibes equal to 100× your current vibes/sec. (90s cooldown)",
     cooldown: 90,
     chaosCost: 50,
     unlockCondition: (state: GameState) => state.totalVibesEarned >= 2500000,
@@ -141,15 +151,16 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
       state.log.push({
         timestamp: state.timeRemaining,
         message: `💰 Chaos Converted! -50 chaos, +${Math.floor(bonus).toLocaleString()} vibes`,
-        type: 'achievement',
+        type: "achievement",
       });
     },
   },
 
   chaosSurge: {
-    id: 'chaosSurge',
-    name: '⚡ Chaos Surge',
-    description: 'Gain +30 chaos instantly, get +5x click power for 10 seconds. (60s cooldown)',
+    id: "chaosSurge",
+    name: "⚡ Chaos Surge",
+    description:
+      "Gain +30 chaos instantly, get +5x click power for 10 seconds. (60s cooldown)",
     cooldown: 60,
     chaosGain: 30,
     unlockCondition: (state: GameState) => state.totalVibesEarned >= 100000,
@@ -157,31 +168,32 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
       state.chaos = Math.min(100, state.chaos + 30);
       const extended = state as ExtendedGameState;
       extended.activeBonuses.push({
-        id: 'chaos_surge_' + Date.now(),
-        name: 'Chaos Surge',
+        id: "chaos_surge_" + Date.now(),
+        name: "Chaos Surge",
         clickMultiplier: 5.0,
         expiresAt: Date.now() + 10000, // 10 seconds
       });
       state.log.push({
         timestamp: state.timeRemaining,
-        message: '⚡ Chaos Surge! +30 chaos, +5x clicks for 10s',
-        type: 'warning',
+        message: "⚡ Chaos Surge! +30 chaos, +5x clicks for 10s",
+        type: "warning",
       });
     },
   },
 
   chaosHarvest: {
-    id: 'chaosHarvest',
-    name: '🌪️ Chaos Harvest',
-    description: 'Spend all chaos above 50. Gain +1% production for 120s per chaos spent. (180s cooldown)',
+    id: "chaosHarvest",
+    name: "🌪️ Chaos Harvest",
+    description:
+      "Spend all chaos above 50. Gain +1% production for 120s per chaos spent. (180s cooldown)",
     cooldown: 180,
     unlockCondition: (state: GameState) => state.totalVibesEarned >= 10000000,
     apply: (state: GameState) => {
       if (state.chaos <= 50) {
         state.log.push({
           timestamp: state.timeRemaining,
-          message: '🌪️ Chaos Harvest failed: Need chaos > 50',
-          type: 'warning',
+          message: "🌪️ Chaos Harvest failed: Need chaos > 50",
+          type: "warning",
         });
         return;
       }
@@ -192,8 +204,8 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
       const bonusMultiplier = 1 + chaosSpent * 0.01; // +1% per chaos
       const extended = state as ExtendedGameState;
       extended.activeBonuses.push({
-        id: 'chaos_harvest_' + Date.now(),
-        name: 'Chaos Harvest',
+        id: "chaos_harvest_" + Date.now(),
+        name: "Chaos Harvest",
         productionMultiplier: bonusMultiplier,
         expiresAt: Date.now() + 120000, // 120 seconds
       });
@@ -201,30 +213,32 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
       state.log.push({
         timestamp: state.timeRemaining,
         message: `🌪️ Chaos Harvested! -${chaosSpent} chaos, +${Math.floor((bonusMultiplier - 1) * 100)}% production for 2 minutes`,
-        type: 'achievement',
+        type: "achievement",
       });
     },
   },
 
   perfectBalance: {
-    id: 'perfectBalance',
-    name: '☯️ Perfect Balance',
-    description: 'Set chaos to exactly 50. Gain +10x production for 5 seconds. (300s cooldown)',
+    id: "perfectBalance",
+    name: "☯️ Perfect Balance",
+    description:
+      "Set chaos to exactly 50. Gain +10x production for 5 seconds. (300s cooldown)",
     cooldown: 300,
     unlockCondition: (state: GameState) => state.totalVibesEarned >= 50000000,
     apply: (state: GameState) => {
       state.chaos = 50;
       const extended = state as ExtendedGameState;
       extended.activeBonuses.push({
-        id: 'perfect_balance_' + Date.now(),
-        name: 'Perfect Balance',
+        id: "perfect_balance_" + Date.now(),
+        name: "Perfect Balance",
         productionMultiplier: 10.0,
         expiresAt: Date.now() + 5000, // 5 seconds
       });
       state.log.push({
         timestamp: state.timeRemaining,
-        message: '☯️ Perfect Balance achieved! Chaos set to 50, +10x production for 5s',
-        type: 'achievement',
+        message:
+          "☯️ Perfect Balance achieved! Chaos set to 50, +10x production for 5s",
+        type: "achievement",
       });
     },
   },
@@ -236,9 +250,9 @@ export const CHAOS_ACTIONS: Record<string, ChaosAction> = {
 
 export const CHAOS_STRATEGIES: Record<string, ChaosStrategy> = {
   none: {
-    id: 'none',
-    name: 'Baseline',
-    description: 'Standard chaos mechanics. Risk and reward in balance.',
+    id: "none",
+    name: "Baseline",
+    description: "Standard chaos mechanics. Risk and reward in balance.",
     unlockCondition: () => true,
     effects: {
       chaosThresholdMultiplier: 1.0,
@@ -261,34 +275,43 @@ export function getCurrentChaosThreshold(chaos: number): ChaosThreshold {
   return CHAOS_THRESHOLDS[0]; // Default to Stable
 }
 
-export function getChaosThresholdMultipliers(
-  state: ExtendedGameState
-): {
+export function getChaosThresholdMultipliers(state: ExtendedGameState): {
   productionMultiplier: number;
   clickPowerMultiplier: number;
   energyRegenMultiplier: number;
 } {
   const threshold = getCurrentChaosThreshold(state.chaos);
-  const strategy = CHAOS_STRATEGIES[state.activeChaosStrategy] || CHAOS_STRATEGIES.none;
+  const strategy =
+    CHAOS_STRATEGIES[state.activeChaosStrategy] || CHAOS_STRATEGIES.none;
 
   const amplifier = strategy.effects.chaosThresholdMultiplier;
 
   return {
-    productionMultiplier: 1 + (threshold.effects.productionMultiplier - 1) * amplifier,
-    clickPowerMultiplier: 1 + (threshold.effects.clickPowerMultiplier - 1) * amplifier,
-    energyRegenMultiplier: 1 + (threshold.effects.energyRegenMultiplier - 1) * amplifier,
+    productionMultiplier:
+      1 + (threshold.effects.productionMultiplier - 1) * amplifier,
+    clickPowerMultiplier:
+      1 + (threshold.effects.clickPowerMultiplier - 1) * amplifier,
+    energyRegenMultiplier:
+      1 + (threshold.effects.energyRegenMultiplier - 1) * amplifier,
   };
 }
 
-export function getActiveChaosStrategy(state: ExtendedGameState): ChaosStrategy {
+export function getActiveChaosStrategy(
+  state: ExtendedGameState,
+): ChaosStrategy {
   return CHAOS_STRATEGIES[state.activeChaosStrategy] || CHAOS_STRATEGIES.none;
 }
 
 export function getAvailableChaosStrategies(state: GameState): ChaosStrategy[] {
-  return Object.values(CHAOS_STRATEGIES).filter((strategy) => strategy.unlockCondition(state));
+  return Object.values(CHAOS_STRATEGIES).filter((strategy) =>
+    strategy.unlockCondition(state),
+  );
 }
 
-export function canUseChaosAction(state: ExtendedGameState, actionId: string): boolean {
+export function canUseChaosAction(
+  state: ExtendedGameState,
+  actionId: string,
+): boolean {
   const action = CHAOS_ACTIONS[actionId];
   if (!action) return false;
   if (!action.unlockCondition(state)) return false;
@@ -303,7 +326,10 @@ export function canUseChaosAction(state: ExtendedGameState, actionId: string): b
   return true;
 }
 
-export function useChaosAction(state: ExtendedGameState, actionId: string): boolean {
+export function useChaosAction(
+  state: ExtendedGameState,
+  actionId: string,
+): boolean {
   if (!canUseChaosAction(state, actionId)) return false;
 
   const action = CHAOS_ACTIONS[actionId];
@@ -313,7 +339,10 @@ export function useChaosAction(state: ExtendedGameState, actionId: string): bool
   return true;
 }
 
-export function switchChaosStrategy(state: ExtendedGameState, strategyId: string): boolean {
+export function switchChaosStrategy(
+  state: ExtendedGameState,
+  strategyId: string,
+): boolean {
   const strategy = CHAOS_STRATEGIES[strategyId];
   if (!strategy) return false;
   if (!strategy.unlockCondition(state)) return false;
@@ -328,14 +357,14 @@ export function switchChaosStrategy(state: ExtendedGameState, strategyId: string
   state.log.push({
     timestamp: state.timeRemaining,
     message: `🎯 Switched to ${strategy.name}`,
-    type: 'info',
+    type: "info",
   });
 
   return true;
 }
 
 export function isChaosFrozen(state: ExtendedGameState): boolean {
-  return state.activeBonuses.some((b) => b.name === 'Chaos Shield');
+  return state.activeBonuses.some((b) => b.name === "Chaos Shield");
 }
 
 export function applyChaosStrategy(state: ExtendedGameState): void {
@@ -352,7 +381,7 @@ export function applyChaosStrategy(state: ExtendedGameState): void {
   }
 
   // Wildcard special effect: random chaos swings
-  if (state.activeChaosStrategy === 'wildcard' && Math.random() < 0.1) {
+  if (state.activeChaosStrategy === "wildcard" && Math.random() < 0.1) {
     // 10% chance per tick
     const swing = Math.random() * 20 - 10; // +/- 10
     state.chaos = Math.max(0, Math.min(100, state.chaos + swing));

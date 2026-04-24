@@ -1,7 +1,7 @@
 // Strategic Choice Upgrades - Meaningful decisions that change playstyle
 // These upgrades offer trade-offs and specializations
 
-import { Upgrade } from './types';
+import { Upgrade } from "./types";
 
 // ============================================================================
 // SPECIALIZATION UPGRADES - Choose your path
@@ -10,9 +10,10 @@ import { Upgrade } from './types';
 export const SPECIALIZATION_UPGRADES: Upgrade[] = [
   // Active vs Passive specializations
   {
-    id: 'spec_active_master',
-    name: '🔥 Active Master',
-    description: '+200% click power, but -50% passive production. For players who love clicking!',
+    id: "spec_active_master",
+    name: "🔥 Active Master",
+    description:
+      "+200% click power, but -50% passive production. For players who love clicking!",
     cost: 500000,
     tier: 6,
     effects: {
@@ -25,9 +26,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'spec_idle_master',
-    name: '💤 Idle Master',
-    description: '+200% passive production, but -50% click power. For players who prefer automation!',
+    id: "spec_idle_master",
+    name: "💤 Idle Master",
+    description:
+      "+200% passive production, but -50% click power. For players who prefer automation!",
     cost: 500000,
     tier: 6,
     effects: {
@@ -41,9 +43,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
 
   // Energy specializations
   {
-    id: 'spec_high_energy',
-    name: '⚡ High Energy Protocol',
-    description: 'Gain massive bonuses above 80 energy (+100% production), but suffer below 50 (-30% production).',
+    id: "spec_high_energy",
+    name: "⚡ High Energy Protocol",
+    description:
+      "Gain massive bonuses above 80 energy (+100% production), but suffer below 50 (-30% production).",
     cost: 750000,
     tier: 7,
     effects: {
@@ -56,9 +59,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'spec_low_energy',
-    name: '😴 Low Energy Protocol',
-    description: 'Gain bonuses below 30 energy (+80% production), perform normally at high energy.',
+    id: "spec_low_energy",
+    name: "😴 Low Energy Protocol",
+    description:
+      "Gain bonuses below 30 energy (+80% production), perform normally at high energy.",
     cost: 750000,
     tier: 7,
     effects: {
@@ -71,9 +75,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
 
   // Chaos specializations
   {
-    id: 'spec_chaos_rider',
-    name: '🌪️ Chaos Rider',
-    description: 'Gain +5% production per chaos point above 50. Maximum chaos becomes your strength!',
+    id: "spec_chaos_rider",
+    name: "🌪️ Chaos Rider",
+    description:
+      "Gain +5% production per chaos point above 50. Maximum chaos becomes your strength!",
     cost: 1000000,
     tier: 8,
     effects: {
@@ -85,9 +90,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'spec_chaos_damper',
-    name: '🛡️ Chaos Damper',
-    description: 'Gain +5% production per chaos point below 50. Stability is your advantage!',
+    id: "spec_chaos_damper",
+    name: "🛡️ Chaos Damper",
+    description:
+      "Gain +5% production per chaos point below 50. Stability is your advantage!",
     cost: 1000000,
     tier: 8,
     effects: {
@@ -100,9 +106,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
 
   // Extreme specializations
   {
-    id: 'spec_manual_override',
-    name: '🚫 Manual Override',
-    description: 'Disable ALL auto-clickers for +300% manual click power. Pure skill!',
+    id: "spec_manual_override",
+    name: "🚫 Manual Override",
+    description:
+      "Disable ALL auto-clickers for +300% manual click power. Pure skill!",
     cost: 5000000,
     tier: 9,
     effects: {
@@ -115,9 +122,10 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'spec_full_automation',
-    name: '🤖 Full Automation',
-    description: 'Manual clicks disabled, but +300% auto-clicker speed and +100% production.',
+    id: "spec_full_automation",
+    name: "🤖 Full Automation",
+    description:
+      "Manual clicks disabled, but +300% auto-clicker speed and +100% production.",
     cost: 5000000,
     tier: 9,
     effects: {
@@ -135,77 +143,82 @@ export const SPECIALIZATION_UPGRADES: Upgrade[] = [
 
 export const SUBSTANCE_SPECIALIST_UPGRADES: Upgrade[] = [
   {
-    id: 'specialist_stimulant',
-    name: '⚡ Stimulant Specialist',
-    description: '+200% stimulant production, but all other substances produce -30%.',
+    id: "specialist_stimulant",
+    name: "⚡ Stimulant Specialist",
+    description:
+      "+200% stimulant production, but all other substances produce -30%.",
     cost: 250000,
     tier: 6,
-    substanceId: 'stimulant',
+    substanceId: "stimulant",
     effects: {
       productionMultiplier: 3.0, // For stimulants
     },
     requirement: {
-      substanceOwned: { id: 'stimulant', count: 20 },
+      substanceOwned: { id: "stimulant", count: 20 },
     },
   },
 
   {
-    id: 'specialist_sedative',
-    name: '😴 Sedative Specialist',
-    description: '+200% sedative production, but all other substances produce -30%.',
+    id: "specialist_sedative",
+    name: "😴 Sedative Specialist",
+    description:
+      "+200% sedative production, but all other substances produce -30%.",
     cost: 250000,
     tier: 6,
-    substanceId: 'sedative',
+    substanceId: "sedative",
     effects: {
       productionMultiplier: 3.0,
     },
     requirement: {
-      substanceOwned: { id: 'sedative', count: 20 },
+      substanceOwned: { id: "sedative", count: 20 },
     },
   },
 
   {
-    id: 'specialist_empathogen',
-    name: '💖 Empathogen Specialist',
-    description: '+200% empathogen production, but all other substances produce -30%.',
+    id: "specialist_empathogen",
+    name: "💖 Empathogen Specialist",
+    description:
+      "+200% empathogen production, but all other substances produce -30%.",
     cost: 250000,
     tier: 6,
-    substanceId: 'empathogen',
+    substanceId: "empathogen",
     effects: {
       productionMultiplier: 3.0,
     },
     requirement: {
-      substanceOwned: { id: 'empathogen', count: 20 },
+      substanceOwned: { id: "empathogen", count: 20 },
     },
   },
 
   {
-    id: 'specialist_dissociative',
-    name: '🌀 Dissociative Specialist',
-    description: '+200% dissociative production, but all other substances produce -30%.',
+    id: "specialist_dissociative",
+    name: "🌀 Dissociative Specialist",
+    description:
+      "+200% dissociative production, but all other substances produce -30%.",
     cost: 250000,
     tier: 6,
-    substanceId: 'dissociative',
+    substanceId: "dissociative",
     effects: {
       productionMultiplier: 3.0,
     },
     requirement: {
-      substanceOwned: { id: 'dissociative', count: 20 },
+      substanceOwned: { id: "dissociative", count: 20 },
     },
   },
 
   {
-    id: 'specialist_deliriant',
-    name: '👁️ Deliriant Specialist',
-    description: '+200% deliriant production, but all other substances produce -30%.',
+    id: "specialist_deliriant",
+    name: "👁️ Deliriant Specialist",
+    description:
+      "+200% deliriant production, but all other substances produce -30%.",
     cost: 250000,
     tier: 6,
-    substanceId: 'deliriant',
+    substanceId: "deliriant",
     effects: {
       productionMultiplier: 3.0,
     },
     requirement: {
-      substanceOwned: { id: 'deliriant', count: 20 },
+      substanceOwned: { id: "deliriant", count: 20 },
     },
   },
 ];
@@ -216,9 +229,10 @@ export const SUBSTANCE_SPECIALIST_UPGRADES: Upgrade[] = [
 
 export const SYNERGY_UPGRADES: Upgrade[] = [
   {
-    id: 'synergy_stimulant_research',
-    name: '🧪 Research Enhancement',
-    description: 'When you own both Stimulant and Research, both produce +100%.',
+    id: "synergy_stimulant_research",
+    name: "🧪 Research Enhancement",
+    description:
+      "When you own both Stimulant and Research, both produce +100%.",
     cost: 500000,
     tier: 7,
     effects: {
@@ -230,9 +244,10 @@ export const SYNERGY_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'synergy_alcohol_empathogen',
-    name: '🍻 Social Lubricant',
-    description: 'Alcohol + Empathogen combo: Reduce memory crash penalty by 50%, both produce +50%.',
+    id: "synergy_alcohol_empathogen",
+    name: "🍻 Social Lubricant",
+    description:
+      "Alcohol + Empathogen combo: Reduce memory crash penalty by 50%, both produce +50%.",
     cost: 750000,
     tier: 7,
     effects: {
@@ -244,9 +259,10 @@ export const SYNERGY_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'synergy_dissociative_sedative',
-    name: '🛌 Deep Dive',
-    description: 'Dissociative + Sedative combo: Memory blackout reduced by 50%, both produce +50%.',
+    id: "synergy_dissociative_sedative",
+    name: "🛌 Deep Dive",
+    description:
+      "Dissociative + Sedative combo: Memory blackout reduced by 50%, both produce +50%.",
     cost: 750000,
     tier: 7,
     effects: {
@@ -258,9 +274,10 @@ export const SYNERGY_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'synergy_paradox_embrace',
-    name: '⚔️ Paradox Embrace',
-    description: 'Stimulant + Sedative combo: Convert paradox anxiety into production boost (+10% per anxiety spike).',
+    id: "synergy_paradox_embrace",
+    name: "⚔️ Paradox Embrace",
+    description:
+      "Stimulant + Sedative combo: Convert paradox anxiety into production boost (+10% per anxiety spike).",
     cost: 1000000,
     tier: 8,
     effects: {
@@ -278,9 +295,10 @@ export const SYNERGY_UPGRADES: Upgrade[] = [
 
 export const RISK_REWARD_UPGRADES: Upgrade[] = [
   {
-    id: 'risk_all_or_nothing',
-    name: '🎲 All Or Nothing',
-    description: 'Production randomly swings between 50% and 300% every 10 seconds. Average: +175%!',
+    id: "risk_all_or_nothing",
+    name: "🎲 All Or Nothing",
+    description:
+      "Production randomly swings between 50% and 300% every 10 seconds. Average: +175%!",
     cost: 2000000,
     tier: 8,
     effects: {
@@ -292,9 +310,10 @@ export const RISK_REWARD_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'risk_burnout',
-    name: '🔥 Burnout Mode',
-    description: 'Lose 5 energy/sec, but gain +500% production. Can you maintain it?',
+    id: "risk_burnout",
+    name: "🔥 Burnout Mode",
+    description:
+      "Lose 5 energy/sec, but gain +500% production. Can you maintain it?",
     cost: 3000000,
     tier: 9,
     effects: {
@@ -306,9 +325,10 @@ export const RISK_REWARD_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'risk_chaos_cascade',
-    name: '💀 Chaos Cascade',
-    description: 'Gain +10 chaos/sec, but production increases by +20% per point of chaos. Dangerous!',
+    id: "risk_chaos_cascade",
+    name: "💀 Chaos Cascade",
+    description:
+      "Gain +10 chaos/sec, but production increases by +20% per point of chaos. Dangerous!",
     cost: 5000000,
     tier: 9,
     effects: {
@@ -326,9 +346,10 @@ export const RISK_REWARD_UPGRADES: Upgrade[] = [
 
 export const SCALING_UPGRADES: Upgrade[] = [
   {
-    id: 'scaling_combo_power',
-    name: '🔥 Combo Momentum',
-    description: '+1% production per combo point. At 100 combo = +100% production!',
+    id: "scaling_combo_power",
+    name: "🔥 Combo Momentum",
+    description:
+      "+1% production per combo point. At 100 combo = +100% production!",
     cost: 1000000,
     tier: 7,
     effects: {
@@ -340,9 +361,9 @@ export const SCALING_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'scaling_knowledge',
-    name: '📚 Knowledge is Power',
-    description: '+20% production per knowledge level. Stacks with everything!',
+    id: "scaling_knowledge",
+    name: "📚 Knowledge is Power",
+    description: "+20% production per knowledge level. Stacks with everything!",
     cost: 2000000,
     tier: 8,
     effects: {
@@ -354,9 +375,10 @@ export const SCALING_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'scaling_diversity',
-    name: '🌈 Diversity Bonus',
-    description: '+15% production for each different substance type owned (max +150%).',
+    id: "scaling_diversity",
+    name: "🌈 Diversity Bonus",
+    description:
+      "+15% production for each different substance type owned (max +150%).",
     cost: 1500000,
     tier: 7,
     effects: {
@@ -368,9 +390,9 @@ export const SCALING_UPGRADES: Upgrade[] = [
   },
 
   {
-    id: 'scaling_prestige',
-    name: '♾️ Prestige Power',
-    description: '+5% production per prestige tier. Rewards veteran players!',
+    id: "scaling_prestige",
+    name: "♾️ Prestige Power",
+    description: "+5% production per prestige tier. Rewards veteran players!",
     cost: 5000000,
     tier: 9,
     effects: {

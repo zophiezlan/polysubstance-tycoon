@@ -71,7 +71,7 @@ export interface GameState {
   // Settings
   disableDistortion: boolean;
   reducedMotion: boolean;
-  fontSize: 'small' | 'default' | 'large';
+  fontSize: "small" | "default" | "large";
   muteNotifications: boolean;
   showFloatingNumbers: boolean;
   compactLog: boolean;
@@ -85,33 +85,33 @@ export interface GameState {
 export interface LogEntry {
   timestamp: number; // seconds into night
   message: string;
-  type: 'info' | 'warning' | 'danger' | 'achievement';
+  type: "info" | "warning" | "danger" | "achievement";
   corrupted?: boolean; // if memory low
 }
 
 export interface SubstanceDefinition {
   id: string;
-  name: string;           // Fictionalized corporate name
-  tagline: string;        // Snarky subtitle
-  description: string;    // Flavor text
-  baseCost: number;       // Starting purchase price
+  name: string; // Fictionalized corporate name
+  tagline: string; // Snarky subtitle
+  description: string; // Flavor text
+  baseCost: number; // Starting purchase price
   costMultiplier: number; // Exponential scaling (1.15 standard)
-  baseVibes: number;      // Vibes/sec per unit
+  baseVibes: number; // Vibes/sec per unit
 
   // Visible effects (tooltip + stat panel)
-  energyMod: number;      // Per-tick Energy delta per unit
-  chaosMod: number;       // Chaos shift per unit active
+  energyMod: number; // Per-tick Energy delta per unit
+  chaosMod: number; // Chaos shift per unit active
 
   // Hidden effects (only visible with Knowledge unlocks)
-  strainMod: number;      // Adds to Strain accumulator per unit
-  hydrationMod: number;   // Debt per tick per unit
-  sleepDebtMod: number;   // Debt per tick per unit
-  memoryMod: number;      // Integrity damage per tick per unit
-  confidenceMod: number;  // Boosts the liar stat per unit
+  strainMod: number; // Adds to Strain accumulator per unit
+  hydrationMod: number; // Debt per tick per unit
+  sleepDebtMod: number; // Debt per tick per unit
+  memoryMod: number; // Integrity damage per tick per unit
+  confidenceMod: number; // Boosts the liar stat per unit
 
   // Special mechanics
   timeExtension?: number; // Seconds added per purchase
-  unlockAction?: string;  // Unlocks maintenance action
+  unlockAction?: string; // Unlocks maintenance action
 }
 
 export interface SubstanceInteraction {
@@ -124,8 +124,8 @@ export interface MaintenanceAction {
   id: string;
   name: string;
   description: string;
-  cost: number;          // Vibes cost to perform
-  cooldown: number;      // Seconds before reuse
+  cost: number; // Vibes cost to perform
+  cooldown: number; // Seconds before reuse
   effects: {
     energyRestore?: number;
     chaosReduction?: number;
@@ -161,7 +161,7 @@ export interface OrganComplaint {
   id: string;
   organ: string; // 'liver', 'brain', 'kidneys', 'heart', 'lungs'
   message: string;
-  severity: 'mild' | 'concerning' | 'critical';
+  severity: "mild" | "concerning" | "critical";
   timestamp: number;
 }
 
@@ -175,14 +175,14 @@ export interface KnowledgeLevel {
 
 // NEW: Upgrade categorization for better organization and pattern identification
 export type UpgradeCategory =
-  | 'global'              // Affects all production/clicking (e.g., Tolerance Management)
-  | 'substance-specific'  // Boosts single substance (e.g., Plastic Bottles for Alcohol)
-  | 'synergy'            // Boosts substance combinations (e.g., Cocktail Theory)
-  | 'automation'         // Auto-clickers, idle bonuses
-  | 'combo'              // Combo system enhancements
-  | 'harm-reduction'     // Chaos dampening, strain management
-  | 'progression-gate'   // Tier unlocks, required for progression
-  | 'special';           // Unique mechanics (memory suppression, reality distortion)
+  | "global" // Affects all production/clicking (e.g., Tolerance Management)
+  | "substance-specific" // Boosts single substance (e.g., Plastic Bottles for Alcohol)
+  | "synergy" // Boosts substance combinations (e.g., Cocktail Theory)
+  | "automation" // Auto-clickers, idle bonuses
+  | "combo" // Combo system enhancements
+  | "harm-reduction" // Chaos dampening, strain management
+  | "progression-gate" // Tier unlocks, required for progression
+  | "special"; // Unique mechanics (memory suppression, reality distortion)
 
 export interface Upgrade {
   id: string;

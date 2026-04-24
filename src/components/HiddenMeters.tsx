@@ -1,16 +1,16 @@
-import { GameState } from '../game/types';
-import { hasUnlock } from '../game/prestige';
-import { getBarFill } from '../utils/formatter';
+import { GameState } from "../game/types";
+import { hasUnlock } from "../game/prestige";
+import { getBarFill } from "../utils/formatter";
 
 interface HiddenMetersProps {
   state: GameState;
 }
 
 export function HiddenMeters({ state }: HiddenMetersProps) {
-  const showHydration = hasUnlock(state.knowledgeLevel, 'hydrationDebt');
-  const showSleepDebt = hasUnlock(state.knowledgeLevel, 'sleepDebt');
-  const showStrain = hasUnlock(state.knowledgeLevel, 'strain');
-  const showMemory = hasUnlock(state.knowledgeLevel, 'memoryIntegrity');
+  const showHydration = hasUnlock(state.knowledgeLevel, "hydrationDebt");
+  const showSleepDebt = hasUnlock(state.knowledgeLevel, "sleepDebt");
+  const showStrain = hasUnlock(state.knowledgeLevel, "strain");
+  const showMemory = hasUnlock(state.knowledgeLevel, "memoryIntegrity");
 
   const anyVisible = showHydration || showSleepDebt || showStrain || showMemory;
 
@@ -29,7 +29,7 @@ export function HiddenMeters({ state }: HiddenMetersProps) {
             </div>
             <div className="stat-bar">
               <div
-                className={`stat-bar-fill ${state.hydrationDebt > 70 ? 'danger' : state.hydrationDebt > 40 ? 'warning' : 'normal'}`}
+                className={`stat-bar-fill ${state.hydrationDebt > 70 ? "danger" : state.hydrationDebt > 40 ? "warning" : "normal"}`}
                 style={{ width: `${getBarFill(state.hydrationDebt, 100)}%` }}
               />
             </div>
@@ -46,7 +46,7 @@ export function HiddenMeters({ state }: HiddenMetersProps) {
             </div>
             <div className="stat-bar">
               <div
-                className={`stat-bar-fill ${state.sleepDebt > 70 ? 'danger' : state.sleepDebt > 40 ? 'warning' : 'normal'}`}
+                className={`stat-bar-fill ${state.sleepDebt > 70 ? "danger" : state.sleepDebt > 40 ? "warning" : "normal"}`}
                 style={{ width: `${getBarFill(state.sleepDebt, 100)}%` }}
               />
             </div>
@@ -63,7 +63,7 @@ export function HiddenMeters({ state }: HiddenMetersProps) {
             </div>
             <div className="stat-bar">
               <div
-                className={`stat-bar-fill ${state.strain > 80 ? 'danger' : state.strain > 60 ? 'warning' : 'normal'}`}
+                className={`stat-bar-fill ${state.strain > 80 ? "danger" : state.strain > 60 ? "warning" : "normal"}`}
                 style={{ width: `${getBarFill(state.strain, 100)}%` }}
               />
             </div>
@@ -80,7 +80,7 @@ export function HiddenMeters({ state }: HiddenMetersProps) {
             </div>
             <div className="stat-bar">
               <div
-                className={`stat-bar-fill ${state.memoryIntegrity < 20 ? 'danger' : state.memoryIntegrity < 50 ? 'warning' : 'normal'}`}
+                className={`stat-bar-fill ${state.memoryIntegrity < 20 ? "danger" : state.memoryIntegrity < 50 ? "warning" : "normal"}`}
                 style={{ width: `${getBarFill(state.memoryIntegrity, 100)}%` }}
               />
             </div>

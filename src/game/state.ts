@@ -1,4 +1,4 @@
-import { GameState } from './types';
+import { GameState } from "./types";
 
 export function createInitialState(): GameState {
   return {
@@ -69,8 +69,8 @@ export function createInitialState(): GameState {
     log: [
       {
         timestamp: 0,
-        message: 'Night started. Time to optimise.',
-        type: 'info',
+        message: "Night started. Time to optimise.",
+        type: "info",
       },
     ],
     showSettings: false,
@@ -79,7 +79,7 @@ export function createInitialState(): GameState {
     // Settings
     disableDistortion: false,
     reducedMotion: false,
-    fontSize: 'default',
+    fontSize: "default",
     muteNotifications: false,
     showFloatingNumbers: true,
     compactLog: false,
@@ -105,10 +105,13 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.upgrades = persistentState.upgrades || [];
 
   // Preserve comprehensive statistics
-  newState.totalSubstancesPurchased = persistentState.totalSubstancesPurchased || 0;
+  newState.totalSubstancesPurchased =
+    persistentState.totalSubstancesPurchased || 0;
   newState.totalUpgradesPurchased = persistentState.totalUpgradesPurchased || 0;
-  newState.totalRandomEventsClicked = persistentState.totalRandomEventsClicked || 0;
-  newState.totalMaintenanceActionsUsed = persistentState.totalMaintenanceActionsUsed || 0;
+  newState.totalRandomEventsClicked =
+    persistentState.totalRandomEventsClicked || 0;
+  newState.totalMaintenanceActionsUsed =
+    persistentState.totalMaintenanceActionsUsed || 0;
   newState.totalEnergyGenerated = persistentState.totalEnergyGenerated || 0;
   newState.totalChaosAccumulated = persistentState.totalChaosAccumulated || 0;
   newState.highestSingleClick = persistentState.highestSingleClick || 0;
@@ -116,7 +119,7 @@ export function startNewNight(persistentState: Partial<GameState>): GameState {
   newState.hasSeenDisclaimer = persistentState.hasSeenDisclaimer || false;
   newState.disableDistortion = persistentState.disableDistortion || false;
   newState.reducedMotion = persistentState.reducedMotion || false;
-  newState.fontSize = persistentState.fontSize || 'default';
+  newState.fontSize = persistentState.fontSize || "default";
   newState.muteNotifications = persistentState.muteNotifications || false;
   newState.showFloatingNumbers = persistentState.showFloatingNumbers ?? true;
   newState.compactLog = persistentState.compactLog || false;

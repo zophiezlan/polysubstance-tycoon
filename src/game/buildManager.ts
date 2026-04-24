@@ -1,8 +1,8 @@
 // Build/Loadout Management System - Save and swap substance configurations
 
-import { GameState } from './types';
-import { ExtendedGameState, SavedBuild } from './progressionTypes';
-import { hasInstantBuildSwap } from './permanentUnlocks';
+import { GameState } from "./types";
+import { ExtendedGameState, SavedBuild } from "./progressionTypes";
+import { hasInstantBuildSwap } from "./permanentUnlocks";
 
 // ============================================================================
 // BUILD MANAGEMENT FUNCTIONS
@@ -15,7 +15,7 @@ export function canSaveBuild(state: ExtendedGameState): boolean {
 export function saveBuild(
   state: ExtendedGameState,
   name: string,
-  notes?: string
+  notes?: string,
 ): SavedBuild | null {
   if (!canSaveBuild(state)) {
     return null;
@@ -36,13 +36,16 @@ export function saveBuild(
   state.log.push({
     timestamp: state.timeRemaining,
     message: `💾 Build saved: ${name}`,
-    type: 'info',
+    type: "info",
   });
 
   return build;
 }
 
-export function deleteBuild(state: ExtendedGameState, buildId: string): boolean {
+export function deleteBuild(
+  state: ExtendedGameState,
+  buildId: string,
+): boolean {
   const index = state.savedBuilds.findIndex((b) => b.id === buildId);
   if (index === -1) return false;
 
@@ -62,7 +65,7 @@ export function deleteBuild(state: ExtendedGameState, buildId: string): boolean 
 export function updateBuildName(
   state: ExtendedGameState,
   buildId: string,
-  newName: string
+  newName: string,
 ): boolean {
   const build = state.savedBuilds.find((b) => b.id === buildId);
   if (!build) return false;
@@ -74,7 +77,7 @@ export function updateBuildName(
 export function updateBuildNotes(
   state: ExtendedGameState,
   buildId: string,
-  newNotes: string
+  newNotes: string,
 ): boolean {
   const build = state.savedBuilds.find((b) => b.id === buildId);
   if (!build) return false;
@@ -83,7 +86,10 @@ export function updateBuildNotes(
   return true;
 }
 
-export function canSwapToBuild(state: ExtendedGameState, buildIndex: number): boolean {
+export function canSwapToBuild(
+  state: ExtendedGameState,
+  buildIndex: number,
+): boolean {
   // Check if build exists
   if (buildIndex < 0 || buildIndex >= state.savedBuilds.length) {
     return false;
@@ -102,7 +108,10 @@ export function canSwapToBuild(state: ExtendedGameState, buildIndex: number): bo
   return true;
 }
 
-export function swapToBuild(state: ExtendedGameState, buildIndex: number): boolean {
+export function swapToBuild(
+  state: ExtendedGameState,
+  buildIndex: number,
+): boolean {
   if (!canSwapToBuild(state, buildIndex)) return false;
 
   const build = state.savedBuilds[buildIndex];
@@ -114,7 +123,7 @@ export function swapToBuild(state: ExtendedGameState, buildIndex: number): boole
     state.log.push({
       timestamp: state.timeRemaining,
       message: `❌ Not enough vibes to swap build! Need ${Math.floor(costToSwap).toLocaleString()}`,
-      type: 'warning',
+      type: "warning",
     });
     return false;
   }
@@ -136,7 +145,7 @@ export function swapToBuild(state: ExtendedGameState, buildIndex: number): boole
   state.log.push({
     timestamp: state.timeRemaining,
     message: `🔄 Swapped to build: ${build.name}`,
-    type: 'info',
+    type: "info",
   });
 
   return true;
@@ -145,7 +154,7 @@ export function swapToBuild(state: ExtendedGameState, buildIndex: number): boole
 export function overwriteBuild(
   state: ExtendedGameState,
   buildIndex: number,
-  name?: string
+  name?: string,
 ): boolean {
   if (buildIndex < 0 || buildIndex >= state.savedBuilds.length) {
     return false;
@@ -166,7 +175,7 @@ export function overwriteBuild(
   state.log.push({
     timestamp: state.timeRemaining,
     message: `💾 Build updated: ${build.name}`,
-    type: 'info',
+    type: "info",
   });
 
   return true;
@@ -176,7 +185,10 @@ export function deactivateBuild(state: ExtendedGameState): void {
   state.activeBuildIndex = -1;
 }
 
-export function getBuildInfo(state: ExtendedGameState, buildIndex: number): SavedBuild | null {
+export function getBuildInfo(
+  state: ExtendedGameState,
+  buildIndex: number,
+): SavedBuild | null {
   if (buildIndex < 0 || buildIndex >= state.savedBuilds.length) {
     return null;
   }
@@ -192,7 +204,10 @@ export function getActiveBuild(state: ExtendedGameState): SavedBuild | null {
 // BUILD COMPARISON AND ANALYSIS
 // ============================================================================
 
-export function calculateBuildSwapCost(state: GameState, build: SavedBuild): number {
+export function calculateBuildSwapCost(
+  state: GameState,
+  build: SavedBuild,
+): number {
   // Calculate the cost to acquire substances we don't have
   // This is a simplified calculation - in reality you'd need to import substance costs
   // For now, assume average cost of 10 vibes per substance unit
@@ -215,7 +230,7 @@ export function calculateBuildSwapCost(state: GameState, build: SavedBuild): num
 
 export function compareBuildToCurrentState(
   state: GameState,
-  build: SavedBuild
+  build: SavedBuild,
 ): {
   substanceDifferences: Array<{
     substanceId: string;
@@ -256,7 +271,8 @@ export function compareBuildToCurrentState(
 
   const extendedState = state as ExtendedGameState;
   const energyModeChanged = build.energyMode !== extendedState.activeEnergyMode;
-  const chaosStrategyChanged = build.chaosStrategy !== extendedState.activeChaosStrategy;
+  const chaosStrategyChanged =
+    build.chaosStrategy !== extendedState.activeChaosStrategy;
 
   return {
     substanceDifferences,
@@ -270,7 +286,10 @@ export function exportBuild(build: SavedBuild): string {
   return JSON.stringify(build, null, 2);
 }
 
-export function importBuild(state: ExtendedGameState, buildJson: string): SavedBuild | null {
+export function importBuild(
+  state: ExtendedGameState,
+  buildJson: string,
+): SavedBuild | null {
   try {
     const build = JSON.parse(buildJson) as SavedBuild;
 
@@ -293,7 +312,7 @@ export function importBuild(state: ExtendedGameState, buildJson: string): SavedB
     state.log.push({
       timestamp: state.timeRemaining,
       message: `📥 Build imported: ${build.name}`,
-      type: 'info',
+      type: "info",
     });
 
     return build;
@@ -308,61 +327,63 @@ export function importBuild(state: ExtendedGameState, buildJson: string): SavedB
 
 export const STARTER_BUILDS: SavedBuild[] = [
   {
-    id: 'preset_balanced',
-    name: '⚖️ Balanced Starter',
+    id: "preset_balanced",
+    name: "⚖️ Balanced Starter",
     timestamp: 0,
     substances: {
       stimulant: 5,
       sedative: 3,
       empathogen: 2,
     },
-    energyMode: 'balanced',
-    chaosStrategy: 'none',
-    notes: 'A balanced approach for beginners. Steady production with manageable risks.',
+    energyMode: "balanced",
+    chaosStrategy: "none",
+    notes:
+      "A balanced approach for beginners. Steady production with manageable risks.",
   },
   {
-    id: 'preset_active_clicker',
-    name: '👆 Active Clicker',
+    id: "preset_active_clicker",
+    name: "👆 Active Clicker",
     timestamp: 0,
     substances: {
       stimulant: 10,
       research: 5,
     },
-    energyMode: 'overdrive',
-    chaosStrategy: 'amplifier',
-    notes: 'Maximize click power for active play. High chaos, high reward!',
+    energyMode: "overdrive",
+    chaosStrategy: "amplifier",
+    notes: "Maximize click power for active play. High chaos, high reward!",
   },
   {
-    id: 'preset_idle',
-    name: '💤 Idle Production',
+    id: "preset_idle",
+    name: "💤 Idle Production",
     timestamp: 0,
     substances: {
       sedative: 8,
       empathogen: 5,
       alcohol: 3,
     },
-    energyMode: 'conservation',
-    chaosStrategy: 'stabilizer',
-    notes: 'Optimized for passive income. Set it and forget it!',
+    energyMode: "conservation",
+    chaosStrategy: "stabilizer",
+    notes: "Optimized for passive income. Set it and forget it!",
   },
   {
-    id: 'preset_risky',
-    name: '🎲 High Risk High Reward',
+    id: "preset_risky",
+    name: "🎲 High Risk High Reward",
     timestamp: 0,
     substances: {
       stimulant: 15,
       deliriant: 10,
       research: 8,
     },
-    energyMode: 'overdrive',
-    chaosStrategy: 'riskyBusiness',
-    notes: 'Live on the edge! Maximum production at maximum risk. Not for beginners!',
+    energyMode: "overdrive",
+    chaosStrategy: "riskyBusiness",
+    notes:
+      "Live on the edge! Maximum production at maximum risk. Not for beginners!",
   },
 ];
 
 export function loadStarterBuild(
   state: ExtendedGameState,
-  presetId: string
+  presetId: string,
 ): SavedBuild | null {
   const preset = STARTER_BUILDS.find((b) => b.id === presetId);
   if (!preset) return null;
@@ -384,7 +405,7 @@ export function loadStarterBuild(
   state.log.push({
     timestamp: state.timeRemaining,
     message: `📦 Starter build loaded: ${build.name}`,
-    type: 'info',
+    type: "info",
   });
 
   return build;

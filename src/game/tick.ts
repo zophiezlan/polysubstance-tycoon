@@ -1,21 +1,21 @@
-import { GameState } from './types';
-import { getSubstance } from './substances';
-import { calculateExperience, getKnowledgeLevel } from './prestige';
+import { GameState } from "./types";
+import { getSubstance } from "./substances";
+import { calculateExperience, getKnowledgeLevel } from "./prestige";
 import {
   calculateInteractionMultipliers,
   getAlcoholAmplification,
   getStimulantEnergyMod,
-} from './interactions';
-import { calculateProductionMultiplier } from './upgradeEffects';
-import { tickCombo } from './combos';
-import { checkGroupChatTriggers } from './groupChat';
-import { checkOrganComplaints } from './organCommentary';
+} from "./interactions";
+import { calculateProductionMultiplier } from "./upgradeEffects";
+import { tickCombo } from "./combos";
+import { checkGroupChatTriggers } from "./groupChat";
+import { checkOrganComplaints } from "./organCommentary";
 import {
   processProgressionSystems,
   getTotalProductionMultiplier,
   checkOfflineProgress,
-} from './progressionIntegration';
-import { isExtendedGameState } from './progressionTypes';
+} from "./progressionIntegration";
+import { isExtendedGameState } from "./progressionTypes";
 
 export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!state.isNightActive) {
@@ -54,7 +54,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   let totalMemoryMod = 0;
   let totalConfidenceMod = 0;
 
-  Object.keys(newState.substances).forEach(substanceId => {
+  Object.keys(newState.substances).forEach((substanceId) => {
     const count = newState.substances[substanceId];
     if (count === 0) return;
 
@@ -62,7 +62,10 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     if (!substance) return;
 
     // Apply upgrade multipliers to production
-    const productionMultiplier = calculateProductionMultiplier(newState, substanceId);
+    const productionMultiplier = calculateProductionMultiplier(
+      newState,
+      substanceId,
+    );
 
     totalVibesPerSec += substance.baseVibes * count * productionMultiplier;
     totalEnergyMod += substance.energyMod * count;
@@ -74,8 +77,11 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     totalConfidenceMod += substance.confidenceMod * count;
 
     // Special handling for stimulants
-    if (substanceId === 'stimulant') {
-      const adjustedEnergyMod = getStimulantEnergyMod(substance.energyMod, cumulativeTimeExtension);
+    if (substanceId === "stimulant") {
+      const adjustedEnergyMod = getStimulantEnergyMod(
+        substance.energyMod,
+        cumulativeTimeExtension,
+      );
       totalEnergyMod += (adjustedEnergyMod - substance.energyMod) * count;
     }
   });
@@ -93,7 +99,10 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.vibes += vibesGained;
   newState.totalVibesEarned += vibesGained;
   newState.timePlayed += dt;
-  newState.highestVibesPerSecond = Math.max(newState.highestVibesPerSecond, totalVibesPerSec);
+  newState.highestVibesPerSecond = Math.max(
+    newState.highestVibesPerSecond,
+    totalVibesPerSec,
+  );
 
   // 2. Apply energy changes - ENERGY IS ALWAYS POSITIVE!
   // NOTE: Energy regeneration is now handled by progressionIntegration.ts
@@ -104,7 +113,10 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   if (!isExtendedGameState(newState) && newState.hydrationDebt > 70) {
     const baseRegen = 1.0 + newState.knowledgeLevel * 0.2; // Buffed for better energy management
     const energyRegen = baseRegen * dt;
-    const penalty = Math.min(energyRegen * 0.3, (newState.hydrationDebt - 70) * 0.005 * dt);
+    const penalty = Math.min(
+      energyRegen * 0.3,
+      (newState.hydrationDebt - 70) * 0.005 * dt,
+    );
     newState.energy -= penalty;
   }
 
@@ -136,14 +148,15 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   }
 
   // Handle chaos randomization from dissociative + alcohol (reduced intensity)
-  if (interactions.specialEffects.includes('chaos_randomization')) {
+  if (interactions.specialEffects.includes("chaos_randomization")) {
     const randomShift = (Math.random() - 0.5) * 3 * dt; // Reduced from 5
     newState.chaos += randomShift;
   }
 
   // Paradox anxiety from stimulant + sedative (less frequent, less intense)
-  if (interactions.specialEffects.includes('paradox_anxiety')) {
-    if (Math.random() < 0.05 * dt) { // Reduced from 0.1
+  if (interactions.specialEffects.includes("paradox_anxiety")) {
+    if (Math.random() < 0.05 * dt) {
+      // Reduced from 0.1
       newState.chaos += Math.random() * 10; // Reduced from 20
     }
   }
@@ -162,7 +175,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.hydrationDebt = Math.max(0, newState.hydrationDebt);
 
   // Triple hydration from stimulant + empathogen (but less punishing now)
-  if (interactions.specialEffects.includes('triple_hydration')) {
+  if (interactions.specialEffects.includes("triple_hydration")) {
     newState.hydrationDebt += totalHydrationMod * 1.5 * dt; // Reduced from 2x
   }
 
@@ -176,7 +189,8 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
 
   // COOKIE CLICKER MODE: Passive sleep debt recovery (allows endless play)
   // Always recovering slowly, even with moderate stimulant use
-  if (stimulantCount < 8) { // Increased threshold from 5
+  if (stimulantCount < 8) {
+    // Increased threshold from 5
     newState.sleepDebt = Math.max(0, newState.sleepDebt - 0.1 * dt); // Increased from 0.05
   }
 
@@ -193,7 +207,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
 
   // High chaos penalty (only at very high chaos, reduced impact)
   if (newState.chaos > 85) {
-    strainAccumulation *= 1 + ((newState.chaos - 85) * 0.01); // Reduced from 0.02, higher threshold
+    strainAccumulation *= 1 + (newState.chaos - 85) * 0.01; // Reduced from 0.02, higher threshold
   }
 
   // Hydration debt increases strain (more forgiving threshold)
@@ -221,16 +235,19 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   }
 
   // Memory crash from alcohol + empathogen (reduced intensity)
-  if (interactions.specialEffects.includes('memory_crash')) {
+  if (interactions.specialEffects.includes("memory_crash")) {
     newState.memoryIntegrity -= 0.5 * dt; // Reduced from 0.8
   }
 
   // Memory blackout from dissociative + sedative (reduced intensity)
-  if (interactions.specialEffects.includes('memory_blackout')) {
+  if (interactions.specialEffects.includes("memory_blackout")) {
     newState.memoryIntegrity -= 1.0 * dt; // Reduced from 1.5
   }
 
-  newState.memoryIntegrity = Math.max(0, Math.min(100, newState.memoryIntegrity));
+  newState.memoryIntegrity = Math.max(
+    0,
+    Math.min(100, newState.memoryIntegrity),
+  );
 
   // 7. Update confidence
   newState.confidence = totalConfidenceMod;
@@ -255,8 +272,11 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
   newState.timeRemaining -= dt;
 
   // 10. Tick down cooldowns
-  Object.keys(newState.actionCooldowns).forEach(actionId => {
-    newState.actionCooldowns[actionId] = Math.max(0, newState.actionCooldowns[actionId] - dt);
+  Object.keys(newState.actionCooldowns).forEach((actionId) => {
+    newState.actionCooldowns[actionId] = Math.max(
+      0,
+      newState.actionCooldowns[actionId] - dt,
+    );
   });
 
   // 11. COOKIE CLICKER MODE: Tick combo system
@@ -299,7 +319,7 @@ export function gameTick(state: GameState, deltaTime: number): GameState {
     newState.log.push({
       timestamp: 0,
       message: `🌅 Day ${newState.daysCompleted} dawns. +${xpGained} XP. Everything continues...`,
-      type: 'info',
+      type: "info",
     });
   }
 
@@ -314,12 +334,18 @@ export function calculateDistortionLevel(state: GameState): number {
   let level = 0;
 
   // Level 1: Confidence 75-85, Memory 30-50
-  if ((state.confidence >= 75 && state.confidence < 86) || (state.memoryIntegrity >= 15 && state.memoryIntegrity < 30)) {
+  if (
+    (state.confidence >= 75 && state.confidence < 86) ||
+    (state.memoryIntegrity >= 15 && state.memoryIntegrity < 30)
+  ) {
     level = 1;
   }
 
   // Level 2: Confidence 86-95, Memory 15-29
-  if ((state.confidence >= 86 && state.confidence < 96) || (state.memoryIntegrity >= 5 && state.memoryIntegrity < 15)) {
+  if (
+    (state.confidence >= 86 && state.confidence < 96) ||
+    (state.memoryIntegrity >= 5 && state.memoryIntegrity < 15)
+  ) {
     level = 2;
   }
 
@@ -344,7 +370,8 @@ export function checkCollapse(state: GameState): boolean {
   const hydrationPenalty = state.hydrationDebt * 0.2; // Reduced
   const chaosPenalty = state.chaos > 80 ? (state.chaos - 80) * 0.1 : 0; // Only kicks in above 80
 
-  const collapseThreshold = baseThreshold + energyBonus - hydrationPenalty - chaosPenalty;
+  const collapseThreshold =
+    baseThreshold + energyBonus - hydrationPenalty - chaosPenalty;
 
   return state.strain >= collapseThreshold;
 }
@@ -363,23 +390,23 @@ export function handleCollapse(state: GameState): GameState {
   // Add log entry (unless memory is completely gone)
   if (state.memoryIntegrity > 5) {
     const messages = [
-      '⚠️ You overdid it a little. Take it easy.',
-      '💫 Maybe slow down? Just a thought.',
-      '🌊 That was a lot. Breathing recommended.',
-      '⚡ Systems need a moment to recalibrate.',
+      "⚠️ You overdid it a little. Take it easy.",
+      "💫 Maybe slow down? Just a thought.",
+      "🌊 That was a lot. Breathing recommended.",
+      "⚡ Systems need a moment to recalibrate.",
     ];
     const message = messages[Math.floor(Math.random() * messages.length)];
 
     state.log.push({
       timestamp: 3600 - state.timeRemaining,
       message,
-      type: 'warning', // Changed from 'danger' to 'warning'
+      type: "warning", // Changed from 'danger' to 'warning'
     });
   } else {
     state.log.push({
       timestamp: 3600 - state.timeRemaining,
-      message: '[...wait what just happened?]',
-      type: 'warning',
+      message: "[...wait what just happened?]",
+      type: "warning",
       corrupted: true,
     });
   }
@@ -417,14 +444,14 @@ export function handleNightEnd(state: GameState): GameState {
   if (newState.memoryIntegrity > 10) {
     newState.log.push({
       timestamp: 3600,
-      message: 'Time\'s up. Night complete.',
-      type: 'info',
+      message: "Time's up. Night complete.",
+      type: "info",
     });
   } else {
     newState.log.push({
       timestamp: 3600,
-      message: '...something ended?',
-      type: 'info',
+      message: "...something ended?",
+      type: "info",
       corrupted: true,
     });
   }

@@ -92,7 +92,8 @@
 }
 
 @keyframes criticalPulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
   }
   50% {

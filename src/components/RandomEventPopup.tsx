@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { RandomEvent } from '../game/randomEvents';
-import './RandomEventPopup.css';
+import { useState, useEffect } from "react";
+import { RandomEvent } from "../game/randomEvents";
+import "./RandomEventPopup.css";
 
 interface RandomEventPopupProps {
   event: RandomEvent;
@@ -8,7 +8,11 @@ interface RandomEventPopupProps {
   onActivate: () => void;
 }
 
-export function RandomEventPopup({ event, timeRemaining, onActivate }: RandomEventPopupProps) {
+export function RandomEventPopup({
+  event,
+  timeRemaining,
+  onActivate,
+}: RandomEventPopupProps) {
   const [position] = useState({
     top: Math.random() * 60 + 20, // 20-80% from top
     left: Math.random() * 60 + 20, // 20-80% from left
@@ -25,16 +29,20 @@ export function RandomEventPopup({ event, timeRemaining, onActivate }: RandomEve
 
   const getRarityClass = () => {
     switch (event.rarity) {
-      case 'legendary': return 'rarity-legendary';
-      case 'epic': return 'rarity-epic';
-      case 'rare': return 'rarity-rare';
-      default: return 'rarity-common';
+      case "legendary":
+        return "rarity-legendary";
+      case "epic":
+        return "rarity-epic";
+      case "rare":
+        return "rarity-rare";
+      default:
+        return "rarity-common";
     }
   };
 
   return (
     <div
-      className={`random-event-popup ${getRarityClass()} ${shake ? 'shake' : ''}`}
+      className={`random-event-popup ${getRarityClass()} ${shake ? "shake" : ""}`}
       style={{
         top: `${position.top}%`,
         left: `${position.left}%`,

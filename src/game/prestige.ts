@@ -1,51 +1,54 @@
-import { GameState, KnowledgeLevel } from './types';
+import { GameState, KnowledgeLevel } from "./types";
 
 export const KNOWLEDGE_LEVELS: KnowledgeLevel[] = [
   {
     level: 0,
     xpRequired: 0,
-    name: 'First Night',
-    description: 'You know nothing.',
+    name: "First Night",
+    description: "You know nothing.",
     unlocks: [],
   },
   {
     level: 1,
     xpRequired: 100,
-    name: 'Things you\'re starting to notice',
-    description: 'Hydration Debt becomes visible',
-    unlocks: ['hydrationDebt', 'maintenanceTooltips'],
+    name: "Things you're starting to notice",
+    description: "Hydration Debt becomes visible",
+    unlocks: ["hydrationDebt", "maintenanceTooltips"],
   },
   {
     level: 2,
     xpRequired: 250,
-    name: 'You\'ve seen this before',
-    description: 'Sleep Debt visible, Test Your Gear unlocked',
-    unlocks: ['sleepDebt', 'testGear', 'basicInteractions'],
+    name: "You've seen this before",
+    description: "Sleep Debt visible, Test Your Gear unlocked",
+    unlocks: ["sleepDebt", "testGear", "basicInteractions"],
   },
   {
     level: 3,
     xpRequired: 500,
-    name: 'Recognizing patterns',
-    description: 'Strain meter visible, detailed interactions',
-    unlocks: ['strain', 'lieDown', 'detailedInteractions'],
+    name: "Recognizing patterns",
+    description: "Strain meter visible, detailed interactions",
+    unlocks: ["strain", "lieDown", "detailedInteractions"],
   },
   {
     level: 4,
     xpRequired: 1000,
-    name: 'Memory is unreliable',
-    description: 'Memory Integrity visible, log reliability tracking',
-    unlocks: ['memoryIntegrity', 'logReliability', 'achievementTracking'],
+    name: "Memory is unreliable",
+    description: "Memory Integrity visible, log reliability tracking",
+    unlocks: ["memoryIntegrity", "logReliability", "achievementTracking"],
   },
   {
     level: 5,
     xpRequired: 2000,
-    name: 'You understand The Night. It doesn\'t care.',
-    description: 'All systems visible, complete interaction graph',
-    unlocks: ['allMeters', 'completeInteractions', 'exactMultipliers'],
+    name: "You understand The Night. It doesn't care.",
+    description: "All systems visible, complete interaction graph",
+    unlocks: ["allMeters", "completeInteractions", "exactMultipliers"],
   },
 ];
 
-export function calculateExperience(state: GameState, collapsed: boolean): number {
+export function calculateExperience(
+  state: GameState,
+  collapsed: boolean,
+): number {
   // Base XP = Vibes / 100
   let baseXP = state.vibes / 100;
 
@@ -81,7 +84,9 @@ export function getKnowledgeLevel(totalXP: number): number {
 }
 
 export function getNextLevelInfo(currentLevel: number): KnowledgeLevel | null {
-  const nextLevel = KNOWLEDGE_LEVELS.find(lvl => lvl.level === currentLevel + 1);
+  const nextLevel = KNOWLEDGE_LEVELS.find(
+    (lvl) => lvl.level === currentLevel + 1,
+  );
   return nextLevel || null;
 }
 
@@ -114,7 +119,7 @@ export function calculateInsightPoints(totalVibesEarned: number): number {
  * Formula: 1 + (points * 0.01)
  */
 export function calculateInsightMultiplier(insightPoints: number): number {
-  return 1 + (insightPoints * 0.01);
+  return 1 + insightPoints * 0.01;
 }
 
 /**
@@ -171,8 +176,8 @@ export function performPrestige(state: GameState): GameState {
       ...state.log,
       {
         timestamp: 0,
-        message: `✨ PRESTIGE: Gained ${pointsGained} Insight Points! (Total: ${newInsightPoints}) All production +${(pointsGained * 1)}%`,
-        type: 'info',
+        message: `✨ PRESTIGE: Gained ${pointsGained} Insight Points! (Total: ${newInsightPoints}) All production +${pointsGained * 1}%`,
+        type: "info",
       },
     ],
     distortionLevel: 0,
@@ -208,7 +213,10 @@ export function getPrestigeInfo(state: GameState): {
 
   // Calculate vibes needed for next insight point
   const nextPointRequirement = Math.pow(potentialPoints + 1, 2) * 1000000;
-  const vibesNeededForNext = Math.max(0, nextPointRequirement - state.totalVibesEarned);
+  const vibesNeededForNext = Math.max(
+    0,
+    nextPointRequirement - state.totalVibesEarned,
+  );
 
   return {
     currentPoints,
