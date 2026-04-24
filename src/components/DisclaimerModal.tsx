@@ -30,10 +30,10 @@ export function DisclaimerModal({ onAccept }: DisclaimerModalProps) {
             </strong>
           </p>
           <p className="disclaimer-note">
-            This game uses abstracted mechanics and fictional substance names.
-            It does not provide dosage information, consumption guides, or
-            medical advice. The goal is to teach about compound risk through
-            systems thinking, not instruction.
+            This game uses abstracted mechanics and fictional substance names —
+            no real products, dosages, or legal statuses are referenced. It does
+            not provide consumption guides or medical advice. The goal is to
+            teach about compound risk through systems thinking, not instruction.
           </p>
         </div>
         <button className="modal-button primary" onClick={onAccept}>

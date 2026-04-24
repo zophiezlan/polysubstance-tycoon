@@ -66,7 +66,7 @@ export const RANDOM_EVENTS: RandomEvent[] = [
   {
     id: "hydration-break",
     name: "Hydration Break",
-    description: "Remember to drink water!",
+    description: "Turns out the body still wants water. Inconvenient.",
     icon: "💧",
     rarity: "common",
     duration: 20,
@@ -486,7 +486,7 @@ export class RandomEventManager {
   /**
    * Serialize for save/load
    */
-  serialize(): any {
+  serialize(): RandomEventManagerData {
     return {
       activeEvent: this.activeEvent,
       lastEventSpawn: this.lastEventSpawn,
@@ -498,15 +498,28 @@ export class RandomEventManager {
   /**
    * Deserialize from save
    */
-  deserialize(data: any): void {
-    if (!data) return;
+  deserialize(data: unknown): void {
+    if (!data || typeof data !== "object") return;
+    const d = data as Partial<RandomEventManagerData>;
 
-    this.activeEvent = data.activeEvent;
-    this.lastEventSpawn = data.lastEventSpawn || 0;
-    this.nextEventCheckTime = data.nextEventCheckTime || 0;
+    this.activeEvent = d.activeEvent ?? null;
+    this.lastEventSpawn = typeof d.lastEventSpawn === "number" ? d.lastEventSpawn : 0;
+    this.nextEventCheckTime =
+      typeof d.nextEventCheckTime === "number" ? d.nextEventCheckTime : 0;
 
-    if (data.eventCooldowns) {
-      this.eventCooldowns = new Map(data.eventCooldowns);
+    if (Array.isArray(d.eventCooldowns)) {
+      this.eventCooldowns = new Map(d.eventCooldowns);
     }
   }
+}
+
+export interface RandomEventManagerData {
+  activeEvent: {
+    event: RandomEvent;
+    spawnTime: number;
+    clickable: boolean;
+  } | null;
+  lastEventSpawn: number;
+  eventCooldowns: Array<[string, number]>;
+  nextEventCheckTime: number;
 }

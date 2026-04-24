@@ -1,10 +1,26 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface MainButtonProps {
   onClick: (event: { clientX: number; clientY: number }) => void;
   disabled: boolean;
   distortionLevel: number;
 }
+
+const BUTTON_TEXTS = [
+  "🌃 RUN THE NIGHT 🌃",
+  "✨ OPTIMIZE THE VIBES ✨",
+  "💊 MANAGE THE EXPERIENCE 💊",
+  "🎯 MAXIMIZE OUTPUT 🎯",
+];
+
+const DISTORTED_TEXTS = [
+  "✅ EVERYTHING IS FINE ✅",
+  "🔥 NO STOP DONT STOP 🔥",
+  "⭐ THE VIBES WANT MORE ⭐",
+  "👁️ THEY'RE WATCHING 👁️",
+  "💫 YOU CAN QUIT ANYTIME 💫",
+  "🌀 JUST ONE MORE CLICK 🌀",
+];
 
 export function MainButton({
   onClick,
@@ -13,26 +29,16 @@ export function MainButton({
 }: MainButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
 
-  const buttonTexts = [
-    "🌃 RUN THE NIGHT 🌃",
-    "✨ OPTIMIZE THE VIBES ✨",
-    "💊 MANAGE THE EXPERIENCE 💊",
-    "🎯 MAXIMIZE OUTPUT 🎯",
-  ];
-
-  const distortedTexts = [
-    "✅ EVERYTHING IS FINE ✅",
-    "🔥 NO STOP DONT STOP 🔥",
-    "⭐ THE VIBES WANT MORE ⭐",
-    "👁️ THEY'RE WATCHING 👁️",
-    "💫 YOU CAN QUIT ANYTIME 💫",
-    "🌀 JUST ONE MORE CLICK 🌀",
-  ];
-
-  const text =
-    distortionLevel >= 2 && Math.random() > 0.6
-      ? distortedTexts[Math.floor(Math.random() * distortedTexts.length)]
-      : buttonTexts[0];
+  // Text changes on distortion level transitions, not every render —
+  // prevents the label flickering between renders mid-second.
+  const [text, setText] = useState(BUTTON_TEXTS[0]);
+  useEffect(() => {
+    if (distortionLevel >= 2 && Math.random() > 0.6) {
+      setText(DISTORTED_TEXTS[Math.floor(Math.random() * DISTORTED_TEXTS.length)]);
+    } else {
+      setText(BUTTON_TEXTS[0]);
+    }
+  }, [distortionLevel]);
 
   const handleMouseClick = (event: React.MouseEvent) => {
     onClick({ clientX: event.clientX, clientY: event.clientY });

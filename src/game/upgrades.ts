@@ -1,4 +1,4 @@
-import { Upgrade } from "./types";
+import { Upgrade, GameState } from "./types";
 
 export const UPGRADES: Upgrade[] = [
   // Global Click Upgrades
@@ -235,7 +235,7 @@ export const UPGRADES: Upgrade[] = [
     id: "pgp-encryption",
     name: "PGP Encryption",
     description:
-      "Operational security. The feds will never know. Research Chemical Markets +50%.",
+      "Encrypted comms for paranoid vibes. You barely know what a key pair is. Research Chemical Markets +50%.",
     cost: 3000000,
     tier: 2,
     substanceId: "research",
@@ -946,7 +946,7 @@ export function getUpgrade(id: string): Upgrade | undefined {
   return UPGRADES.find((u) => u.id === id);
 }
 
-export function canPurchaseUpgrade(upgrade: Upgrade, state: any): boolean {
+export function canPurchaseUpgrade(upgrade: Upgrade, state: GameState): boolean {
   // Check cost
   if (state.vibes < upgrade.cost) return false;
 
@@ -982,7 +982,7 @@ export function canPurchaseUpgrade(upgrade: Upgrade, state: any): boolean {
   return true;
 }
 
-export function getAvailableUpgrades(state: any): Upgrade[] {
+export function getAvailableUpgrades(state: GameState): Upgrade[] {
   return UPGRADES.filter((upgrade) => canPurchaseUpgrade(upgrade, state));
 }
 

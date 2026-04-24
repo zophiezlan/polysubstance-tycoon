@@ -13,9 +13,11 @@ export function RandomEventPopup({
   timeRemaining,
   onActivate,
 }: RandomEventPopupProps) {
+  // Position is clamped well inside the viewport so the popup (translated
+  // by -50%/-50%) never gets cut off on small/mobile screens.
   const [position] = useState({
-    top: Math.random() * 60 + 20, // 20-80% from top
-    left: Math.random() * 60 + 20, // 20-80% from left
+    top: Math.random() * 50 + 25, // 25-75%
+    left: Math.random() * 50 + 25, // 25-75%
   });
   const ref = useRef<HTMLButtonElement>(null);
 
@@ -28,9 +30,13 @@ export function RandomEventPopup({
     }
   }, [timeRemaining]);
 
-  // Focus the popup so keyboard users can immediately activate with Enter/Space
+  // Only auto-focus if no other element currently holds focus — avoids
+  // stealing focus mid-interaction.
   useEffect(() => {
-    ref.current?.focus({ preventScroll: true });
+    const active = document.activeElement;
+    if (!active || active === document.body) {
+      ref.current?.focus({ preventScroll: true });
+    }
   }, [event.id]);
 
   const getRarityClass = () => {

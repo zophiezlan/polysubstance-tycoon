@@ -24,12 +24,19 @@ const SUFFIXES = [
 ];
 
 export function formatNumber(num: number, decimals: number = 3): string {
+  if (!isFinite(num)) return "∞";
   if (num < 0) {
     return "-" + formatNumber(-num, decimals);
   }
 
   if (num < 1000) {
     return Math.floor(num).toLocaleString();
+  }
+
+  // Beyond the largest named suffix (Vg = 1e63), fall back to scientific
+  // notation so the label stays readable instead of "1000000Vg".
+  if (num >= 1e66) {
+    return num.toExponential(2).replace("e+", "e");
   }
 
   // Find appropriate suffix

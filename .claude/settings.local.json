@@ -7,7 +7,8 @@
       "Bash(find \"/c/Users/AV/SlashDot/polysubstance-tycoon/src/components\" -name \"*.tsx\" -exec wc -l {} +)",
       "Bash(awk '{sum+=$1} END {print \"Total lines in components/:\", sum}')",
       "Bash(npx tsc *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(find /c/Users/AV/SlashDot/polysubstance-tycoon -type f \\\\\\( -name \"*.tsx\" -o -name \"*.ts\" \\\\\\) -exec grep -l \"message\\\\|toast\\\\|notify\\\\|about\\\\|footer\" {} \\\\;)"
     ]
   }
 }

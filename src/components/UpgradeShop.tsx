@@ -49,7 +49,7 @@ export function UpgradeShop({
         <h3>🔬 UPGRADES</h3>
         <div className="no-upgrades">
           <p>
-            No upgrades available. Purchase more substances to unlock upgrades!
+            No upgrades yet. You haven't broken enough ground. Keep consuming.
           </p>
         </div>
       </div>
@@ -77,11 +77,11 @@ export function UpgradeShop({
           if (flashSaleActive) tooltip += " — 50% off!";
 
           // Check if this is a synergy upgrade and if the synergy is active
-          const isSynergyUpgrade =
-            upgrade.synergySubstances && upgrade.synergySubstances.length > 0;
+          const synergySubstances = upgrade.synergySubstances ?? [];
+          const isSynergyUpgrade = synergySubstances.length > 0;
           const synergyActive =
             isSynergyUpgrade &&
-            upgrade.synergySubstances!.every(
+            synergySubstances.every(
               (sId) => (state.substances[sId] || 0) > 0,
             );
 
@@ -120,7 +120,7 @@ export function UpgradeShop({
               {isSynergyUpgrade && (
                 <div className="synergy-requirements">
                   <span className="synergy-label">Synergy:</span>
-                  {upgrade.synergySubstances!.map((sId, idx) => {
+                  {synergySubstances.map((sId, idx) => {
                     const substance = getSubstance(sId);
                     const owned = (state.substances[sId] || 0) > 0;
                     return (

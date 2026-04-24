@@ -78,22 +78,25 @@ function refundRemovedUpgrades(state: Record<string, unknown>): Record<string, u
  * Validates that loaded save data has the shape we expect. Returns true for
  * any supported version (legacy, v1, v2) — migration fills in missing fields.
  */
-export function validateSaveData(data: any): data is SaveData {
+export function validateSaveData(data: unknown): data is SaveData {
   if (!data || typeof data !== "object") {
     return false;
   }
 
-  if (typeof data.version !== "number") {
+  const d = data as Record<string, unknown>;
+
+  if (typeof d.version !== "number") {
     // Legacy format: state fields live directly on the root object.
-    return typeof data.vibes === "number";
+    return typeof d.vibes === "number";
   }
 
   // v1 and v2 share the same wrapper shape; the migration step reconciles fields.
+  const inner = d.state as Record<string, unknown> | undefined;
   return (
-    typeof data.timestamp === "number" &&
-    data.state &&
-    typeof data.state.vibes === "number" &&
-    typeof data.state.energy === "number"
+    typeof d.timestamp === "number" &&
+    !!inner &&
+    typeof inner.vibes === "number" &&
+    typeof inner.energy === "number"
   );
 }
 
@@ -101,9 +104,11 @@ export function validateSaveData(data: any): data is SaveData {
  * Migrates save data from older versions to current version. Unknown fields
  * from cut systems are silently dropped.
  */
-export function migrateSaveData(data: any): GameState {
-  const rawState =
-    typeof data?.version === "number" ? data.state : data;
+export function migrateSaveData(data: unknown): GameState {
+  const wrapper = (data ?? {}) as Record<string, unknown>;
+  const rawState = (
+    typeof wrapper.version === "number" ? wrapper.state : wrapper
+  ) as Record<string, unknown> | undefined;
   const stripped = refundRemovedUpgrades(stripOrphanFields(rawState ?? {}));
   const initialState = createInitialState();
 
