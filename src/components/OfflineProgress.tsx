@@ -1,4 +1,5 @@
 import { GameState } from "../game/types";
+import { useFocusTrap } from "../utils/useFocusTrap";
 import "./OfflineProgress.css";
 
 interface OfflineProgressProps {
@@ -13,6 +14,7 @@ export function OfflineProgress({
   offlineData,
   onClaim,
 }: OfflineProgressProps) {
+  const ref = useFocusTrap<HTMLDivElement>(onClaim);
   const { vibesGained, timeAway } = offlineData;
 
   // Format time away
@@ -30,11 +32,18 @@ export function OfflineProgress({
     <div className="offline-progress-overlay" onClick={onClaim}>
       <div
         className="offline-progress-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="offline-title"
+        ref={ref}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="offline-header">
-          <div className="offline-icon">💤</div>
-          <h2>Welcome Back!</h2>
+          <div className="offline-icon" aria-hidden="true">
+            💤
+          </div>
+          <h2 id="offline-title">Welcome Back!</h2>
         </div>
 
         <div className="offline-content">

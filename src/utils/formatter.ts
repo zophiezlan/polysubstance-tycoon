@@ -70,10 +70,10 @@ export function getConfidenceEmoji(confidence: number): string {
 }
 
 export function getConfidenceLabel(confidence: number): string {
-  if (confidence >= 95) return "You've never felt better!";
-  if (confidence >= 85) return "Feeling good!";
-  if (confidence >= 75) return "Pretty confident";
-  if (confidence >= 50) return "Doing okay";
-  if (confidence >= 30) return "A bit uncertain";
-  return "Stressed";
+  if (confidence >= 95) return "Invincible (citation needed)";
+  if (confidence >= 85) return "Convinced of your own genius";
+  if (confidence >= 75) return "Suspiciously certain";
+  if (confidence >= 50) return "Holding it together";
+  if (confidence >= 30) return "Second-guessing everything";
+  return "Spiralling, mildly";
 }

@@ -6,9 +6,14 @@ import { getSubstance } from "../game/substances";
 interface UpgradeShopProps {
   state: GameState;
   onPurchase: (upgradeId: string) => void;
+  flashSaleActive?: boolean;
 }
 
-export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
+export function UpgradeShop({
+  state,
+  onPurchase,
+  flashSaleActive = false,
+}: UpgradeShopProps) {
   // Filter to show only available and affordable upgrades
   const availableUpgrades = UPGRADES.filter((upgrade) => {
     if (state.upgrades.includes(upgrade.id)) return false;
@@ -52,11 +57,24 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
   }
 
   return (
-    <div className="upgrade-shop">
+    <div className={`upgrade-shop ${flashSaleActive ? "flash-sale-active" : ""}`}>
       <h3>🔬 UPGRADES</h3>
       <div className="upgrade-list">
         {availableUpgrades.slice(0, 8).map((upgrade) => {
-          const isPurchasable = canPurchaseUpgrade(upgrade, state);
+          const displayCost = flashSaleActive
+            ? Math.ceil(upgrade.cost * 0.5)
+            : upgrade.cost;
+          const isPurchasable =
+            canPurchaseUpgrade({ ...upgrade, cost: displayCost }, state);
+          const canAfford = state.vibes >= displayCost;
+
+          let tooltip: string;
+          if (canAfford) {
+            tooltip = `${displayCost.toLocaleString()} vibes`;
+          } else {
+            tooltip = `Need ${formatNumber(displayCost - state.vibes)} more vibes`;
+          }
+          if (flashSaleActive) tooltip += " — 50% off!";
 
           // Check if this is a synergy upgrade and if the synergy is active
           const isSynergyUpgrade =
@@ -90,8 +108,10 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
                   className="buy-button"
                   onClick={() => onPurchase(upgrade.id)}
                   disabled={!isPurchasable}
+                  title={tooltip}
+                  aria-label={`Buy upgrade ${upgrade.name}. ${tooltip}`}
                 >
-                  Buy ({formatNumber(upgrade.cost)} V)
+                  Buy ({formatNumber(displayCost)} V)
                 </button>
               </div>
               <div className="upgrade-description">{upgrade.description}</div>

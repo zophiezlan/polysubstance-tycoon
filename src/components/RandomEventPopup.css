@@ -145,6 +145,29 @@
   }
 }
 
+/* Reduced-motion overrides — kill float, shake, pulse, glow */
+.reduced-motion .random-event-popup,
+.reduced-motion .random-event-popup.shake,
+.reduced-motion .random-event-popup.rarity-legendary,
+.reduced-motion .event-glow {
+  animation: none !important;
+  transform: translate(-50%, -50%);
+}
+
+.reduced-motion .random-event-popup:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.reduced-motion .random-event-popup:active {
+  transform: translate(-50%, -50%) scale(0.97);
+}
+
+/* Keyboard focus */
+.random-event-popup:focus-visible {
+  outline: 3px solid var(--text-cyan);
+  outline-offset: 4px;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 600px) {
   .random-event-popup {

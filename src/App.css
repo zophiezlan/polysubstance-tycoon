@@ -1288,18 +1288,26 @@
   box-shadow: 0 0 10px var(--danger);
 }
 
-/* Distortion effects */
-.distortion-1 .stat-value,
-.distortion-1 .stat-bar-label {
+/* Distortion effects — suppressed when distortion is disabled or reduced-motion is on */
+.distortion-1:not(.disable-distortion):not(.reduced-motion) .stat-value,
+.distortion-1:not(.disable-distortion):not(.reduced-motion) .stat-bar-label {
   animation: text-shimmer 3s infinite;
 }
 
-.distortion-2 .stat-value {
+.distortion-2:not(.disable-distortion):not(.reduced-motion) .stat-value {
   animation: text-glitch 2s infinite;
 }
 
-.distortion-3 .stat-value {
+.distortion-3:not(.disable-distortion):not(.reduced-motion) .stat-value {
   animation: text-chaos 1s infinite;
+}
+
+/* Suppress button wobble animations when distortion is disabled */
+.disable-distortion .main-button.distorted-1,
+.disable-distortion .main-button.distorted-3,
+.reduced-motion .main-button.distorted-1,
+.reduced-motion .main-button.distorted-3 {
+  animation: none;
 }
 
 @keyframes text-shimmer {
@@ -1354,18 +1362,101 @@
 }
 
 /* Responsive - 4 Column Layout */
+@media (max-width: 1440px) {
+  /* Tighten gaps on common laptop displays */
+  .app-main {
+    gap: 0.6rem;
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  /* 3 columns for smaller desktops — fold "everything else" under vibes */
+  .app-main {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+      "vibes acquisitions upgrades"
+      "everything everything everything";
+  }
+
+  .column-vibes {
+    grid-area: vibes;
+  }
+
+  .column-acquisitions {
+    grid-area: acquisitions;
+  }
+
+  .column-upgrades {
+    grid-area: upgrades;
+  }
+
+  .column-everything-else {
+    grid-area: everything;
+    /* Lay out the column-4 sections horizontally when we have the width */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+  }
+
+  .column-everything-else .section-card {
+    border-bottom: none;
+    border-right: 1px solid rgba(138, 43, 226, 0.3);
+    padding: 0 0.8rem;
+    margin-bottom: 0;
+  }
+
+  .column-everything-else .section-card:last-child {
+    border-right: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  /* 2 columns */
+  .app-main {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "vibes acquisitions"
+      "upgrades everything"
+      "everything-bottom everything-bottom";
+  }
+
+  .column-everything-else {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .column-everything-else .section-card {
+    border-right: none;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+    padding: 1rem 0;
+  }
+
+  .column-everything-else .section-card:last-child {
+    border-bottom: none;
+  }
+}
+
 @media (max-width: 900px) {
   /* 2 columns for tablets */
   .app-main {
     grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: none;
   }
 
-  .column-vibes {
+  .column-vibes,
+  .column-everything-else {
     grid-column: 1 / -1;
   }
 
   .column-everything-else {
-    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .column-everything-else .section-card {
+    padding: 1rem 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
   }
 }
 
@@ -1465,6 +1556,264 @@
   font-size: 0.8rem;
   font-family: "Courier New", monospace;
   white-space: nowrap;
+}
+
+/* Save indicator (header badge) */
+.save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-right: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-cyan);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(0, 255, 255, 0.08);
+  font-family: "Courier New", monospace;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.save-indicator.visible {
+  opacity: 1;
+}
+
+.save-indicator.failed {
+  color: var(--danger);
+  border-color: rgba(255, 0, 255, 0.5);
+  background: rgba(255, 0, 255, 0.12);
+  pointer-events: auto;
+}
+
+/* Flash sale banner */
+.flash-sale-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 200, 0, 0.15),
+    rgba(255, 100, 200, 0.2),
+    rgba(255, 200, 0, 0.15)
+  );
+  border-bottom: 1px solid rgba(255, 200, 0, 0.6);
+  color: var(--warning);
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(255, 200, 0, 0.5);
+  animation: flash-sale-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.reduced-motion .flash-sale-banner {
+  animation: none;
+}
+
+.flash-sale-banner .flash-sale-countdown {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  color: var(--text-white);
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+@keyframes flash-sale-pulse {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Per-item flash sale highlight */
+.flash-sale-active .substance-item,
+.flash-sale-active .upgrade-item {
+  border-color: rgba(255, 200, 0, 0.6);
+  box-shadow: 0 0 8px rgba(255, 200, 0, 0.25);
+}
+
+.flash-sale-active .buy-button:not(:disabled) {
+  background: linear-gradient(135deg, var(--purple), #c97a00);
+  border: 1px solid rgba(255, 200, 0, 0.6);
+}
+
+.flash-sale-active .buy-button:not(:disabled)::after {
+  content: " 50% OFF";
+  font-size: 0.65rem;
+  color: var(--warning);
+  margin-left: 0.25rem;
+}
+
+/* Purchase toast (transient confirmations) */
+.purchase-toast-container {
+  position: fixed;
+  bottom: 4rem;
+  right: 1rem;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.4rem;
+  pointer-events: none;
+  max-width: 320px;
+}
+
+.purchase-toast {
+  background: var(--bg-panel);
+  border-left: 3px solid var(--success);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: toast-slide-in 0.25s ease-out;
+}
+
+.purchase-toast.toast-warning {
+  border-left-color: var(--warning);
+}
+
+.purchase-toast.toast-flash {
+  border-left-color: var(--warning);
+  background: linear-gradient(
+    90deg,
+    var(--bg-panel),
+    rgba(255, 200, 0, 0.15)
+  );
+}
+
+.purchase-toast .toast-amount {
+  color: var(--success);
+  font-family: "Courier New", monospace;
+  margin-left: 0.4rem;
+}
+
+.purchase-toast.toast-warning .toast-amount {
+  color: var(--warning);
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.reduced-motion .purchase-toast {
+  animation: none;
+}
+
+/* Achievement overflow badge */
+.achievement-overflow {
+  background: var(--bg-panel);
+  border: 2px dashed var(--success);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-cyan);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Settings close X */
+.settings-modal {
+  position: relative;
+}
+
+.modal-close-x {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--text-cyan);
+  border: 1px solid var(--purple-dark);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.15s;
+  z-index: 1;
+}
+
+.modal-close-x:hover {
+  background: rgba(255, 0, 255, 0.15);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Zero-state hint above main button */
+.zero-state-hint {
+  background: rgba(0, 255, 255, 0.08);
+  border: 1px dashed var(--text-cyan);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-cyan);
+  text-align: center;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+  max-width: 220px;
+  line-height: 1.4;
+  animation: hint-pulse 2.5s ease-in-out infinite;
+}
+
+.reduced-motion .zero-state-hint {
+  animation: none;
+}
+
+@keyframes hint-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Focus visibility — make keyboard navigation obvious */
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--text-cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.main-button:focus-visible {
+  outline: 3px solid var(--success);
+  outline-offset: 4px;
+}
+
+/* Screen-reader-only helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Scrollbar styling */

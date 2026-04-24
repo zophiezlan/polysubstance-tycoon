@@ -48,6 +48,14 @@ import "./App.css";
 const STORAGE_KEY = "polysubstance-tycoon-save";
 const TICK_INTERVAL = 1000; // 1 second
 
+type SaveStatus = "idle" | "saved" | "failed";
+type PurchaseToast = {
+  id: string;
+  message: string;
+  amount?: string;
+  variant?: "success" | "warning" | "flash";
+};
+
 function App() {
   const initialLoad = useRef<{ notice: SaveLoadNotice }>({ notice: null });
   const [state, setState] = useState<GameState>(() => {
@@ -69,11 +77,27 @@ function App() {
   const [saveNotice, setSaveNotice] = useState<SaveLoadNotice>(
     initialLoad.current.notice,
   );
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const saveStatusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [achievementQueue, setAchievementQueue] = useState<string[]>([]);
   const [floatingNumbers, setFloatingNumbers] = useState<
     Array<{ id: string; value: number; x: number; y: number }>
   >([]);
+  const [purchaseToasts, setPurchaseToasts] = useState<PurchaseToast[]>([]);
+
+  // A short clock that ticks every 250ms so flash-sale countdowns stay live
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, []);
+
+  const flashSaleRemainingMs = Math.max(
+    0,
+    state.flashSaleDiscountUntil - now,
+  );
+  const flashSaleActive = flashSaleRemainingMs > 0;
 
   // Random Event Manager (Golden Cookie equivalent)
   const randomEventManager = useRef<RandomEventManager>(
@@ -92,6 +116,15 @@ function App() {
   }, []); // Only run on mount
 
   const saveWriteCount = useRef(0);
+  const isFirstSave = useRef(true);
+
+  const enqueueToast = useCallback((toast: Omit<PurchaseToast, "id">) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setPurchaseToasts((prev) => [...prev, { ...toast, id }].slice(-5));
+    setTimeout(() => {
+      setPurchaseToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 2400);
+  }, []);
 
   // Save to localStorage whenever state changes (debounced for performance)
   useEffect(() => {
@@ -107,8 +140,20 @@ function App() {
         if (saveWriteCount.current % 10 === 1) {
           localStorage.setItem(STORAGE_KEY + "_backup", serialized);
         }
+
+        // Skip the indicator on first save (mount) — too noisy
+        if (!isFirstSave.current) {
+          setSaveStatus("saved");
+          if (saveStatusTimer.current) clearTimeout(saveStatusTimer.current);
+          saveStatusTimer.current = setTimeout(
+            () => setSaveStatus("idle"),
+            1200,
+          );
+        }
+        isFirstSave.current = false;
       } catch (error) {
         console.error("Failed to save to localStorage:", error);
+        setSaveStatus("failed");
       }
     }, 1000); // Debounce: save 1 second after last state change
 
@@ -196,185 +241,227 @@ function App() {
     setFloatingNumbers((prev) => prev.filter((fn) => fn.id !== id));
   }, []);
 
-  const handleMainClick = useCallback((event: React.MouseEvent) => {
-    const { clientX, clientY } = event;
-    setState((prevState) => {
-      let newState = { ...prevState };
+  const handleMainClick = useCallback(
+    (event: { clientX: number; clientY: number }) => {
+      const { clientX, clientY } = event;
+      setState((prevState) => {
+        let newState = { ...prevState };
 
-      // HYBRID MODEL: Clicking GENERATES energy (+0.5 per click)
-      newState.energy = Math.min(100, newState.energy + 0.5);
-      newState.totalEnergyGenerated += 0.5; // Track energy generation
+        // HYBRID MODEL: Clicking GENERATES energy (+0.5 per click)
+        newState.energy = Math.min(100, newState.energy + 0.5);
+        newState.totalEnergyGenerated += 0.5; // Track energy generation
 
-      // COOKIE CLICKER MODE: Update combo system
-      newState = updateCombo(newState);
-      const comboMultiplier = calculateComboMultiplier(newState.comboCount);
+        // COOKIE CLICKER MODE: Update combo system
+        newState = updateCombo(newState);
+        const comboMultiplier = calculateComboMultiplier(newState.comboCount);
 
-      const baseClickPower = calculateClickPower(prevState);
+        const baseClickPower = calculateClickPower(prevState);
 
-      // Energy provides a scaling bonus multiplier (0-100 → 1.0x-2.0x)
-      const energyBonus = 1 + newState.energy / 100; // 0 energy = 1x, 100 energy = 2x
+        // Energy provides a scaling bonus multiplier (0-100 → 1.0x-2.0x)
+        const energyBonus = 1 + newState.energy / 100; // 0 energy = 1x, 100 energy = 2x
 
-      // Apply combo multiplier!
-      let vibesGained = Math.floor(
-        baseClickPower * energyBonus * comboMultiplier,
-      );
-      vibesGained = Math.max(1, vibesGained); // Minimum 1 vibe per click
+        // Apply combo multiplier!
+        let vibesGained = Math.floor(
+          baseClickPower * energyBonus * comboMultiplier,
+        );
+        vibesGained = Math.max(1, vibesGained); // Minimum 1 vibe per click
 
-      newState.vibes += vibesGained;
-      newState.totalVibesEarned += vibesGained;
-      newState.totalClicks += 1;
+        newState.vibes += vibesGained;
+        newState.totalVibesEarned += vibesGained;
+        newState.totalClicks += 1;
 
-      // Track highest single click
-      if (vibesGained > newState.highestSingleClick) {
-        newState.highestSingleClick = vibesGained;
-      }
+        // Track highest single click
+        if (vibesGained > newState.highestSingleClick) {
+          newState.highestSingleClick = vibesGained;
+        }
 
-      // Minimal chaos increase - make it VERY easy to manage
-      const chaosIncrease =
-        Math.random() * 1.5 * (1 - calculateChaosDampening(prevState));
-      newState.chaos = Math.min(100, newState.chaos + chaosIncrease);
+        // Minimal chaos increase - make it VERY easy to manage
+        const chaosIncrease =
+          Math.random() * 1.5 * (1 - calculateChaosDampening(prevState));
+        newState.chaos = Math.min(100, newState.chaos + chaosIncrease);
 
-      // Lore-appropriate messages based on state
-      let message = "Running the night.";
-      const energyLevel = newState.energy;
-      if (energyLevel > 80) {
-        message = "Vibing hard.";
-      } else if (energyLevel < 30) {
-        message = "Coasting on fumes.";
-      }
-      if (newState.chaos > 80) {
-        message = "Everything is fine.";
-      }
-      if (newState.comboCount > 100) {
-        message = `${newState.comboCount}x COMBO!!!`;
-      }
+        // Lore-appropriate messages based on state
+        let message = "Running the night.";
+        const energyLevel = newState.energy;
+        if (energyLevel > 80) {
+          message = "Vibing hard.";
+        } else if (energyLevel < 30) {
+          message = "Coasting on fumes.";
+        }
+        if (newState.chaos > 80) {
+          message = "Everything is fine.";
+        }
+        if (newState.comboCount > 100) {
+          message = `${newState.comboCount}x COMBO!!!`;
+        }
 
-      // Only log occasionally to reduce spam
-      if (Math.random() < 0.15) {
-        const bonusText =
-          energyLevel > 50 ? ` (⚡${(energyBonus * 100).toFixed(0)}%)` : "";
-        const comboText =
-          newState.comboCount > 25 ? ` 🔥${newState.comboCount}x` : "";
+        // Only log occasionally to reduce spam
+        if (Math.random() < 0.15) {
+          const bonusText =
+            energyLevel > 50 ? ` (⚡${(energyBonus * 100).toFixed(0)}%)` : "";
+          const comboText =
+            newState.comboCount > 25 ? ` 🔥${newState.comboCount}x` : "";
+          newState.log.push({
+            timestamp: 3600 - newState.timeRemaining,
+            message: `${message} Vibes +${vibesGained}${bonusText}${comboText}`,
+            type: "info",
+          });
+        }
+
+        // Create floating number
+        if (prevState.showFloatingNumbers) {
+          setFloatingNumbers((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString() + Math.random(),
+              value: vibesGained,
+              x: clientX,
+              y: clientY,
+            },
+          ]);
+        }
+
+        return newState;
+      });
+    },
+    [],
+  );
+
+  const handlePurchase = useCallback(
+    (substanceId: string) => {
+      let toastQueued = false;
+      setState((prevState) => {
+        const substance = getSubstance(substanceId);
+        if (!substance) return prevState;
+
+        const owned = prevState.substances[substanceId] || 0;
+        const baseVibesCost = getSubstanceCost(substance, owned);
+        const energyCost = getSubstanceEnergyCost(substance);
+
+        const now = Date.now();
+        const flashSaleActive = prevState.flashSaleDiscountUntil > now;
+        const vibesCost = flashSaleActive
+          ? Math.ceil(baseVibesCost * 0.5)
+          : baseVibesCost;
+
+        // Check both vibes and energy
+        if (prevState.vibes < vibesCost || prevState.energy < energyCost)
+          return prevState;
+
+        const newState = { ...prevState };
+        newState.vibes -= vibesCost;
+        newState.energy = Math.max(0, newState.energy - energyCost);
+        newState.substances[substanceId] = owned + 1;
+
+        // Track statistics
+        newState.totalSubstancesPurchased += 1;
+
+        // Apply time extension immediately
+        if (substance.timeExtension) {
+          newState.timeRemaining += substance.timeExtension;
+        }
+
+        // Flash sale is consumed on a single purchase
+        if (flashSaleActive) {
+          newState.flashSaleDiscountUntil = 0;
+        }
+
+        // Bad batch: next substance purchase applies chaos/strain spike, then clears
+        let badBatch = false;
+        if (prevState.badBatchDebuffUntil > now) {
+          newState.chaos = Math.min(100, newState.chaos + 20);
+          newState.strain += 10;
+          newState.badBatchDebuffUntil = 0;
+          badBatch = true;
+          newState.log.push({
+            timestamp: 3600 - newState.timeRemaining,
+            message: `⚠️ Bad batch! Chaos +20, strain +10.`,
+            type: "warning",
+          });
+        }
+
         newState.log.push({
           timestamp: 3600 - newState.timeRemaining,
-          message: `${message} Vibes +${vibesGained}${bonusText}${comboText}`,
+          message: flashSaleActive
+            ? `💸 Purchased ${substance.name} (x${owned + 1}) [50% off!]`
+            : `Purchased ${substance.name} (x${owned + 1}) [-${energyCost} energy]`,
           type: "info",
         });
-      }
 
-      // Create floating number
-      if (prevState.showFloatingNumbers) {
-        setFloatingNumbers((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString() + Math.random(),
-            value: vibesGained,
-            x: clientX,
-            y: clientY,
-          },
-        ]);
-      }
+        if (!toastQueued && !newState.muteNotifications) {
+          toastQueued = true;
+          if (badBatch) {
+            enqueueToast({
+              message: `⚠️ Bad batch on ${substance.name}!`,
+              amount: "+20 chaos / +10 strain",
+              variant: "warning",
+            });
+          } else {
+            enqueueToast({
+              message: `✓ ${substance.name} x${owned + 1}`,
+              amount: `-${formatNumber(vibesCost)} V`,
+              variant: flashSaleActive ? "flash" : "success",
+            });
+          }
+        }
 
-      return newState;
-    });
-  }, []);
+        return newState;
+      });
+    },
+    [enqueueToast],
+  );
 
-  const handlePurchase = useCallback((substanceId: string) => {
-    setState((prevState) => {
-      const substance = getSubstance(substanceId);
-      if (!substance) return prevState;
+  const handlePurchaseUpgrade = useCallback(
+    (upgradeId: string) => {
+      let toastQueued = false;
+      setState((prevState) => {
+        const upgrade = getUpgrade(upgradeId);
+        if (!upgrade) return prevState;
 
-      const owned = prevState.substances[substanceId] || 0;
-      const baseVibesCost = getSubstanceCost(substance, owned);
-      const energyCost = getSubstanceEnergyCost(substance);
+        const now = Date.now();
+        const flashSaleActive = prevState.flashSaleDiscountUntil > now;
+        const cost = flashSaleActive
+          ? Math.ceil(upgrade.cost * 0.5)
+          : upgrade.cost;
 
-      const now = Date.now();
-      const flashSaleActive = prevState.flashSaleDiscountUntil > now;
-      const vibesCost = flashSaleActive
-        ? Math.ceil(baseVibesCost * 0.5)
-        : baseVibesCost;
+        // canPurchaseUpgrade checks cost against upgrade.cost; re-check with discount.
+        if (prevState.vibes < cost) return prevState;
+        if (!canPurchaseUpgrade({ ...upgrade, cost }, prevState))
+          return prevState;
 
-      // Check both vibes and energy
-      if (prevState.vibes < vibesCost || prevState.energy < energyCost)
-        return prevState;
+        const newState = { ...prevState };
+        newState.vibes -= cost;
+        newState.upgrades.push(upgradeId);
 
-      const newState = { ...prevState };
-      newState.vibes -= vibesCost;
-      newState.energy = Math.max(0, newState.energy - energyCost);
-      newState.substances[substanceId] = owned + 1;
+        // Track statistics
+        newState.totalUpgradesPurchased += 1;
 
-      // Track statistics
-      newState.totalSubstancesPurchased += 1;
+        if (flashSaleActive) {
+          newState.flashSaleDiscountUntil = 0;
+        }
 
-      // Apply time extension immediately
-      if (substance.timeExtension) {
-        newState.timeRemaining += substance.timeExtension;
-      }
-
-      // Flash sale is consumed on a single purchase
-      if (flashSaleActive) {
-        newState.flashSaleDiscountUntil = 0;
-      }
-
-      // Bad batch: next substance purchase applies chaos/strain spike, then clears
-      if (prevState.badBatchDebuffUntil > now) {
-        newState.chaos = Math.min(100, newState.chaos + 20);
-        newState.strain += 10;
-        newState.badBatchDebuffUntil = 0;
         newState.log.push({
           timestamp: 3600 - newState.timeRemaining,
-          message: `⚠️ Bad batch! Chaos +20, strain +10.`,
-          type: "warning",
+          message: flashSaleActive
+            ? `🔬 Unlocked: ${upgrade.name} [50% off!]`
+            : `🔬 Unlocked: ${upgrade.name}`,
+          type: "info",
         });
-      }
 
-      newState.log.push({
-        timestamp: 3600 - newState.timeRemaining,
-        message: flashSaleActive
-          ? `💸 Purchased ${substance.name} (x${owned + 1}) [50% off!]`
-          : `Purchased ${substance.name} (x${owned + 1}) [-${energyCost} energy]`,
-        type: "info",
+        if (!toastQueued && !newState.muteNotifications) {
+          toastQueued = true;
+          enqueueToast({
+            message: `🔬 ${upgrade.name}`,
+            amount: `-${formatNumber(cost)} V`,
+            variant: flashSaleActive ? "flash" : "success",
+          });
+        }
+
+        return newState;
       });
-
-      return newState;
-    });
-  }, []);
-
-  const handlePurchaseUpgrade = useCallback((upgradeId: string) => {
-    setState((prevState) => {
-      const upgrade = getUpgrade(upgradeId);
-      if (!upgrade) return prevState;
-
-      const now = Date.now();
-      const flashSaleActive = prevState.flashSaleDiscountUntil > now;
-      const cost = flashSaleActive ? Math.ceil(upgrade.cost * 0.5) : upgrade.cost;
-
-      // canPurchaseUpgrade checks cost against upgrade.cost; re-check with discount.
-      if (prevState.vibes < cost) return prevState;
-      if (!canPurchaseUpgrade({ ...upgrade, cost }, prevState)) return prevState;
-
-      const newState = { ...prevState };
-      newState.vibes -= cost;
-      newState.upgrades.push(upgradeId);
-
-      // Track statistics
-      newState.totalUpgradesPurchased += 1;
-
-      if (flashSaleActive) {
-        newState.flashSaleDiscountUntil = 0;
-      }
-
-      newState.log.push({
-        timestamp: 3600 - newState.timeRemaining,
-        message: flashSaleActive
-          ? `🔬 Unlocked: ${upgrade.name} [50% off!]`
-          : `🔬 Unlocked: ${upgrade.name}`,
-        type: "info",
-      });
-
-      return newState;
-    });
-  }, []);
+    },
+    [enqueueToast],
+  );
 
   const handleMaintenance = useCallback((actionId: string) => {
     setState((prevState) => {
@@ -605,9 +692,32 @@ function App() {
 
   const autoClickerTier = getAutoClickerTier(state);
 
+  // Modal priority: Disclaimer > OfflineProgress > Settings.
+  // RandomEventPopup, save notice, achievement toasts, and purchase toasts are
+  // non-modal and may coexist with whichever modal is open.
+  const showDisclaimer = !state.hasSeenDisclaimer;
+  const showOfflineProgress =
+    !showDisclaimer &&
+    !!state.offlineProgressPending &&
+    !state.offlineProgressPending.claimed;
+  const showSettings =
+    !showDisclaimer && !showOfflineProgress && state.showSettings;
+
+  // Zero-state hint shows for new players with nothing purchased and few clicks
+  const showZeroStateHint =
+    state.totalClicks < 5 &&
+    Object.keys(state.substances).length === 0 &&
+    !showDisclaimer;
+
+  const exactVibes = Math.floor(state.vibes).toLocaleString();
+  const exactPerSecond = vibesPerSecond.toFixed(2);
+
+  const visibleAchievements = achievementQueue.slice(0, 3);
+  const hiddenAchievementCount = Math.max(0, achievementQueue.length - 3);
+
   return (
     <div
-      className={`app font-${state.fontSize} ${state.reducedMotion ? "reduced-motion" : ""} distortion-${state.distortionLevel}`}
+      className={`app font-${state.fontSize} ${state.reducedMotion ? "reduced-motion" : ""} ${state.disableDistortion ? "disable-distortion" : ""} distortion-${state.distortionLevel}`}
     >
       <header className="app-header">
         <div className="header-left">
@@ -617,7 +727,12 @@ function App() {
         <div className="header-stats">
           <div className="header-stat">
             <span className="header-stat-label">Vibes:</span>
-            <span className="header-stat-value vibes">
+            <span
+              className="header-stat-value vibes"
+              title={`Exact: ${exactVibes}`}
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {formatNumber(state.vibes)}
             </span>
           </div>
@@ -625,7 +740,14 @@ function App() {
             <div className="header-stat-label-small">
               Energy {Math.floor(state.energy)}
             </div>
-            <div className="header-bar">
+            <div
+              className="header-bar"
+              role="progressbar"
+              aria-label="Energy"
+              aria-valuenow={Math.floor(state.energy)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
               <div
                 className={`header-bar-fill ${state.energy < 20 ? "danger" : state.energy < 50 ? "warning" : "normal"}`}
                 style={{ width: `${state.energy}%` }}
@@ -636,7 +758,14 @@ function App() {
             <div className="header-stat-label-small">
               Chaos {Math.floor(state.chaos)}
             </div>
-            <div className="header-bar">
+            <div
+              className="header-bar"
+              role="progressbar"
+              aria-label="Chaos"
+              aria-valuenow={Math.floor(state.chaos)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
               <div
                 className={`header-bar-fill ${state.chaos > 70 ? "danger" : state.chaos < 30 ? "low" : "normal"}`}
                 style={{ width: `${state.chaos}%` }}
@@ -644,27 +773,63 @@ function App() {
             </div>
           </div>
           <div className="header-stat">
-            <span className="header-stat-label">⏱</span>
-            <span className="header-stat-value time">
+            <span className="header-stat-label" aria-hidden="true">
+              ⏱
+            </span>
+            <span
+              className="header-stat-value time"
+              aria-label="Time remaining"
+            >
               {formatTime(state.timeRemaining)}
             </span>
           </div>
         </div>
 
         <div className="header-right">
-          <button className="settings-button" onClick={handleToggleSettings}>
+          <span
+            className={`save-indicator ${saveStatus !== "idle" ? "visible" : ""} ${saveStatus === "failed" ? "failed" : ""}`}
+            role="status"
+            aria-live="polite"
+          >
+            {saveStatus === "failed" ? "⚠ Save failed" : "💾 Saved"}
+          </span>
+          <button
+            type="button"
+            className="settings-button"
+            onClick={handleToggleSettings}
+            aria-label="Open settings"
+          >
             ⚙️ Settings
           </button>
         </div>
       </header>
+
+      {flashSaleActive && (
+        <div className="flash-sale-banner" role="status" aria-live="polite">
+          <span>💸 FLASH SALE — 50% off your next purchase!</span>
+          <span className="flash-sale-countdown">
+            {Math.ceil(flashSaleRemainingMs / 1000)}s
+          </span>
+        </div>
+      )}
 
       <main className="app-main">
         {/* Column 1: Vibes - Big Clicker */}
         <div className="game-column column-vibes">
           <div className="vibes-display">
             <div className="vibes-label">VIBES</div>
-            <div className="vibes-value">{formatNumber(state.vibes)}</div>
-            <div className="vibes-per-second">
+            <div
+              className="vibes-value"
+              title={`Exact: ${exactVibes}`}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {formatNumber(state.vibes)}
+            </div>
+            <div
+              className="vibes-per-second"
+              title={`${exactPerSecond} vibes per second`}
+            >
               per second: {formatNumber(vibesPerSecond, 1)}
               {autoClickerTier > 0 && (
                 <span
@@ -676,6 +841,13 @@ function App() {
               )}
             </div>
           </div>
+
+          {showZeroStateHint && (
+            <div className="zero-state-hint" role="note">
+              👇 Click the button to earn vibes. Buy a substance to start
+              passive production.
+            </div>
+          )}
 
           <div className="main-action-container">
             <MainButton
@@ -693,12 +865,20 @@ function App() {
 
         {/* Column 2: Acquisitions */}
         <div className="game-column column-acquisitions">
-          <SubstanceShop state={state} onPurchase={handlePurchase} />
+          <SubstanceShop
+            state={state}
+            onPurchase={handlePurchase}
+            flashSaleActive={flashSaleActive}
+          />
         </div>
 
         {/* Column 3: Upgrades */}
         <div className="game-column column-upgrades">
-          <UpgradeShop state={state} onPurchase={handlePurchaseUpgrade} />
+          <UpgradeShop
+            state={state}
+            onPurchase={handlePurchaseUpgrade}
+            flashSaleActive={flashSaleActive}
+          />
         </div>
 
         {/* Column 4: Everything Else */}
@@ -732,10 +912,16 @@ function App() {
           <span className="footer-stat">
             Nights Completed: {state.nightsCompleted || 0}
           </span>
-          <span className="footer-stat">
+          <span
+            className="footer-stat"
+            title={`Exact: ${Math.floor(state.totalVibesEarned).toLocaleString()}`}
+          >
             Total Vibes Earned: {formatNumber(state.totalVibesEarned)}
           </span>
-          <span className="footer-stat">
+          <span
+            className="footer-stat"
+            title={`Exact: ${state.totalClicks.toLocaleString()}`}
+          >
             Total Clicks: {formatNumber(state.totalClicks)}
           </span>
           {state.achievements && state.achievements.length > 0 && (
@@ -747,8 +933,13 @@ function App() {
       </footer>
 
       {!state.muteNotifications && achievementQueue.length > 0 && (
-        <div className="achievement-toast">
-          {achievementQueue.slice(0, 3).map((achId, index) => {
+        <div
+          className="achievement-toast"
+          role="status"
+          aria-live="polite"
+          aria-label={`${achievementQueue.length} achievement${achievementQueue.length > 1 ? "s" : ""} unlocked`}
+        >
+          {visibleAchievements.map((achId, index) => {
             const ach = getAchievement(achId);
             return ach ? (
               <div
@@ -761,6 +952,11 @@ function App() {
               </div>
             ) : null;
           })}
+          {hiddenAchievementCount > 0 && (
+            <div className="achievement-overflow">
+              +{hiddenAchievementCount} more queued
+            </div>
+          )}
         </div>
       )}
 
@@ -776,6 +972,27 @@ function App() {
         />
       ))}
 
+      {/* Purchase toast container */}
+      {purchaseToasts.length > 0 && (
+        <div
+          className="purchase-toast-container"
+          role="status"
+          aria-live="polite"
+        >
+          {purchaseToasts.map((toast) => (
+            <div
+              key={toast.id}
+              className={`purchase-toast toast-${toast.variant ?? "success"}`}
+            >
+              {toast.message}
+              {toast.amount && (
+                <span className="toast-amount">{toast.amount}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Random Event Popup (Golden Cookie equivalent) */}
       {activeRandomEvent && (
         <RandomEventPopup
@@ -784,12 +1001,6 @@ function App() {
           onActivate={handleActivateRandomEvent}
         />
       )}
-
-      {/* Offline Progress Welcome */}
-      <OfflineProgressManager
-        gameState={state}
-        onClaimOfflineProgress={handleClaimOfflineProgress}
-      />
 
       {saveNotice && (
         <div
@@ -802,6 +1013,7 @@ function App() {
               : "⚠️ Save file was unrecoverable. Starting fresh."}
           </span>
           <button
+            type="button"
             className="save-notice-dismiss"
             onClick={handleDismissSaveNotice}
           >
@@ -810,11 +1022,17 @@ function App() {
         </div>
       )}
 
-      {!state.hasSeenDisclaimer && (
-        <DisclaimerModal onAccept={handleDisclaimerAccept} />
+      {/* Modals — priority order, only one rendered at a time */}
+      {showDisclaimer && <DisclaimerModal onAccept={handleDisclaimerAccept} />}
+
+      {showOfflineProgress && (
+        <OfflineProgressManager
+          gameState={state}
+          onClaimOfflineProgress={handleClaimOfflineProgress}
+        />
       )}
 
-      {state.showSettings && (
+      {showSettings && (
         <SettingsModal
           state={state}
           onClose={handleToggleSettings}

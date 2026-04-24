@@ -10,21 +10,42 @@ import { hasUnlock } from "../game/prestige";
 interface SubstanceShopProps {
   state: GameState;
   onPurchase: (substanceId: string) => void;
+  flashSaleActive?: boolean;
 }
 
-export function SubstanceShop({ state, onPurchase }: SubstanceShopProps) {
+export function SubstanceShop({
+  state,
+  onPurchase,
+  flashSaleActive = false,
+}: SubstanceShopProps) {
   const showDetailed = hasUnlock(state.knowledgeLevel, "detailedInteractions");
 
   return (
-    <div className="substance-shop">
+    <div className={`substance-shop ${flashSaleActive ? "flash-sale-active" : ""}`}>
       <h3>🏪 ACQUISITIONS</h3>
       <div className="substance-list">
         {SUBSTANCES.map((substance) => {
           const owned = state.substances[substance.id] || 0;
-          const vibesCost = getSubstanceCost(substance, owned);
+          const baseCost = getSubstanceCost(substance, owned);
+          const vibesCost = flashSaleActive
+            ? Math.ceil(baseCost * 0.5)
+            : baseCost;
           const energyCost = getSubstanceEnergyCost(substance);
-          const canAfford =
-            state.vibes >= vibesCost && state.energy >= energyCost;
+          const canAffordVibes = state.vibes >= vibesCost;
+          const canAffordEnergy = state.energy >= energyCost;
+          const canAfford = canAffordVibes && canAffordEnergy;
+
+          let tooltip: string;
+          if (canAfford) {
+            tooltip = `Costs ${vibesCost.toLocaleString()} vibes and ${energyCost} energy`;
+          } else if (!canAffordVibes && !canAffordEnergy) {
+            tooltip = `Need ${formatNumber(vibesCost - state.vibes)} more vibes and ${Math.ceil(energyCost - state.energy)} more energy`;
+          } else if (!canAffordVibes) {
+            tooltip = `Need ${formatNumber(vibesCost - state.vibes)} more vibes`;
+          } else {
+            tooltip = `Need ${Math.ceil(energyCost - state.energy)} more energy`;
+          }
+          if (flashSaleActive) tooltip += " — 50% off!";
 
           return (
             <div key={substance.id} className="substance-item">
@@ -37,7 +58,8 @@ export function SubstanceShop({ state, onPurchase }: SubstanceShopProps) {
                   className="buy-button"
                   onClick={() => onPurchase(substance.id)}
                   disabled={!canAfford}
-                  title={`Costs ${formatNumber(vibesCost)} vibes and ${energyCost} energy`}
+                  title={tooltip}
+                  aria-label={`Buy ${substance.name}. ${tooltip}`}
                 >
                   Buy ({formatNumber(vibesCost)} V | {energyCost} E)
                 </button>

@@ -1,12 +1,23 @@
+import { useFocusTrap } from "../utils/useFocusTrap";
+
 interface DisclaimerModalProps {
   onAccept: () => void;
 }
 
 export function DisclaimerModal({ onAccept }: DisclaimerModalProps) {
+  const ref = useFocusTrap<HTMLDivElement>();
+
   return (
     <div className="modal-overlay">
-      <div className="modal disclaimer-modal">
-        <h2>⚠️ THE FINE PRINT THAT ISN'T FINE</h2>
+      <div
+        className="modal disclaimer-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="disclaimer-title"
+        ref={ref}
+        tabIndex={-1}
+      >
+        <h2 id="disclaimer-title">⚠️ THE FINE PRINT THAT ISN'T FINE</h2>
         <div className="modal-content">
           <p>
             This is satirical systems fiction. It cannot tell you what's safe.

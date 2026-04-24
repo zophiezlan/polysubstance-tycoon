@@ -1,5 +1,6 @@
 import { GameState } from "../game/types";
 import { formatNumber, formatTime } from "../utils/formatter";
+import { useFocusTrap } from "../utils/useFocusTrap";
 
 interface SettingsModalProps {
   state: GameState;
@@ -28,10 +29,28 @@ export function SettingsModal({
   onChangeFontSize,
   onReset,
 }: SettingsModalProps) {
+  const ref = useFocusTrap<HTMLDivElement>(onClose);
+
   return (
-    <div className="modal-overlay">
-      <div className="modal settings-modal">
-        <h2>⚙️ SETTINGS</h2>
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal settings-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+        ref={ref}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="modal-close-x"
+          onClick={onClose}
+          aria-label="Close settings"
+        >
+          ✕
+        </button>
+        <h2 id="settings-title">⚙️ SETTINGS</h2>
 
         <div className="modal-content">
           <div className="settings-section">
